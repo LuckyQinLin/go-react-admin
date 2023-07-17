@@ -4,4 +4,5 @@ admin-api/.idea
 admin-web/build
 admin-web/.idea
 admin-web/node_modules
+admin-web/yarn.lock
 log
