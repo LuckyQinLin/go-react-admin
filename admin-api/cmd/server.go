@@ -15,6 +15,7 @@ var serverCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		println(banner)
 		router.Run(Param.port)
 	},
 }
