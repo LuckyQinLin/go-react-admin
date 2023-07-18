@@ -22,6 +22,14 @@ const toml = `
     run-model = "debug"
     # 白名单
     white-list = ["/user/login", "/user/register", "/user/captcha"]
+# 数据库配置
+[db]
+	host = "192.168.98.128""
+	port = 5432
+	username = "admin""
+	password = "123456"
+	db-name = "admin_db"
+	schema = "public"
 # jwt配置信息
 [jwt]
     issuer = "Lucky.麒麟"
