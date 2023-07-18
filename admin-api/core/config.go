@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pelletier/go-toml/v2"
 	"os"
@@ -11,6 +12,7 @@ var Config *Configuration
 // Configuration 配置表
 type Configuration struct {
 	Web    Server    `toml:"web" json:"web"` // web服务器配置
+	Db     Database  `toml:"db" json:"db"`   // 数据库配置
 	Jwt    JwtConfig `toml:"jwt" json:"jwt"` // jwt配置
 	Logger Logger    `toml:"log" json:"log"` // 日志配置
 }
@@ -24,6 +26,26 @@ type Server struct {
 	MaxHeaderBytes int      `toml:"max-header-bytes" json:"max-header-bytes"` // 最大头
 	RunModel       string   `toml:"dev-model" json:"run-model"`               // 运行模型
 	WhiteList      []string `toml:"white-list" json:"white-list"`             // 白名单
+}
+
+// Database 数据库配置
+type Database struct {
+	Host     string `toml:"host" json:"host"`         // 地址
+	Port     int64  `toml:"port" json:"port"`         // 端口
+	Username string `toml:"username" json:"username"` // 用户
+	Password string `toml:"password" json:"password"` // 密码
+	DbName   string `toml:"db-name" json:"dbName"`    // 数据库
+	Schema   string `toml:"schema" json:"schema"`     // 模式
+}
+
+func (d Database) Link() string {
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d search_path=%s sslmode=disable TimeZone=Asia/Shanghai",
+		d.Host,
+		d.Username,
+		d.Password,
+		d.DbName,
+		d.Port,
+		d.Schema)
 }
 
 // JwtConfig jwt配置
