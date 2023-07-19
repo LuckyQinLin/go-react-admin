@@ -1,12 +1,27 @@
 package entity
 
 // Role 角色表
-type Role struct{}
-
-// RoleDept 角色部门
-type RoleDept struct {
+type Role struct {
+	RoleId            int64  `gorm:"column:post_id;primaryKey;not null;autoIncrement;comment:角色id" json:"roleId"`
+	RoleName          string `gorm:"column:post_code;not null;size:64;comment:角色名称" json:"roleName"`
+	RoleKey           string `gorm:"column:post_name;not null;size:50;comment:角色权限字符串" json:"roleKey"`
+	RoleSort          int    `gorm:"column:post_sort;default:0;comment:显示顺序" json:"roleSort"`
+	DataScope         int    `gorm:"column:data_scope;default:1;comment:数据范围(1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限)" json:"dataScope"`
+	MenuCheckStrictly bool   `gorm:"column:menu_check_strictly;type:boolean;default:true;comment:菜单树选择项是否关联显示" json:"menuCheckStrictly"`
+	DeptCheckStrictly bool   `gorm:"column:dept_check_strictly;type:boolean;default:true;comment:部门树选择项是否关联显示" json:"deptCheckStrictly"`
+	Status            int    `gorm:"column:status;default:1;comment:角色状态（1正常 0停用）" json:"status"`
+	Remark            string `gorm:"size:500;default:null;comment:备注" json:"remark"`
+	BaseField
 }
 
-// RoleMenu 角色菜单
+// RoleDept 角色和部门关联表  角色1-N部门
+type RoleDept struct {
+	RoleId int64 `gorm:"column:role_id;primaryKey;not null;autoIncrement:false;comment:角色id" json:"roleId"`
+	DeptId int64 `gorm:"column:dept_id;primaryKey;not null;autoIncrement:false;comment:部门id" json:"deptId"`
+}
+
+// RoleMenu 角色和菜单关联表  角色1-N菜单
 type RoleMenu struct {
+	RoleId int64 `gorm:"column:role_id;primaryKey;not null;autoIncrement:false;comment:角色id" json:"roleId"`
+	MenuId int64 `gorm:"column:menu_id;primaryKey;not null;autoIncrement:false;comment:菜单id" json:"menuId"`
 }

@@ -21,16 +21,16 @@ func InitDb() {
 		tables      []string
 		err         error
 		tableMap    = map[string]any{
-			"sys_dept": entity.Department{}, // 部门表
-			"sys_user": entity.User{},       // 用户表
-			//"sys_post":      entity.Post{},       // 岗位表
-			//"sys_role":      entity.Role{},       // 角色表
-			//"sys_menu":      entity.Menu{},       // 菜单表
-			"sys_user_role": entity.UserRole{}, // 用户角色表
-			//"sys_role_menu": entity.RoleMenu{},   // 角色菜单表
-			//"sys_role_dept": entity.RoleDept{},   // 角色部门表
-			"sys_user_post": entity.UserPost{}, // 用户岗位表
-			//"sys_operate":   entity.Operate{},    // 操作日志记录
+			"sys_dept":      entity.Department{}, // 部门表
+			"sys_user":      entity.User{},       // 用户表
+			"sys_post":      entity.Post{},       // 岗位表
+			"sys_role":      entity.Role{},       // 角色表
+			"sys_menu":      entity.Menu{},       // 菜单表
+			"sys_user_role": entity.UserRole{},   // 用户角色表
+			"sys_role_menu": entity.RoleMenu{},   // 角色菜单表
+			"sys_role_dept": entity.RoleDept{},   // 角色部门表
+			"sys_user_post": entity.UserPost{},   // 用户岗位表
+			"sys_operate":   entity.Operate{},    // 操作日志记录
 			//"sys_dict_type": entity.DictType{},   // 字典类型表
 			//"sys_dict_data": entity.DictData{},   // 字典数据表
 			//"sys_config":    entity.Setting{},    // 参数配置表
