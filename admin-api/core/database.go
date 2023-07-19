@@ -49,6 +49,7 @@ func InitDb() {
 		Log.Error("连接数据库失败: %s", err.Error())
 		panic(err.Error())
 	}
+	Log.Error("连接Postgresql数据库成功")
 	if err = db.Raw(GetTable, Config.Db.Schema).Scan(&tables).Error; err == nil {
 		for key, value := range tableMap {
 			if exist, _ := utils.In[string](key, tables); !exist {

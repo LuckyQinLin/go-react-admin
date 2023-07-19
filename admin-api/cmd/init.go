@@ -21,7 +21,7 @@ const toml = `
     # 运行模型
     run-model = "debug"
     # 白名单
-    white-list = ["/user/login", "/user/register", "/user/captcha"]
+    white-list = ["/user/login", "/user/register", "/user/captcha", "/user/captchaImage"]
 # 数据库配置
 [db]
 	host = "192.168.98.128"
@@ -30,6 +30,12 @@ const toml = `
 	password = "123456"
 	db-name = "admin_db"
 	schema = "public"
+# Redis配置
+[redis]
+	host = "192.168.98.128"
+	port = 6379
+	password = "123456"
+	db = 1
 # jwt配置信息
 [jwt]
     issuer = "Lucky.麒麟"

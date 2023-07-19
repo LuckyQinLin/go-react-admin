@@ -1,6 +1,7 @@
 package router
 
 import (
+	"admin-api/app/controller"
 	"admin-api/core"
 	"admin-api/internal/gin"
 	"context"
@@ -17,11 +18,18 @@ func initRouter() {
 	core.InitCore()
 	core.Log.Info("初始化路由配置")
 	Engine = gin.Default(core.Log)
+	Engine.Use(CorsMiddle()) // 跨域
+	Engine.Use(JwtMiddle())  // jwt
 	root := Engine.Group(core.Config.Web.ContextPath)
 	{
-		root.GET("login", func(context *gin.Context) {
-			context.JSON(http.StatusOK, "success")
-		})
+		user := root.Group("user")
+		{
+			user.GET("captchaImage", controller.User.CaptchaImage) // 获取验证码
+			user.POST("login", func(context *gin.Context) {
+				context.JSON(http.StatusOK, "success")
+			})
+		}
+
 	}
 }
 

@@ -5,16 +5,18 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"github.com/pelletier/go-toml/v2"
 	"os"
+	"strings"
 )
 
 var Config *Configuration
 
 // Configuration 配置表
 type Configuration struct {
-	Web    Server    `toml:"web" json:"web"` // web服务器配置
-	Db     Database  `toml:"db" json:"db"`   // 数据库配置
-	Jwt    JwtConfig `toml:"jwt" json:"jwt"` // jwt配置
-	Logger Logger    `toml:"log" json:"log"` // 日志配置
+	Web    Server    `toml:"web" json:"web"`     // web服务器配置
+	Db     Database  `toml:"db" json:"db"`       // 数据库配置
+	Redis  Redis     `toml:"redis" json:"redis"` // Redis缓冲
+	Jwt    JwtConfig `toml:"jwt" json:"jwt"`     // jwt配置
+	Logger Logger    `toml:"log" json:"log"`     // 日志配置
 }
 
 // Server 服务器相关配置
@@ -28,6 +30,22 @@ type Server struct {
 	WhiteList      []string `toml:"white-list" json:"white-list"`             // 白名单
 }
 
+func (s *Server) Whites() []string {
+	result := make([]string, 0)
+	for _, item := range s.WhiteList {
+		if s.ContextPath == "" {
+			result = append(result, item)
+		} else {
+			if strings.HasPrefix(s.ContextPath, "/") {
+				result = append(result, s.ContextPath+item)
+			} else {
+				result = append(result, "/"+s.ContextPath+item)
+			}
+		}
+	}
+	return result
+}
+
 // Database 数据库配置
 type Database struct {
 	Host     string `toml:"host" json:"host"`         // 地址
@@ -36,6 +54,14 @@ type Database struct {
 	Password string `toml:"password" json:"password"` // 密码
 	DbName   string `toml:"db-name" json:"dbName"`    // 数据库
 	Schema   string `toml:"schema" json:"schema"`     // 模式
+}
+
+// Redis redis配置
+type Redis struct {
+	Host     string `toml:"host" json:"host"`         // 地址
+	Port     int64  `toml:"port" json:"port"`         // 端口
+	Password string `toml:"password" json:"password"` // 密码
+	Db       int    `toml:"db" json:"db"`             // 数据库
 }
 
 func (d Database) Link() string {

@@ -4,4 +4,5 @@ func InitCore() {
 	InitConfig()
 	InitLogger()
 	InitDb()
+	InitRedis()
 }
