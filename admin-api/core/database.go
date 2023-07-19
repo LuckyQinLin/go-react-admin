@@ -31,11 +31,11 @@ func InitDb() {
 			"sys_role_dept": entity.RoleDept{},   // 角色部门表
 			"sys_user_post": entity.UserPost{},   // 用户岗位表
 			"sys_operate":   entity.Operate{},    // 操作日志记录
-			//"sys_dict_type": entity.DictType{},   // 字典类型表
-			//"sys_dict_data": entity.DictData{},   // 字典数据表
-			//"sys_config":    entity.Setting{},    // 参数配置表
-			//"sys_visit":     entity.Visit{},      // 系统访问记录
-			//"sys_notice":    entity.Notice{},     // 通知公告表
+			"sys_dict_type": entity.DictType{},   // 字典类型表
+			"sys_dict_data": entity.DictData{},   // 字典数据表
+			"sys_config":    entity.Setting{},    // 参数配置表
+			"sys_visit":     entity.Visit{},      // 系统访问记录
+			"sys_notice":    entity.Notice{},     // 通知公告表
 		}
 	)
 
