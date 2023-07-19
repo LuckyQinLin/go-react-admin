@@ -1,0 +1,85 @@
+.account-root {
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: row wrap;
+  width: 100%;
+  height: 100vh;
+  justify-content: center;
+  .account-root-item {
+    flex-basis: 50%;
+    flex-grow: 0;
+    max-width: 50%;
+    .account-root-item-img {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      background-color: #428bef;
+      img {
+        width: 70%;
+        display: inline-block;
+        margin: 0 auto;
+      }
+    }
+  }
+  .root-right-item {
+    background: #fff;
+    box-sizing: border-box;
+    flex-flow: row wrap;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .account-form {
+      flex-basis: 45%;
+      flex-grow: 0;
+      max-width: 45%;
+      .account-top {
+        text-align: center;
+        margin: 20px 0;
+        .account-top-logo {
+          text-align: center;
+          img {
+            width: 100%;
+            margin: 0 auto;
+          }
+        }
+        .account-top-desc {
+          font-size: 14px;
+          color: #808695;
+        }
+      }
+      .account-tabs {
+        .ant-tabs-nav::before {
+          bottom: 0;
+          border: 0;
+        }
+        .ant-tabs-tab {
+          margin-right: 50px;
+          margin-left: 50px;
+        }
+      }
+      .account-login-form {
+        .account-login-item-1 {
+          .ant-form-item-control-input-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+          }
+          .account-login-method {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+          }
+        }
+      }
+      .account-register-form {
+        .account-register-email {
+          display: flex;
+          align-items: center;
+          justify-content: space-between
+        }
+      }
+    }
+  }
+}
