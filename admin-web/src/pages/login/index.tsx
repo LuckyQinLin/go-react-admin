@@ -1,11 +1,11 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Logo from '@/assets/images/account-logo.png';
 import './index.less';
 import {Button, Checkbox, Form, Input, message, Tabs, TabsProps} from "antd";
 import {
     GithubOutlined,
     LockOutlined, MailOutlined,
-    QqOutlined,
+    QqOutlined, SafetyOutlined,
     UserOutlined,
     VerifiedOutlined,
     WechatOutlined
@@ -14,14 +14,15 @@ import LoginBg from '@/assets/images/login-bg-1.svg';
 import {changeLoginStatusActionCreator} from "@/redux/user/action";
 import {useDispatch} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import {sendCaptcha, userLogin, userRegister} from "@/api/user";
-import {RegisterFormProp} from "@/pages/login/modules";
+import {captchaImage, sendCaptcha, userLogin, userRegister} from "@/api/user";
+import {LoginCaptchaProp, RegisterFormProp} from "@/pages/login/modules";
 import {paths} from "@/pages/layout";
 
 
 export interface LoginFormProp {
     username: string;
     password: string;
+    captcha: string;
 }
 
 interface LoginProp {
@@ -37,10 +38,21 @@ const LoginForm: React.FC<LoginProp> = ({submit, changeRegister}) => {
         form.validateFields().then(value => submit(value))
     }
 
+    const [captchaProp, setCaptchaProp] = useState<LoginCaptchaProp>({} as LoginCaptchaProp);
+
     const toRegister = () => {
         form.resetFields();
         changeRegister()
     }
+
+    const loadCaptchaImage = async () => {
+        const result = await captchaImage();
+        setCaptchaProp(result);
+    }
+
+    useEffect(() => {
+        loadCaptchaImage();
+    }, [])
 
     return <Form className="account-login-form" form={form}>
         <Form.Item name="username" rules={[{ required: true, message: '请输入账号' }]}>
@@ -48,6 +60,12 @@ const LoginForm: React.FC<LoginProp> = ({submit, changeRegister}) => {
         </Form.Item>
         <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
             <Input.Password size="large" prefix={<LockOutlined />} placeholder="密码"/>
+        </Form.Item>
+        <Form.Item name="captcha" rules={[{ required: true, message: '请输入验证码' }]}>
+            <div className="account-login-form-captcha">
+                <Input className="alfc-left" size="large" prefix={<SafetyOutlined />} placeholder="验证码"/>
+                <img onClick={() => loadCaptchaImage()} className="alfc-right" src={captchaProp.image} />
+            </div>
         </Form.Item>
         <Form.Item className="account-login-item-1">
             <Checkbox>自动登录</Checkbox>

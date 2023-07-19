@@ -24,18 +24,18 @@ const toml = `
     white-list = ["/user/login", "/user/register", "/user/captcha", "/user/captchaImage"]
 # 数据库配置
 [db]
-	host = "192.168.98.128"
+	host = "192.168.110.107"
 	port = 5432
-	username = "admin"
-	password = "123456"
-	db-name = "admin_db"
+	username = "lucky"
+	password = "zjnslovef2354"
+	db-name = "manager_db"
 	schema = "public"
 # Redis配置
 [redis]
-	host = "192.168.98.128"
+	host = "192.168.110.107"
 	port = 6379
-	password = "123456"
-	db = 1
+	password = "zjnslovef2354"
+	db = 0
 # jwt配置信息
 [jwt]
     issuer = "Lucky.麒麟"

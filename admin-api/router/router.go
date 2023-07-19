@@ -25,11 +25,8 @@ func initRouter() {
 		user := root.Group("user")
 		{
 			user.GET("captchaImage", controller.User.CaptchaImage) // 获取验证码
-			user.POST("login", func(context *gin.Context) {
-				context.JSON(http.StatusOK, "success")
-			})
+			user.POST("login", controller.User.Login)              // 登陆
 		}
-
 	}
 }
 

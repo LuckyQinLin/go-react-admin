@@ -1,9 +1,14 @@
 package service
 
 import (
+	"admin-api/app/dao"
+	"admin-api/app/models/entity"
+	"admin-api/app/models/request"
 	"admin-api/app/models/response"
 	"admin-api/app/models/vo"
 	"admin-api/core"
+	"admin-api/utils"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/mojocn/base64Captcha"
 	"sync"
 	"time"
@@ -21,17 +26,18 @@ type redisStore struct {
 func (r *redisStore) Set(id string, value string) error {
 	r.Lock()
 	defer r.Unlock()
-	return core.Cache.Set(vo.CaptchaPrefix+id, value, time.Minute*5).Err()
+	_, err := core.Cache.SetKeyValue(vo.CaptchaPrefix, id, value, time.Minute*5)
+	return err
 }
 
 func (r *redisStore) Get(id string, clear bool) string {
 	r.Lock()
 	defer r.Unlock()
-	if result, err := core.Cache.Get(vo.CaptchaPrefix + id).Result(); err == nil {
+	if result, err := core.Cache.GetKey(vo.CaptchaPrefix, id); err == nil {
 		return result
 	}
 	if clear {
-		core.Cache.Del(vo.CaptchaPrefix + id)
+		_ = core.Cache.Delete(vo.CaptchaPrefix, id)
 	}
 	return ""
 }
@@ -62,4 +68,45 @@ func (u *UserService) CaptchaImage() (*response.CaptchaImageResponse, *response.
 		Image:      base64,
 		ExpireTime: time.Now().Add(time.Minute * 5).Unix(),
 	}, nil
+}
+
+// UserLogin 用户登陆
+func (u *UserService) UserLogin(param *request.UserLoginRequest) (string, *response.BusinessError) {
+	var (
+		generateToken = func(user *entity.User) (string, error) {
+			claims := vo.UserClaims{
+				UserId:   user.UserId,
+				Username: user.UserName,
+				Email:    user.Email,
+				RegisteredClaims: jwt.RegisteredClaims{
+					ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(core.Config.Jwt.ExpiresTime) * time.Hour)), // 过期时间
+					IssuedAt:  jwt.NewNumericDate(time.Now()),                                                             // 签发时间
+					NotBefore: jwt.NewNumericDate(time.Now()),                                                             // 生效时间
+					Issuer:    core.Config.Jwt.Issuer,
+				},
+			}
+			t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+			return t.SignedString([]byte(core.Config.Jwt.SecretKey))
+		} // 生成token信息
+		token string
+		user  *entity.User
+		err   error
+	)
+	// 获取用户信息
+	if user, err = dao.User.GetUserByUserName(param.Username); err != nil {
+		core.Log.Error("当前用户[%s]不存在: [%s]", param.Username, err.Error())
+		return "", response.NewBusinessError(response.DataNotExist)
+	}
+	// 密码不正确
+	if utils.TransformMd5(param.Password+vo.UserSalt) != user.Password {
+		core.Log.Error("当前用户密码[%s]不正确", param.Password)
+		return "", response.NewBusinessError(response.UserPasswordError)
+	}
+	// 构建jwt
+	if token, err = generateToken(user); err != nil {
+		core.Log.Error("生成认证Token错误:%s", err.Error())
+		return "", response.NewBusinessError(response.TokenBuildError)
+	}
+	_, err = core.Cache.SetKeyValue(vo.UserKey, user.UserId, token, time.Duration(core.Config.Jwt.ExpiresTime)*time.Hour)
+	return token, nil
 }

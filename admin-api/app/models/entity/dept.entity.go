@@ -1,7 +1,7 @@
 package entity
 
-// Department 部门表
-type Department struct {
+// Dept 部门表
+type Dept struct {
 	DeptId    int64  `gorm:"column:dept_id;primaryKey;not null;autoIncrement;comment:部门id" json:"deptId"`
 	ParentId  int64  `gorm:"column:parent_id;default:0;comment:父部门id" json:"parentId"`
 	Ancestors string `gorm:"column:ancestors;default:'';size:50;comment:祖级列表" json:"ancestors"`

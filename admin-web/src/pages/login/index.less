@@ -60,6 +60,21 @@
         }
       }
       .account-login-form {
+        .account-login-form-captcha {
+          display: flex;
+          height: 40px;
+          line-height: 40px;
+          .alfc-left {
+            flex: 1; /* 自适应宽度，占据剩余空间 */
+            padding: 10px;
+            margin-right: 5px;
+          }
+          .alfc-right {
+            flex: 0 0 135px; /* 固定宽度为200px */
+            border: 1px solid #d9d9d9;
+            border-radius: 5px;
+          }
+        }
         .account-login-item-1 {
           .ant-form-item-control-input-content {
             display: flex;

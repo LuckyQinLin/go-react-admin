@@ -16,3 +16,8 @@ const (
 	UserKey       = "user:"
 	CaptchaPrefix = "captcha:"
 )
+
+const (
+	RedisToken   = "token"   // 用户token
+	RedisCaptcha = "captcha" // 验证码
+)

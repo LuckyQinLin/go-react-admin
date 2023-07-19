@@ -1,13 +1,22 @@
 import {LoginFormProp} from "@/pages/login";
 import {UserState} from "@/redux/user/reducer.ts";
 import {https} from "@/utils/request.ts";
-import {RegisterFormProp} from "@/pages/login/modules.ts";
+import {LoginCaptchaProp, RegisterFormProp} from "@/pages/login/modules.ts";
 
+// userLogin 用户登录
 export const userLogin = (data: LoginFormProp): Promise<UserState> => {
     return https.request({
         url: '/user/login',
         method: 'post',
         data: data
+    }, {})
+}
+
+// captchaImage 验证码
+export const captchaImage = (): Promise<LoginCaptchaProp> => {
+    return https.request({
+        url: '/user/captchaImage',
+        method: 'get',
     }, {})
 }
 
