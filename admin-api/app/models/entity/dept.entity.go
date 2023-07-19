@@ -11,5 +11,6 @@ type Department struct {
 	Phone     string `gorm:"column:phone;default:null;size:11;comment:联系电话" json:"phone"`
 	Email     string `gorm:"column:email;default:'';size:50;comment:邮箱" json:"email"`
 	Status    int    `gorm:"column:status;default:1;comment:部门状态（1正常 0停用）" json:"status"`
+	DelFlag   int    `gorm:"column:del_flag;default:1;comment:删除标志（1代表存在 0代表删除）" json:"delFlag"`
 	BaseField
 }

@@ -53,9 +53,10 @@ func InitDb() {
 		for key, value := range tableMap {
 			if exist, _ := utils.In[string](key, tables); !exist {
 				if err = db.AutoMigrate(&value); err != nil {
-					Log.Error("生成数据表失败 => %s", err.Error())
-					panic("初始化数据表失败")
+					Log.Error("生成数据表失败 => %s:%s", key, err.Error())
+					//panic("初始化数据表失败")
 				}
+				Log.Info("生成表[%s]完成", key)
 			}
 		}
 	}

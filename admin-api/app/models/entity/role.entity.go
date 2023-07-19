@@ -11,6 +11,7 @@ type Role struct {
 	DeptCheckStrictly bool   `gorm:"column:dept_check_strictly;type:boolean;default:true;comment:部门树选择项是否关联显示" json:"deptCheckStrictly"`
 	Status            int    `gorm:"column:status;default:1;comment:角色状态（1正常 0停用）" json:"status"`
 	Remark            string `gorm:"size:500;default:null;comment:备注" json:"remark"`
+	DelFlag           int    `gorm:"column:del_flag;default:1;comment:删除标志（1代表存在 0代表删除）" json:"delFlag"`
 	BaseField
 }
 

@@ -24,11 +24,11 @@ const toml = `
     white-list = ["/user/login", "/user/register", "/user/captcha"]
 # 数据库配置
 [db]
-	host = "192.168.110.107"
+	host = "192.168.98.128"
 	port = 5432
-	username = "lucky"
-	password = "zjnslovef2354"
-	db-name = "manager_db"
+	username = "admin"
+	password = "123456"
+	db-name = "admin_db"
 	schema = "public"
 # jwt配置信息
 [jwt]

@@ -19,7 +19,7 @@ type Operate struct {
 	JsonResult    string    `gorm:"column:json_result;size:2000;default:'';comment:模块标题" json:"jsonResult"`
 	ErrorMsg      string    `gorm:"column:error_msg;size:200;default:'';comment:错误消息" json:"errorMsg"`
 	OperTime      time.Time `gorm:"column:oper_time;default:0;comment:操作时间" json:"operTime"`
-	CostTime      int64     `gorm:"column:cost_time;size:50;default:'';comment:消耗时间" json:"costTime"`
+	CostTime      int64     `gorm:"column:cost_time;size:50;default:0;comment:消耗时间" json:"costTime"`
 	Status        int       `gorm:"column:status;default:1;comment:操作状态(1正常 0异常)" json:"status"`
 	BaseField
 }

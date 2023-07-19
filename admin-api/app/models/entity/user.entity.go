@@ -18,6 +18,7 @@ type User struct {
 	LoginIp   string    `gorm:"size:128;default:'';comment:最后登录IP" json:"loginIp"`
 	LoginDate time.Time `gorm:"comment:最后登录时间" json:"loginDate"`
 	Remark    string    `gorm:"size:500;default:null;comment:备注" json:"remark"`
+	DelFlag   int       `gorm:"column:del_flag;default:1;comment:删除标志（1代表存在 0代表删除）" json:"delFlag"`
 	BaseField
 }
 
