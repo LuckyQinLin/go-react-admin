@@ -37,7 +37,7 @@ func (u *UserController) Login(c *gin.Context) {
 		c.JSON(http.StatusOK, response.Fail(response.RequestParamError))
 		return
 	}
-	if token, customErr = service.User.UserLogin(&param); customErr != nil {
+	if token, customErr = service.User.UserLogin(&param, c); customErr != nil {
 		c.JSON(http.StatusOK, response.ResultCustom(customErr))
 		return
 	}

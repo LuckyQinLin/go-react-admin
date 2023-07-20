@@ -5,4 +5,5 @@ type UserLoginRequest struct {
 	Username string `json:"username" binding:"required"` // 账号
 	Password string `json:"password" binding:"required"` // 密码
 	Captcha  string `json:"captcha" binding:"required"`  // 验证码
+	Uuid     string `json:"uuid" binding:"required"`     // 验证码ID
 }

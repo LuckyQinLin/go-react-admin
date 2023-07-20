@@ -22,3 +22,10 @@ func CustomBusinessError(code HttpCode, msg string) *BusinessError {
 		Msg:  msg,
 	}
 }
+
+func LoginBusinessError(msg string) *BusinessError {
+	return &BusinessError{
+		Code: LoginFailed,
+		Msg:  msg,
+	}
+}

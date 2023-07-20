@@ -5,6 +5,7 @@ type HttpCode int64
 const (
 	Success             HttpCode = 100200
 	Failed              HttpCode = 100500
+	LoginFailed         HttpCode = 100499
 	DataNotExist        HttpCode = 100501
 	UserPasswordError   HttpCode = 100502
 	AuthNotExist        HttpCode = 100503
@@ -32,6 +33,7 @@ const (
 var Menus = map[HttpCode]string{
 	Success:             "操作成功",
 	Failed:              "操作失败",
+	LoginFailed:         "登录失败",
 	DataNotExist:        "数据不存在",
 	UserPasswordError:   "账号密码不正确",
 	AuthNotExist:        "认证信息不正确",

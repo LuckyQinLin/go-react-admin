@@ -7,16 +7,28 @@ import (
 	"admin-api/app/models/response"
 	"admin-api/app/models/vo"
 	"admin-api/core"
+	"admin-api/internal/gin"
 	"admin-api/utils"
+	"errors"
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/mojocn/base64Captcha"
+	"github.com/mssola/useragent"
 	"sync"
 	"time"
 )
 
-var User = new(UserService)
+var User = NewUserService()
 
-type UserService struct{}
+type UserService struct {
+	captcha *base64Captcha.Captcha
+}
+
+func NewUserService() *UserService {
+	driver := base64Captcha.NewDriverDigit(40, 135, 5, 0.4, 72)
+	store := &redisStore{expiration: time.Minute * 5}
+	return &UserService{captcha: base64Captcha.NewCaptcha(driver, store)}
+}
 
 type redisStore struct {
 	sync.RWMutex
@@ -26,18 +38,18 @@ type redisStore struct {
 func (r *redisStore) Set(id string, value string) error {
 	r.Lock()
 	defer r.Unlock()
-	_, err := core.Cache.SetKeyValue(vo.CaptchaPrefix, id, value, time.Minute*5)
+	_, err := core.Cache.SetKeyValue(fmt.Sprintf("%s:%v", vo.RedisCaptcha, id), value, time.Minute*5)
 	return err
 }
 
 func (r *redisStore) Get(id string, clear bool) string {
 	r.Lock()
 	defer r.Unlock()
-	if result, err := core.Cache.GetKey(vo.CaptchaPrefix, id); err == nil {
+	if result, err := core.Cache.GetKey(fmt.Sprintf("%s:%v", vo.RedisCaptcha, id)); err == nil {
 		return result
 	}
 	if clear {
-		_ = core.Cache.Delete(vo.CaptchaPrefix, id)
+		_ = core.Cache.Delete(fmt.Sprintf("%s:%v", vo.RedisCaptcha, id))
 	}
 	return ""
 }
@@ -50,29 +62,33 @@ func (r *redisStore) Verify(id, answer string, clear bool) bool {
 // https://mojotv.cn/go/refactor-base64-captcha 验证码文档地址
 func (u *UserService) CaptchaImage() (*response.CaptchaImageResponse, *response.BusinessError) {
 	var (
-		captcha *base64Captcha.Captcha
-		driver  base64Captcha.Driver
-		store   base64Captcha.Store
-		base64  string
-		err     error
+		id     string
+		base64 string
+		err    error
 	)
-	driver = base64Captcha.NewDriverDigit(40, 135, 5, 0.4, 72)
-	store = &redisStore{expiration: time.Minute * 5}
-	captcha = base64Captcha.NewCaptcha(driver, store)
-	if _, base64, err = captcha.Generate(); err != nil {
+	if id, base64, err = u.captcha.Generate(); err != nil {
 		return nil, response.NewBusinessError(response.CaptchaImageError)
 	}
 	// 生成验证码
 	return &response.CaptchaImageResponse{
-		Uuid:       "",
+		Uuid:       id,
 		Image:      base64,
 		ExpireTime: time.Now().Add(time.Minute * 5).Unix(),
 	}, nil
 }
 
 // UserLogin 用户登陆
-func (u *UserService) UserLogin(param *request.UserLoginRequest) (string, *response.BusinessError) {
+func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Context) (string, *response.BusinessError) {
 	var (
+		captchaVerify = func(id, code string) error {
+			if !core.Cache.Exist(vo.RedisCaptcha + ":" + id) {
+				return errors.New("验证码已经过期")
+			}
+			if !u.captcha.Verify(id, code, true) {
+				return errors.New("验证码不正确")
+			}
+			return nil
+		} // 验证码验证
 		generateToken = func(user *entity.User) (string, error) {
 			claims := vo.UserClaims{
 				UserId:   user.UserId,
@@ -88,25 +104,67 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest) (string, *respo
 			t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 			return t.SignedString([]byte(core.Config.Jwt.SecretKey))
 		} // 生成token信息
+		getUserInfoWithVerity = func(username, password string) (user *entity.User, err error) {
+			if user, err = dao.User.GetUserByUserName(username); err != nil {
+				err = errors.New("登录用户" + username + "不存在")
+				return
+			}
+			// 删除
+			if user.DelFlag == 0 {
+				err = errors.New("对不起，您的账号：" + username + " 已被删除")
+				return
+			}
+			// 状态
+			if user.Status == 0 {
+				err = errors.New("对不起，您的账号：" + username + " 已停用")
+				return
+			}
+			// 密码
+			if !utils.BcryptVerify(user.Password, param.Password) {
+				err = errors.New("账号密码不正确")
+				return
+			}
+			return
+		} // 验证用户信息
+		loginLogger = func(c *gin.Context, username, msg string, status int) {
+			userAgent := useragent.New(c.GetHeader("User-Agent"))
+			browser, version := userAgent.Browser()
+			ip := c.ClientIP()
+			_ = dao.Visit.Save(&entity.Visit{
+				UserName:      username,
+				IpAddr:        ip,
+				LoginLocation: utils.IpAddress(ip),
+				Browser:       fmt.Sprintf("%sv%s", browser, version),
+				Os:            userAgent.OS(),
+				Msg:           msg,
+				LoginTime:     time.Now(),
+				Status:        status,
+			})
+		}
 		token string
 		user  *entity.User
 		err   error
 	)
+	// 验证码校验
+	if err = captchaVerify(param.Uuid, param.Captcha); err != nil {
+		// 更新用户登录信息并记录登录信息
+		go loginLogger(ctx, param.Username, err.Error(), 0)
+		return "", response.LoginBusinessError(err.Error())
+	}
 	// 获取用户信息
-	if user, err = dao.User.GetUserByUserName(param.Username); err != nil {
-		core.Log.Error("当前用户[%s]不存在: [%s]", param.Username, err.Error())
-		return "", response.NewBusinessError(response.DataNotExist)
+	if user, err = getUserInfoWithVerity(param.Username, param.Password); err != nil {
+		// 更新用户登录信息并记录登录信息
+		go loginLogger(ctx, param.Username, err.Error(), 0)
+		return "", response.LoginBusinessError(err.Error())
 	}
-	// 密码不正确
-	if utils.TransformMd5(param.Password+vo.UserSalt) != user.Password {
-		core.Log.Error("当前用户密码[%s]不正确", param.Password)
-		return "", response.NewBusinessError(response.UserPasswordError)
-	}
+	go loginLogger(ctx, user.UserName, "登录成功", 1)
 	// 构建jwt
 	if token, err = generateToken(user); err != nil {
 		core.Log.Error("生成认证Token错误:%s", err.Error())
 		return "", response.NewBusinessError(response.TokenBuildError)
 	}
-	_, err = core.Cache.SetKeyValue(vo.UserKey, user.UserId, token, time.Duration(core.Config.Jwt.ExpiresTime)*time.Hour)
+	if _, err = core.Cache.SetKeyValue(fmt.Sprintf("%s:%d", vo.RedisToken, user.UserId), token, time.Duration(core.Config.Jwt.ExpiresTime)*time.Hour); err != nil {
+		core.Log.Error("写入用户Token[%s]失败: %s", token, err.Error())
+	}
 	return token, nil
 }
