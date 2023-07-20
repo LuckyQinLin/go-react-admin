@@ -23,6 +23,7 @@ export interface LoginFormProp {
     username: string;
     password: string;
     captcha: string;
+    uuid: string;
 }
 
 interface LoginProp {
@@ -35,7 +36,7 @@ const LoginForm: React.FC<LoginProp> = ({submit, changeRegister}) => {
     const [form] = Form.useForm<LoginFormProp>();
 
     const onSubmit = () => {
-        form.validateFields().then(value => submit(value))
+        form.validateFields().then(value => submit({...value, uuid: captchaProp.uuid}))
     }
 
     const [captchaProp, setCaptchaProp] = useState<LoginCaptchaProp>({} as LoginCaptchaProp);

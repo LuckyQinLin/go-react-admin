@@ -43,3 +43,8 @@ func (u *UserController) Login(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, response.Ok(token))
 }
+
+// GetUserInfo 获取用户信息
+func (u *UserController) GetUserInfo(c *gin.Context) {
+
+}

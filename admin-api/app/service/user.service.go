@@ -89,22 +89,22 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 			}
 			return nil
 		} // 验证码验证
-		generateToken = func(user *entity.User) (string, error) {
+		generateToken = func(user entity.User) (string, error) {
 			claims := vo.UserClaims{
 				UserId:   user.UserId,
 				Username: user.UserName,
 				Email:    user.Email,
 				RegisteredClaims: jwt.RegisteredClaims{
-					ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(core.Config.Jwt.ExpiresTime) * time.Hour)), // 过期时间
-					IssuedAt:  jwt.NewNumericDate(time.Now()),                                                             // 签发时间
-					NotBefore: jwt.NewNumericDate(time.Now()),                                                             // 生效时间
+					// ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(core.Config.Jwt.ExpiresTime) * time.Hour)), // 这里不配置过期时间，放到Redis中管理Token的过期时间，方便后面做续期
+					IssuedAt:  jwt.NewNumericDate(time.Now()), // 签发时间
+					NotBefore: jwt.NewNumericDate(time.Now()), // 生效时间
 					Issuer:    core.Config.Jwt.Issuer,
 				},
 			}
 			t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 			return t.SignedString([]byte(core.Config.Jwt.SecretKey))
 		} // 生成token信息
-		getUserInfoWithVerity = func(username, password string) (user *entity.User, err error) {
+		getUserInfoWithVerity = func(username, password string) (user entity.User, err error) {
 			if user, err = dao.User.GetUserByUserName(username); err != nil {
 				err = errors.New("登录用户" + username + "不存在")
 				return
@@ -120,7 +120,9 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 				return
 			}
 			// 密码
-			if !utils.BcryptVerify(user.Password, param.Password) {
+			pd, _ := utils.BcryptEncode(password)
+			core.Log.Info("密码：%s", pd)
+			if !utils.BcryptVerify(user.Password, password) {
 				err = errors.New("账号密码不正确")
 				return
 			}
@@ -142,7 +144,7 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 			})
 		}
 		token string
-		user  *entity.User
+		user  entity.User
 		err   error
 	)
 	// 验证码校验
