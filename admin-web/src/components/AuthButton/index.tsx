@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, message} from "antd";
+import {Button} from "antd";
 import {ButtonProps} from "antd/es/button/button";
 import {useSelector} from "@/redux/hooks";
 import {permsKeys} from "@/pages/layout";

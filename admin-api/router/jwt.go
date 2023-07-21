@@ -40,7 +40,7 @@ func JwtMiddle() gin.HandlerFunc {
 					t  *jwt.Token
 					ok bool
 				)
-				if t, err = jwt.ParseWithClaims(tokenClaims, &vo.UserClaims{}, func(token *jwt.Token) (interface{}, error) {
+				if t, err = jwt.ParseWithClaims(tokenClaims, &vo.UserClaims{}, func(token *jwt.Token) (any, error) {
 					return []byte(core.Config.Jwt.SecretKey), nil
 				}); err != nil {
 					return nil, false, err
@@ -60,32 +60,29 @@ func JwtMiddle() gin.HandlerFunc {
 			auth      string
 			err       error
 		)
+		// 后续打包后放过 /admin开头的前端路由
 		if strings.HasPrefix(path, "/admin") || authPath(whiteList, path) {
-			core.Log.Info("当前请求路径 => [%s]不做拦截", path)
+			core.Log.Info("当前请求路径[%s]不做拦截", path)
 			c.Next()
 		} else {
-			if path == "/api/ws" {
-				auth = c.DefaultQuery("token", "")
-			} else {
-				auth = c.GetHeader(vo.AuthHeader)
-			}
-			if auth == "" {
+			// 获取请求头数据
+			if auth = c.GetHeader(vo.AuthHeader); auth == "" {
 				c.Abort()
-				core.Log.Error("当前请求路径 => [%s], 认证信息不存在", path)
-				c.JSON(http.StatusUnauthorized, response.Result(response.AuthNotExist, "认证信息不存在"))
+				core.Log.Error("当前请求路径[%s], 认证信息不存在", path)
+				c.JSON(http.StatusUnauthorized, response.Fail(response.AuthNotExist))
 				return
 			}
 			// 解析Token
 			if claims, isExpired, err = parseJwt(auth); err != nil {
 				c.Abort()
-				core.Log.Info("当前请求路径 => [%s], 认证信息错误 => [%s]", path, err.Error())
-				c.JSON(http.StatusUnauthorized, response.Result(response.AuthFail, "认证信息错误"))
+				core.Log.Info("当前请求路径[%s], 认证信息错误[%s]", path, err.Error())
+				c.JSON(http.StatusUnauthorized, response.Fail(response.AuthFail))
 				return
 			}
 			if isExpired {
 				c.Abort()
-				core.Log.Info("当前请求路径 => [%s], 认证信息过期 => [%s]", path, err.Error())
-				c.JSON(http.StatusUnauthorized, response.Result(response.TokenTimeOut, "认证信息过期"))
+				core.Log.Info("当前请求路径[%s], 认证信息过期[%s]", path, err.Error())
+				c.JSON(http.StatusUnauthorized, response.Fail(response.TokenTimeOut))
 				return
 			}
 			next(c, claims)

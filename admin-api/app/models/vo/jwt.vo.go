@@ -9,7 +9,3 @@ type UserClaims struct {
 	Email    string
 	jwt.RegisteredClaims
 }
-
-const (
-	PasswordSalt = "Lucky.麒麟" // 密码的盐值
-)
