@@ -16,14 +16,15 @@ type UserRoleProp struct {
 
 // UserInfoResponse 用户信息
 type UserInfoResponse struct {
-	Id       int64          `json:"id"`       // 用户ID
-	UserName string         `json:"userName"` // 姓名
-	NickName string         `json:"nickName"` // 昵称
-	Sex      int            `json:"sex"`      // 性别
-	Avatar   string         `json:"avatar"`   // 头像
-	DeptId   string         `json:"deptId"`   // 部门ID
-	Email    string         `json:"email"`    // 邮箱
-	Phone    string         `json:"phone"`    // 手机号
-	Remark   string         `json:"remark"`   // 备注
-	Roles    []UserRoleProp `json:"roles"`    // 用户角色
+	Id         int64          `json:"id"`         // 用户ID
+	UserName   string         `json:"userName"`   // 姓名
+	NickName   string         `json:"nickName"`   // 昵称
+	Sex        int            `json:"sex"`        // 性别
+	Avatar     string         `json:"avatar"`     // 头像
+	DeptId     int64          `json:"deptId"`     // 部门ID
+	Email      string         `json:"email"`      // 邮箱
+	Phone      string         `json:"phone"`      // 手机号
+	Remark     string         `json:"remark"`     // 备注
+	ExpireTime int64          `json:"expireTime"` // 到期时间
+	Roles      []UserRoleProp `json:"roles"`      // 用户角色
 }

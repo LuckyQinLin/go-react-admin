@@ -9,7 +9,7 @@ export const userLogin = (data: LoginFormProp): Promise<UserState> => {
         url: '/user/login',
         method: 'post',
         data: data
-    }, {})
+    })
 }
 
 // captchaImage 验证码
@@ -20,7 +20,7 @@ export const captchaImage = (): Promise<LoginCaptchaProp> => {
     }, {})
 }
 
-// sendCaptcha 发送验证码
+// sendCaptcha 发送邮箱验证码
 export const sendCaptcha = (data: string): Promise<string> => {
     return https.request({
         url: '/user/captcha',
@@ -35,5 +35,13 @@ export const userRegister = (data: RegisterFormProp): Promise<boolean> => {
         url: '/user/register',
         method: 'post',
         data: data
+    })
+}
+
+// userInfo 获取用户信息
+export const userInfo = (): Promise<UserState> => {
+    return https.request({
+        url: '/user/info',
+        method: 'get',
     })
 }

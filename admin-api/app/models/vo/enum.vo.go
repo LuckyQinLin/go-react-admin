@@ -7,6 +7,7 @@ const (
 )
 
 const (
+	ClaimsInfo    = "Claims"
 	AuthHeader    = "Authorization"
 	HeaderUserKey = "userId"
 	WSHeaderKey   = "WsValid"

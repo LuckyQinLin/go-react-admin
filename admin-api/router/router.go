@@ -26,6 +26,7 @@ func initRouter() {
 		{
 			user.GET("captchaImage", controller.User.CaptchaImage) // 获取验证码
 			user.POST("login", controller.User.Login)              // 登陆
+			user.GET("info", controller.User.GetUserInfo)          // 获取用户信息
 		}
 	}
 }

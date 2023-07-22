@@ -14,3 +14,9 @@ func (u *UserDao) GetUserByUserName(username string) (user entity.User, err erro
 	err = core.DB.Model(&entity.User{}).Where("user_name = ?", username).First(&user).Error
 	return
 }
+
+// GetUserById 获取用户信息
+func (u *UserDao) GetUserById(id int64) (user entity.User, err error) {
+	err = core.DB.Model(&entity.User{}).Where("user_id = ?", id).First(&user).Error
+	return
+}

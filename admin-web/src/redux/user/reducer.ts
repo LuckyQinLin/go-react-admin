@@ -1,15 +1,20 @@
 import {CHANGE_LONGIN_STATUS, CLEAN_USER_STORE, UserTypes} from "./action";
 
 export interface UserState {
-	status?: boolean;
+	status: boolean;
 	token?: string;
-	roleType?: number;
-	username?: string;
-	phone?: string;
-	email?: string;
-	userId?: string;
-	roles?: RoleInfo[];
-	perms?: PermInfo[];
+	userId?: number; // 用户ID
+	sex?: number; // 性别
+	username?: string; // 用户名称
+	nickName?: string; // 用户昵称
+	avatar?: string;// 头像
+	deptId?: number; // 部门ID
+	phone?: string; // 手机号
+	email?: string; // 邮箱
+	remark?: string; // 备注
+	expireTime?: number; // 到期时间
+	roles?: RoleInfo[]; // 角色信息
+	perms?: PermInfo[]; // 资源
 }
 
 export interface RoleInfo {
@@ -31,15 +36,7 @@ export interface PermInfo {
 	children?: PermInfo[];
 }
 
-export const defaultUserState: UserState = {
-	status: false,
-	token: undefined,
-	roleType: undefined,
-	username: undefined,
-	phone: undefined,
-	email: undefined,
-	userId: undefined
-}
+export const defaultUserState: UserState = {status: false}
 
 export default function userReducer(state = defaultUserState, action: UserTypes) {
 	switch (action.type) {

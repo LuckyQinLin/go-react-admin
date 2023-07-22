@@ -4,8 +4,10 @@ import './index.less';
 import {Button, Checkbox, Form, Input, message, Tabs, TabsProps} from "antd";
 import {
     GithubOutlined,
-    LockOutlined, MailOutlined,
-    QqOutlined, SafetyOutlined,
+    LockOutlined,
+    MailOutlined,
+    QqOutlined,
+    SafetyOutlined,
     UserOutlined,
     VerifiedOutlined,
     WechatOutlined
@@ -16,7 +18,7 @@ import {useDispatch} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import {captchaImage, sendCaptcha, userLogin, userRegister} from "@/api/user";
 import {LoginCaptchaProp, RegisterFormProp} from "@/pages/login/modules";
-import {paths} from "@/pages/layout";
+import {useRequest} from "ahooks";
 
 
 export interface LoginFormProp {
@@ -162,16 +164,18 @@ const RegisterForm: React.FC<RegisterProp> = ({submit, changeRegister}) => {
 const LoginPage: React.FC = () => {
 
     const dispatch = useDispatch();
+
     const navigate = useNavigate();
 
-    const loginHandle = async (value: LoginFormProp) => {
-        console.log(value);
-        const data = await userLogin(value);
-        await dispatch(changeLoginStatusActionCreator({...data, status: true}));
-        const path = Array.from(paths(data.perms!))[0];
-        console.log("path", path);
-        navigate(path);
-    }
+    const {run} = useRequest(userLogin, {
+        manual: true,
+        onSuccess: (data)=> {
+            dispatch(changeLoginStatusActionCreator({...data, status: true}));
+            navigate('/index');
+        }
+    })
+
+    const loginHandle = async (value: LoginFormProp) => run(value)
 
     const registerHandle = async (value: RegisterFormProp) => {
         await userRegister(value)
@@ -193,8 +197,6 @@ const LoginPage: React.FC = () => {
     ];
 
     const [activeKey, setActiveKey] = useState<string>('1');
-
-
 
     return <div className="account-root">
         <div className="account-root-item">

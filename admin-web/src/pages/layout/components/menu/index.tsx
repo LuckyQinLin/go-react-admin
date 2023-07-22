@@ -10,7 +10,7 @@ import {PermInfo} from "@/redux/user/reducer";
 type MenuItem = Required<MenuProps>['items'][number];
 import {Icon} from "@/components";
 import './index.less';
-import {paths, permsKeys} from "@/pages/layout";
+import {permsKeys} from "@/pages/layout";
 
 interface LayoutHeaderProp {
 	collapsed: boolean;
@@ -53,10 +53,96 @@ export const menusRouter = (perms: PermInfo[]): Map<string, string> => {
 const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed, breadcrumb}) => {
 
 	const [defaultMenu, setDefaultMenu] = useState<string>('');
-	const [routerMap, setRouterMap] = useState<Map<string, string>>();
-	const [menus, setMenus] = useState<MenuItem[]>([]);
+	// const [routerMap, setRouterMap] = useState<Map<string, string>>();
+	const [menus, setMenus] = useState<MenuItem[]>([
+		{
+			label: '系统首页',
+			key: '/index',
+			icon: <Icon icon="HomeOutlined" />
+		},
+		{
+			label: '系统管理',
+			key: '/system',
+			icon: <Icon icon="SettingOutlined" />,
+			children: [
+				{
+					label: '用户管理',
+					key: '/system/user'
+				},
+				{
+					label: '角色管理',
+					key: '/system/role'
+				},
+				{
+					label: '菜单管理',
+					key: '/system/menu'
+				},
+				{
+					label: '部门管理',
+					key: '/system/dept'
+				},
+				{
+					label: '岗位管理',
+					key: '/system/post'
+				},
+				{
+					label: '字典管理',
+					key: '/system/dict'
+				},
+				{
+					label: '参数管理',
+					key: '/system/param'
+				},
+				{
+					label: '通知公告',
+					key: '/system/inform'
+				},
+			]
+		},
+		{
+			label: '日志管理',
+			key: '/logger',
+			icon: <Icon icon="FileTextOutlined" />,
+			children: [
+				{
+					label: '操作日志',
+					key: '/logger/operate'
+				},
+				{
+					label: '登录日志',
+					key: '/logger/login'
+				},
+			]
+		},
+		{
+			label: '系统监控',
+			key: '/monitor',
+			icon: <Icon icon="FundProjectionScreenOutlined" />,
+			children: [
+				{
+					label: '在线用户',
+					key: '/monitor/onlineUser'
+				},
+				{
+					label: '定时任务',
+					key: '/monitor/timeTask'
+				},
+				{
+					label: '服务器监控',
+					key: '/monitor/server'
+				},
+				{
+					label: '缓冲监控',
+					key: '/monitor/cache'
+				},
+				{
+					label: '缓冲列表',
+					key: '/monitor/cacheList'
+				},
+			]
+		},
+	]);
 
-	const system = useSelector((state) => state.system);
 	const userStore = useSelector((state) => state.user);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -64,13 +150,14 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed, breadcrumb}) => {
 
 	const changePage: MenuProps['onClick'] = (e) => {
 		console.log("changePage - 0", e)
-		const path = routerMap?.get(e.key);
+		// const path = routerMap?.get(e.key);
 		const keys = [...e.keyPath].reverse();
-		if (path) {
+		// if (path) {
 			dispatch(changeMenuActionCreator({menuKey: e.key}))
 			setDefaultMenu(e.key);
-			navigate(path)
-		}
+		// 	navigate(path)
+		// }
+		navigate(e.key)
 		if (keys.length === 1) {
 			const temp = menus.find(item => item?.key === keys[0]);
 			console.log("changePage - 1", menus, temp);
@@ -109,7 +196,7 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed, breadcrumb}) => {
 	useEffect(() => {
 		if (userStore.perms) {
 			let menusList = buildMenus(userStore.perms);
-			setRouterMap(menusRouter(userStore.perms));
+			// setRouterMap(menusRouter(userStore.perms));
 			setMenus(menusList);
 			setDefaultMenu(permsKeys(userStore.perms)[0]);
 			const temp = menusList.find(item => item?.key === defaultMenu)! as MenuItemType;
@@ -123,7 +210,7 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed, breadcrumb}) => {
 		}
 		return () => {
 			setMenus([])
-			setRouterMap(new Map<string, string>());
+			// setRouterMap(new Map<string, string>());
 		}
 	}, [])
 
@@ -132,7 +219,7 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed, breadcrumb}) => {
 		<div className="ant-pro-sider-logo">
 			<a href="">
 				<img src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg" alt="logo"/>
-				{!collapsed && <h1>服务器助手</h1>}
+				{!collapsed && <h1>通用管理系统</h1>}
 			</a>
 		</div>
 		<Menu

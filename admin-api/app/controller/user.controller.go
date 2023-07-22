@@ -3,6 +3,7 @@ package controller
 import (
 	"admin-api/app/models/request"
 	"admin-api/app/models/response"
+	"admin-api/app/models/vo"
 	"admin-api/app/service"
 	"admin-api/internal/gin"
 	"net/http"
@@ -31,20 +32,32 @@ func (u *UserController) Login(c *gin.Context) {
 		err       error
 		customErr *response.BusinessError
 		param     request.UserLoginRequest
-		token     string
+		result    *response.UserInfoResponse
 	)
 	if err = c.ShouldBindJSON(&param); err != nil {
 		c.JSON(http.StatusOK, response.Fail(response.RequestParamError))
 		return
 	}
-	if token, customErr = service.User.UserLogin(&param, c); customErr != nil {
+	if result, customErr = service.User.UserLogin(&param, c); customErr != nil {
 		c.JSON(http.StatusOK, response.ResultCustom(customErr))
 		return
 	}
-	c.JSON(http.StatusOK, response.Ok(token))
+	c.JSON(http.StatusOK, response.Ok(result))
 }
 
 // GetUserInfo 获取用户信息
 func (u *UserController) GetUserInfo(c *gin.Context) {
-
+	var (
+		value     any
+		claims    *vo.UserClaims
+		customErr *response.BusinessError
+		result    *response.UserInfoResponse
+	)
+	value, _ = c.Get(vo.ClaimsInfo)
+	claims = value.(*vo.UserClaims)
+	if result, customErr = service.User.GetUserInfo(claims); customErr != nil {
+		c.JSON(http.StatusOK, response.ResultCustom(customErr))
+		return
+	}
+	c.JSON(http.StatusOK, response.Ok(result))
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // authPath 判断当前路径是否在白名单中，在的话，直接放行
@@ -19,16 +20,6 @@ func authPath(list []string, path string) bool {
 		}
 	}
 	return false
-}
-
-// next 执行下一个handler
-func next(c *gin.Context, claims *vo.UserClaims) {
-	if c.Request.URL.Path == "/api/ws" {
-		c.Set(vo.WSHeaderKey, true)
-	}
-	c.Set(vo.HeaderUserKey, claims.UserId)
-	c.Next()
-	c.Set(vo.HeaderUserKey, "")
 }
 
 // JwtMiddle 认证配置
@@ -58,6 +49,7 @@ func JwtMiddle() gin.HandlerFunc {
 			claims    *vo.UserClaims
 			isExpired bool
 			auth      string
+			newToken  string
 			err       error
 		)
 		// 后续打包后放过 /admin开头的前端路由
@@ -79,13 +71,27 @@ func JwtMiddle() gin.HandlerFunc {
 				c.JSON(http.StatusUnauthorized, response.Fail(response.AuthFail))
 				return
 			}
+			// 判断是否过期
 			if isExpired {
 				c.Abort()
 				core.Log.Info("当前请求路径[%s], 认证信息过期[%s]", path, err.Error())
 				c.JSON(http.StatusUnauthorized, response.Fail(response.TokenTimeOut))
 				return
 			}
-			next(c, claims)
+			// 续期
+			if (claims.ExpiresAt.Sub(time.Now()).Minutes() * 3) <= float64(core.Config.Jwt.ExpiresTime) {
+				core.Log.Info("Token剩余时间小于1/3，系统进行续期操作", err.Error())
+				claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Duration(core.Config.Jwt.ExpiresTime) * time.Minute))
+				t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+				if newToken, err = t.SignedString([]byte(core.Config.Jwt.SecretKey)); err != nil {
+					core.Log.Info("Token续期失败[%s]", err.Error())
+				}
+				// 将新的Token写入Header中
+				c.Header("NewToken", newToken)
+			}
+			c.Set(vo.ClaimsInfo, claims)
+			c.Next()
+			c.Set(vo.ClaimsInfo, "")
 		}
 	}
 }

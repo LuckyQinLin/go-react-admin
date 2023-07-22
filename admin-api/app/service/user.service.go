@@ -78,7 +78,7 @@ func (u *UserService) CaptchaImage() (*response.CaptchaImageResponse, *response.
 }
 
 // UserLogin 用户登陆
-func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Context) (string, *response.BusinessError) {
+func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Context) (*response.UserInfoResponse, *response.BusinessError) {
 	var (
 		captchaVerify = func(id, code string) error {
 			if !core.Cache.Exist(vo.RedisCaptcha + ":" + id) {
@@ -89,20 +89,23 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 			}
 			return nil
 		} // 验证码验证
-		generateToken = func(user entity.User) (string, error) {
-			claims := vo.UserClaims{
+		generateToken = func(user entity.User) (claims vo.UserClaims, token string, err error) {
+			claims = vo.UserClaims{
 				UserId:   user.UserId,
+				DeptId:   user.DeptId,
 				Username: user.UserName,
 				Email:    user.Email,
+				Phone:    user.Phone,
 				RegisteredClaims: jwt.RegisteredClaims{
-					// ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(core.Config.Jwt.ExpiresTime) * time.Hour)), // 这里不配置过期时间，放到Redis中管理Token的过期时间，方便后面做续期
-					IssuedAt:  jwt.NewNumericDate(time.Now()), // 签发时间
-					NotBefore: jwt.NewNumericDate(time.Now()), // 生效时间
+					ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(core.Config.Jwt.ExpiresTime) * time.Minute)), // 这里不配置过期时间，放到Redis中管理Token的过期时间，方便后面做续期
+					IssuedAt:  jwt.NewNumericDate(time.Now()),                                                               // 签发时间
+					NotBefore: jwt.NewNumericDate(time.Now()),                                                               // 生效时间
 					Issuer:    core.Config.Jwt.Issuer,
 				},
 			}
 			t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-			return t.SignedString([]byte(core.Config.Jwt.SecretKey))
+			token, err = t.SignedString([]byte(core.Config.Jwt.SecretKey))
+			return
 		} // 生成token信息
 		getUserInfoWithVerity = func(username, password string) (user entity.User, err error) {
 			if user, err = dao.User.GetUserByUserName(username); err != nil {
@@ -143,30 +146,73 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 				Status:        status,
 			})
 		}
-		token string
-		user  entity.User
-		err   error
+		token  string
+		user   entity.User
+		claims vo.UserClaims
+		err    error
 	)
 	// 验证码校验
 	if err = captchaVerify(param.Uuid, param.Captcha); err != nil {
 		// 更新用户登录信息并记录登录信息
 		go loginLogger(ctx, param.Username, err.Error(), 0)
-		return "", response.LoginBusinessError(err.Error())
+		return nil, response.LoginBusinessError(err.Error())
 	}
 	// 获取用户信息
 	if user, err = getUserInfoWithVerity(param.Username, param.Password); err != nil {
 		// 更新用户登录信息并记录登录信息
 		go loginLogger(ctx, param.Username, err.Error(), 0)
-		return "", response.LoginBusinessError(err.Error())
+		return nil, response.LoginBusinessError(err.Error())
 	}
 	go loginLogger(ctx, user.UserName, "登录成功", 1)
 	// 构建jwt
-	if token, err = generateToken(user); err != nil {
+	if claims, token, err = generateToken(user); err != nil {
 		core.Log.Error("生成认证Token错误:%s", err.Error())
-		return "", response.NewBusinessError(response.TokenBuildError)
+		return nil, response.NewBusinessError(response.TokenBuildError)
 	}
-	if _, err = core.Cache.SetKeyValue(fmt.Sprintf("%s:%d", vo.RedisToken, user.UserId), token, time.Duration(core.Config.Jwt.ExpiresTime)*time.Hour); err != nil {
+	if _, err = core.Cache.SetKeyValue(
+		fmt.Sprintf("%s:%d", vo.RedisToken, user.UserId),
+		token,
+		time.Duration(core.Config.Jwt.ExpiresTime)*time.Minute,
+	); err != nil {
 		core.Log.Error("写入用户Token[%s]失败: %s", token, err.Error())
 	}
-	return token, nil
+	return &response.UserInfoResponse{
+		Id:         user.UserId,
+		UserName:   user.UserName,
+		NickName:   user.NickName,
+		Sex:        user.Sex,
+		Avatar:     user.Avatar,
+		DeptId:     user.DeptId,
+		Email:      user.Email,
+		Phone:      user.Phone,
+		Remark:     user.Remark,
+		ExpireTime: claims.ExpiresAt.Unix(),
+		Roles:      nil,
+	}, nil
+}
+
+// GetUserInfo 获取用户信息
+func (u *UserService) GetUserInfo(claims *vo.UserClaims) (*response.UserInfoResponse, *response.BusinessError) {
+	var (
+		user entity.User
+		err  error
+	)
+	if user, err = dao.User.GetUserById(claims.UserId); err != nil {
+		return nil, response.NewBusinessError(response.DataNotExist)
+	}
+
+	return &response.UserInfoResponse{
+		Id:         claims.UserId,
+		UserName:   user.UserName,
+		NickName:   user.NickName,
+		Sex:        user.Sex,
+		Avatar:     user.Avatar,
+		DeptId:     user.DeptId,
+		Email:      user.Email,
+		Phone:      user.Phone,
+		Remark:     user.Remark,
+		ExpireTime: claims.ExpiresAt.Unix(),
+		Roles:      nil,
+	}, nil
+
 }
