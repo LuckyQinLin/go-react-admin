@@ -142,6 +142,7 @@ function checkStatus(status: number, msg: string): void {
 		// 在登录成功后返回当前页面，这一步需要在登录页操作。
 		case 401:
 			Message.error('认证失败，' + msg);
+			window.location.href = '/login';
 			break;
 		case 403:
 			Message.error('用户得到授权，但是访问是被禁止的。!');

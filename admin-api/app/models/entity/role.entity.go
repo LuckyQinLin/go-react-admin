@@ -2,10 +2,10 @@ package entity
 
 // Role 角色表
 type Role struct {
-	RoleId            int64  `gorm:"column:post_id;primaryKey;not null;autoIncrement;comment:角色id" json:"roleId"`
-	RoleName          string `gorm:"column:post_code;not null;size:64;comment:角色名称" json:"roleName"`
-	RoleKey           string `gorm:"column:post_name;not null;size:50;comment:角色权限字符串" json:"roleKey"`
-	RoleSort          int    `gorm:"column:post_sort;default:0;comment:显示顺序" json:"roleSort"`
+	RoleId            int64  `gorm:"column:role_id;primaryKey;not null;autoIncrement;comment:角色id" json:"roleId"`
+	RoleName          string `gorm:"column:role_name;not null;size:64;comment:角色名称" json:"roleName"`
+	RoleKey           string `gorm:"column:role_key;not null;size:50;comment:角色权限字符串" json:"roleKey"`
+	RoleSort          int    `gorm:"column:role_sort;default:0;comment:显示顺序" json:"roleSort"`
 	DataScope         int    `gorm:"column:data_scope;default:1;comment:数据范围(1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限)" json:"dataScope"`
 	MenuCheckStrictly bool   `gorm:"column:menu_check_strictly;type:boolean;default:true;comment:菜单树选择项是否关联显示" json:"menuCheckStrictly"`
 	DeptCheckStrictly bool   `gorm:"column:dept_check_strictly;type:boolean;default:true;comment:部门树选择项是否关联显示" json:"deptCheckStrictly"`

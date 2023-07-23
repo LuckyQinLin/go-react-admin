@@ -2,7 +2,6 @@ import {CHANGE_LONGIN_STATUS, CLEAN_USER_STORE, UserTypes} from "./action";
 
 export interface UserState {
 	status: boolean;
-	token?: string;
 	userId?: number; // 用户ID
 	sex?: number; // 性别
 	username?: string; // 用户名称
@@ -12,6 +11,7 @@ export interface UserState {
 	phone?: string; // 手机号
 	email?: string; // 邮箱
 	remark?: string; // 备注
+	token?: string;
 	expireTime?: number; // 到期时间
 	roles?: RoleInfo[]; // 角色信息
 	perms?: PermInfo[]; // 资源

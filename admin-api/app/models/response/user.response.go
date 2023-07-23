@@ -25,6 +25,7 @@ type UserInfoResponse struct {
 	Email      string         `json:"email"`      // 邮箱
 	Phone      string         `json:"phone"`      // 手机号
 	Remark     string         `json:"remark"`     // 备注
+	Token      string         `json:"token"`      // token信息
 	ExpireTime int64          `json:"expireTime"` // 到期时间
 	Roles      []UserRoleProp `json:"roles"`      // 用户角色
 }

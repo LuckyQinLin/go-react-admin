@@ -28,6 +28,15 @@ func initRouter() {
 			user.POST("login", controller.User.Login)              // 登陆
 			user.GET("info", controller.User.GetUserInfo)          // 获取用户信息
 		}
+		role := root.Group("role")
+		{
+			role.POST("page", controller.Role.Page)  // 角色分页
+			role.GET("all", controller.Role.RoleAll) // 所有角色
+		}
+		menu := root.Group("menu")
+		{
+			menu.Group("tree", controller.Menu.MenuTree) // 菜单树
+		}
 	}
 }
 

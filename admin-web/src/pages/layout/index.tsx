@@ -3,13 +3,9 @@ import {Outlet} from "react-router-dom";
 import {Layout, theme} from "antd";
 import {LayoutHeader, LayoutSider} from "@/pages/layout/components";
 import {BreadcrumbProp} from "@/pages/layout/components/header";
-import "./index.less";
-import {useSelector} from "@/redux/hooks";
 import {PermInfo} from "@/redux/user/reducer";
-import {userInfo} from "@/api/user.ts";
-import {useRequest} from "ahooks";
-import {changeLoginStatusActionCreator} from "@/redux/user/action.ts";
-import {useDispatch} from "react-redux";
+import "./index.less";
+import {useSelector} from "@/redux/hooks.ts";
 
 export const paths = (perms: PermInfo[]): Set<string> => {
     let path = new Set<string>()
@@ -47,18 +43,14 @@ export const permsKeys = (perms: PermInfo[]): string[] => {
 const LayoutPage: React.FC = () => {
 
     const {token: { colorBgContainer }} = theme.useToken();
-    const dispatch = useDispatch();
-    const userState = useSelector((state) => state.user)
     const [collapsed, setCollapsed] = useState(false);
     const [breadcrumb, setBreadcrumb] = useState<BreadcrumbProp[]>([]);
-    const {run} = useRequest(userInfo, {
-        manual: true,
-        onSuccess: (data)=> {
-            dispatch(changeLoginStatusActionCreator({...userState, ...data}));
-        }
-    })
+    const user = useSelector((state) => state.user)
 
-    useEffect(() => run(), [])
+    useEffect(() => {
+        console.log("user", user);
+    }, [user])
+
 
     const contentCss: React.CSSProperties = {
         margin: '16px 16px',
