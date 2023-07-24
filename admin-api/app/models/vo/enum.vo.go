@@ -1,11 +1,5 @@
 package vo
 
-type MongoName string
-
-const (
-	UserSalt = "Lucky.麒麟"
-)
-
 const (
 	ClaimsInfo    = "Claims"
 	AuthHeader    = "Authorization"
@@ -13,7 +7,11 @@ const (
 	WSHeaderKey   = "WsValid"
 )
 
+type BusinessType int
+
 const (
-	UserKey       = "user:"
-	CaptchaPrefix = "captcha:"
+	Other BusinessType = iota
+	Add
+	Update
+	Delete
 )

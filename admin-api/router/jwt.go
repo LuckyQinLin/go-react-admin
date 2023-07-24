@@ -80,7 +80,7 @@ func JwtMiddle() gin.HandlerFunc {
 			}
 			// 续期
 			if (claims.ExpiresAt.Sub(time.Now()).Minutes() * 3) <= float64(core.Config.Jwt.ExpiresTime) {
-				core.Log.Info("Token剩余时间小于1/3，系统进行续期操作", err.Error())
+				core.Log.Info("Token剩余时间小于1/3，系统进行续期操作")
 				claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Duration(core.Config.Jwt.ExpiresTime) * time.Minute))
 				t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 				if newToken, err = t.SignedString([]byte(core.Config.Jwt.SecretKey)); err != nil {

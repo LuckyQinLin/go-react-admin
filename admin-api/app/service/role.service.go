@@ -61,3 +61,55 @@ func (r *RoleService) RoleAll() (list []response.RoleKeyValueResponse, customErr
 	}
 	return
 }
+
+// Create 角色创建
+func (r *RoleService) Create(param *request.RoleCreateRequest) *response.BusinessError {
+	var (
+		err       error
+		isExist   bool
+		condition *gorm.DB
+		role      entity.Role
+		maps      []*entity.RoleMenu
+	)
+
+	// 判断是否存在相同的角色名称或者权限字符
+	condition = core.DB.Where("role_name = ? or role_key = ?", param.RoleName, param.RoleKey)
+	if isExist, err = dao.Role.Exist(condition); err != nil || isExist {
+		core.Log.Error("存在相同的角色名称或者权限字符")
+		return response.CustomBusinessError(response.Failed, "存在相同的角色名称或者权限字符")
+	}
+	if err = core.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建角色
+		role = entity.Role{
+			RoleName: param.RoleName,
+			RoleKey:  param.RoleKey,
+			RoleSort: param.RoleSort,
+			Status:   param.Status,
+			Remark:   param.Remark,
+			DelFlag:  1,
+			BaseField: entity.BaseField{
+				CreateBy:   param.UserName,
+				CreateTime: time.Now(),
+			},
+		}
+		if err = dao.Role.Create(tx, &role); err != nil {
+			core.Log.Error("创建角色[%s]失败：%s", param.RoleName, err.Error())
+			return err
+		}
+		// 创建角色菜单映射关系
+		if len(param.MenuIds) > 0 {
+			for _, id := range param.MenuIds {
+				maps = append(maps, &entity.RoleMenu{RoleId: role.RoleId, MenuId: id})
+			}
+			if err = dao.Role.RoleMenuMapping(tx, maps); err != nil {
+				core.Log.Error("创建角色[%s]映射关系失败：%s", param.RoleName, err.Error())
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		return response.CustomBusinessError(response.Failed, "创建角色失败")
+	}
+	core.Log.Info("创建角色[%d:%s]成功", role.RoleId, param.RoleName)
+	return nil
+}

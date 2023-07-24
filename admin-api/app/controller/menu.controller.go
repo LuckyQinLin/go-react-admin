@@ -14,7 +14,7 @@ type MenuController struct{}
 // MenuTree 菜单树
 func (m *MenuController) MenuTree(c *gin.Context) {
 	var (
-		tree      []response.MenuTree
+		tree      []*response.MenuTree
 		customErr *response.BusinessError
 	)
 	if tree, customErr = service.Menu.Tree(); customErr != nil {

@@ -30,12 +30,13 @@ func initRouter() {
 		}
 		role := root.Group("role")
 		{
-			role.POST("page", controller.Role.Page)  // 角色分页
-			role.GET("all", controller.Role.RoleAll) // 所有角色
+			role.POST("page", controller.Role.Page)         // 角色分页
+			role.GET("all", controller.Role.RoleAll)        // 所有角色
+			role.POST("create", controller.Role.RoleCreate) // 角色创建
 		}
 		menu := root.Group("menu")
 		{
-			menu.Group("tree", controller.Menu.MenuTree) // 菜单树
+			menu.GET("tree", controller.Menu.MenuTree) // 菜单树
 		}
 	}
 }

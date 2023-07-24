@@ -25,7 +25,12 @@ interface RoleCreateDrawerProp {
 
 // RoleCreateFormProp 角色创建表单属性
 interface RoleCreateFormProp {
-
+    roleName: string; // 角色名称
+    roleKey: string; // 权限字符
+    roleSort: number; // 角色排序
+    status: number; // 状态
+    menuIds?: number[]; // 授权菜单ids
+    remark?: string; // 备注
 }
 
 // RoleDrawerProp 角色抽屉属性
