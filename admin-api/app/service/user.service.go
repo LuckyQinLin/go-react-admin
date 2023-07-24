@@ -135,6 +135,7 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 			userAgent := useragent.New(c.GetHeader("User-Agent"))
 			browser, version := userAgent.Browser()
 			ip := c.ClientIP()
+			now := time.Now()
 			_ = dao.Visit.Save(&entity.Visit{
 				UserName:      username,
 				IpAddr:        ip,
@@ -142,7 +143,7 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 				Browser:       fmt.Sprintf("%sv%s", browser, version),
 				Os:            userAgent.OS(),
 				Msg:           msg,
-				LoginTime:     time.Now(),
+				LoginTime:     &now,
 				Status:        status,
 			})
 		}

@@ -4,22 +4,25 @@ import "time"
 
 // User 用户表
 type User struct {
-	UserId    int64     `gorm:"column:user_id;primaryKey;not null;autoIncrement;comment:用户id" json:"userId"`
-	DeptId    int64     `gorm:"column:dept_id;default:null;comment:部门ID" json:"deptId"`
-	UserName  string    `gorm:"column:user_name;not null;size:30;comment:用户账号" json:"userName"`
-	NickName  string    `gorm:"column:nick_name;not null;size:30;comment:用户昵称" json:"nickName"`
-	UserType  string    `gorm:"column:user_type;default:00;size:2;comment:用户类型(00系统用户)" json:"userType"`
-	Email     string    `gorm:"size:50;default:'';comment:邮箱" json:"email"`
-	Phone     string    `gorm:"size:11;default:'';comment:手机" json:"phone"`
-	Sex       int       `gorm:"size:1;default:0;comment:用户性别(0:女 1:男 2:未知)" json:"sex"`
-	Avatar    string    `gorm:"size:100;default:'';comment:头像地址" json:"avatar"`
-	Password  string    `gorm:"size:100;default:'';comment:密码" json:"password"`
-	Status    int       `gorm:"size:1;default:1;comment:账号状态(1:正常 0:停用)" json:"status"`
-	LoginIp   string    `gorm:"size:128;default:'';comment:最后登录IP" json:"loginIp"`
-	LoginDate time.Time `gorm:"comment:最后登录时间" json:"loginDate"`
-	Remark    string    `gorm:"size:500;default:null;comment:备注" json:"remark"`
-	DelFlag   int       `gorm:"column:del_flag;default:1;comment:删除标志（1代表存在 0代表删除）" json:"delFlag"`
-	BaseField
+	UserId     int64      `gorm:"column:user_id;primaryKey;not null;autoIncrement;comment:用户id" json:"userId"`
+	DeptId     int64      `gorm:"column:dept_id;default:null;comment:部门ID" json:"deptId"`
+	UserName   string     `gorm:"column:user_name;not null;size:30;comment:用户账号" json:"userName"`
+	NickName   string     `gorm:"column:nick_name;not null;size:30;comment:用户昵称" json:"nickName"`
+	UserType   string     `gorm:"column:user_type;default:00;size:2;comment:用户类型(00系统用户)" json:"userType"`
+	Email      string     `gorm:"size:50;default:'';comment:邮箱" json:"email"`
+	Phone      string     `gorm:"size:11;default:'';comment:手机" json:"phone"`
+	Sex        int        `gorm:"size:1;default:0;comment:用户性别(0:女 1:男 2:未知)" json:"sex"`
+	Avatar     string     `gorm:"size:100;default:'';comment:头像地址" json:"avatar"`
+	Password   string     `gorm:"size:100;default:'';comment:密码" json:"password"`
+	Status     int        `gorm:"size:1;default:1;comment:账号状态(1:正常 0:停用)" json:"status"`
+	LoginIp    string     `gorm:"size:128;default:'';comment:最后登录IP" json:"loginIp"`
+	LoginDate  time.Time  `gorm:"comment:最后登录时间" json:"loginDate"`
+	Remark     string     `gorm:"size:500;default:null;comment:备注" json:"remark"`
+	DelFlag    int        `gorm:"column:del_flag;default:1;comment:删除标志（1代表存在 0代表删除）" json:"delFlag"`
+	CreateBy   string     `gorm:"column:create_by;default:'';size:64;comment:创建者" json:"createBy"`
+	CreateTime *time.Time `gorm:"column:create_time;default:null;comment:创建时间" json:"createTime"`
+	UpdateBy   string     `gorm:"column:update_by;default:'';size:64;comment:更新者" json:"updateBy"`
+	UpdateTime *time.Time `gorm:"column:update_time;default:null;comment:更新时间" json:"updateTime"`
 }
 
 // UserRole 用户和角色关联表  用户N-1角色

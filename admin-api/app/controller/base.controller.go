@@ -29,13 +29,14 @@ func (b *BaseController) Parse(c *gin.Context, title string, businessType vo.Bus
 		ip     string
 		claims *vo.UserClaims
 		bytes  []byte
+		now    time.Time
 	)
 	value, _ = c.Get(vo.ClaimsInfo)
 	claims = value.(*vo.UserClaims)
 	ip = c.ClientIP()
 
 	bytes, _ = json.Marshal(param)
-
+	now = time.Now()
 	return claims, &entity.Operate{
 		Title:         title,
 		BusinessType:  int(businessType),
@@ -48,7 +49,7 @@ func (b *BaseController) Parse(c *gin.Context, title string, businessType vo.Bus
 		OperIp:        ip,
 		OperParam:     string(bytes),
 		OperLocation:  utils.IpAddress(ip),
-		OperTime:      time.Now(),
+		OperTime:      &now,
 	}
 }
 
@@ -61,7 +62,7 @@ func (b *BaseController) result(ctx *gin.Context, oper *entity.Operate, isSucces
 		oper.Status = 0
 		oper.ErrorMsg = string(bytes)
 	}
-	oper.CostTime = time.Now().Sub(oper.OperTime).Microseconds()
+	oper.CostTime = time.Now().Sub(*oper.OperTime).Microseconds()
 	service.Operate.Push(oper)
 	ctx.JSON(http.StatusOK, msg)
 	return

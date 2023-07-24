@@ -70,6 +70,7 @@ func (r *RoleService) Create(param *request.RoleCreateRequest) *response.Busines
 		condition *gorm.DB
 		role      entity.Role
 		maps      []*entity.RoleMenu
+		now       time.Time
 	)
 
 	// 判断是否存在相同的角色名称或者权限字符
@@ -79,18 +80,17 @@ func (r *RoleService) Create(param *request.RoleCreateRequest) *response.Busines
 		return response.CustomBusinessError(response.Failed, "存在相同的角色名称或者权限字符")
 	}
 	if err = core.DB.Transaction(func(tx *gorm.DB) error {
+		now = time.Now()
 		// 创建角色
 		role = entity.Role{
-			RoleName: param.RoleName,
-			RoleKey:  param.RoleKey,
-			RoleSort: param.RoleSort,
-			Status:   param.Status,
-			Remark:   param.Remark,
-			DelFlag:  1,
-			BaseField: entity.BaseField{
-				CreateBy:   param.UserName,
-				CreateTime: time.Now(),
-			},
+			RoleName:   param.RoleName,
+			RoleKey:    param.RoleKey,
+			RoleSort:   param.RoleSort,
+			Status:     param.Status,
+			Remark:     param.Remark,
+			DelFlag:    1,
+			CreateBy:   param.UserName,
+			CreateTime: &now,
 		}
 		if err = dao.Role.Create(tx, &role); err != nil {
 			core.Log.Error("创建角色[%s]失败：%s", param.RoleName, err.Error())
