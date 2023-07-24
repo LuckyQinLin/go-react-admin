@@ -113,3 +113,21 @@ func (r *RoleService) Create(param *request.RoleCreateRequest) *response.Busines
 	core.Log.Info("创建角色[%d:%s]成功", role.RoleId, param.RoleName)
 	return nil
 }
+
+func (r *RoleService) Update(param *request.RoleUpdateRequest) *response.BusinessError {
+	var (
+		err       error
+		isExist   bool
+		condition *gorm.DB
+		role      entity.Role
+		maps      []*entity.RoleMenu
+		now       time.Time
+		old       entity.Role
+	)
+	// 获取修改数据
+	if old, err = dao.Role.GetRoleById(param.RoleId); err != nil {
+		core.Log.Error("当前角色[%d]不存在", param.RoleId)
+		return response.CustomBusinessError(response.Failed, "当前角色不存在")
+	}
+	return nil
+}

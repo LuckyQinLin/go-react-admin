@@ -3,6 +3,7 @@ package dao
 import (
 	"admin-api/app/models/entity"
 	"admin-api/app/models/response"
+	"admin-api/core"
 	"admin-api/internal/gorm"
 )
 
@@ -45,4 +46,13 @@ func (r *RoleDao) Create(tx *gorm.DB, role *entity.Role) error {
 // RoleMenuMapping 保存映射关系
 func (r *RoleDao) RoleMenuMapping(tx *gorm.DB, maps []*entity.RoleMenu) error {
 	return tx.Create(maps).Error
+}
+
+// GetRoleById 角色ID
+func (r *RoleDao) GetRoleById(roleId int64) (role entity.Role, err error) {
+	err = core.DB.Model(&entity.Role{}).
+		Where("role_id = ? and del_flag = 1", roleId).
+		First(&role).
+		Error
+	return
 }

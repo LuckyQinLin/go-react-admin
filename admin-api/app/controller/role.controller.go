@@ -68,3 +68,24 @@ func (r *RoleController) RoleCreate(c *gin.Context) {
 	}
 	r.Success(c, operate, response.Ok("角色创建成功"))
 }
+
+// RoleUpdate 角色修改
+func (r *RoleController) RoleUpdate(ctx *gin.Context) {
+	var (
+		claims    *vo.UserClaims
+		operate   *entity.Operate
+		param     request.RoleUpdateRequest
+		customErr *response.BusinessError
+		err       error
+	)
+	claims, operate = r.Parse(ctx, "角色修改", vo.Update, param)
+	if err = ctx.ShouldBind(&param); err != nil {
+		ctx.JSON(http.StatusOK, response.Fail(response.RequestParamError))
+		return
+	}
+	param.UserName = claims.Username
+	if customErr = service.Role.Update(&param); customErr != nil {
+		r.Failed(ctx, operate, response.ResultCustom(customErr))
+	}
+	r.Success(ctx, operate, response.Ok("角色修改成功"))
+}

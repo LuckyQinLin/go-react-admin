@@ -21,3 +21,9 @@ type RoleCreateRequest struct {
 	MenuIds  []int64 `json:"menuIds"`                     // 菜单IDs
 	UserName string  `json:"userName"`                    // 创建用户名称
 }
+
+// RoleUpdateRequest 角色修改
+type RoleUpdateRequest struct {
+	RoleId int64 `json:"roleId" binding:"required"` // 角色ID
+	RoleCreateRequest
+}
