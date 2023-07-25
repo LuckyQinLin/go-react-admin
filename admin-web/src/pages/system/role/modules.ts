@@ -23,6 +23,13 @@ interface RoleCreateDrawerProp {
     close: (isLoad: boolean) => void;
 }
 
+// RoleUpdateDrawerProp 角色更新
+interface RoleUpdateDrawerProp {
+    roleId?: number;
+    visible: boolean;
+    close: (isLoad: boolean) => void;
+}
+
 // RoleCreateFormProp 角色创建表单属性
 interface RoleCreateFormProp {
     roleName: string; // 角色名称
@@ -33,15 +40,24 @@ interface RoleCreateFormProp {
     remark?: string; // 备注
 }
 
+// RoleUpdateFormProp 角色修改表单属性
+interface RoleUpdateFormProp extends RoleCreateFormProp{
+    roleId: number; // 角色ID
+}
+
 // RoleDrawerProp 角色抽屉属性
 interface RoleDrawerProp {
     createVisible: boolean;
+    updateVisible: boolean;
+    roleId?: number;
 }
 
 export type {
     RolePageQueryProp,
     RolePageProp,
     RoleCreateDrawerProp,
+    RoleUpdateDrawerProp,
     RoleCreateFormProp,
+    RoleUpdateFormProp,
     RoleDrawerProp
 }

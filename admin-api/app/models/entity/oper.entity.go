@@ -1,6 +1,9 @@
 package entity
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // Operate 操作日志记录
 type Operate struct {
@@ -21,4 +24,10 @@ type Operate struct {
 	OperTime      *time.Time `gorm:"column:oper_time;default:null;comment:操作时间" json:"operTime"`
 	CostTime      int64      `gorm:"column:cost_time;size:50;default:0;comment:消耗时间" json:"costTime"`
 	Status        int        `gorm:"column:status;default:1;comment:操作状态(1正常 0异常)" json:"status"`
+}
+
+func (o *Operate) ParamToJson(param any) *Operate {
+	bytes, _ := json.Marshal(param)
+	o.OperParam = string(bytes)
+	return o
 }

@@ -15,6 +15,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -415,6 +416,23 @@ func (c *Context) AddParam(key, value string) {
 func (c *Context) Query(key string) (value string) {
 	value, _ = c.GetQuery(key)
 	return
+}
+
+// QueryInt64 请求参数从string转为int64
+func (c *Context) QueryInt64(key string) (int64, error) {
+	var (
+		result int64
+		value  string
+		err    error
+		ok     bool
+	)
+	if value, ok = c.GetQuery(key); !ok {
+		return 0, errors.New("request parameter does not exist")
+	}
+	if result, err = strconv.ParseInt(value, 10, 64); err != nil {
+		return 0, errors.New("the request failed from string to int64")
+	}
+	return result, nil
 }
 
 // DefaultQuery returns the keyed url query value if it exists,

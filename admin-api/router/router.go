@@ -27,12 +27,19 @@ func initRouter() {
 			user.GET("captchaImage", controller.User.CaptchaImage) // 获取验证码
 			user.POST("login", controller.User.Login)              // 登陆
 			user.GET("info", controller.User.GetUserInfo)          // 获取用户信息
+			user.POST("userAllot", controller.User.AllotRole)      // 用户分配角色
 		}
 		role := root.Group("role")
 		{
-			role.POST("page", controller.Role.Page)         // 角色分页
-			role.GET("all", controller.Role.RoleAll)        // 所有角色
-			role.POST("create", controller.Role.RoleCreate) // 角色创建
+			role.GET("all", controller.Role.RoleAll)            // 所有角色
+			role.POST("page", controller.Role.Page)             // 角色分页
+			role.POST("create", controller.Role.RoleCreate)     // 角色创建
+			role.POST("update", controller.Role.RoleUpdate)     // 角色修改
+			role.GET("info", controller.Role.RoleInfo)          // 角色详情
+			role.POST("status", controller.Role.RoleStatus)     // 角色状态修改
+			role.POST("delete", controller.Role.RoleDelete)     // 角色删除
+			role.POST("dataAuth", controller.Role.RoleDataAuth) // 角色数据权限分配
+			role.GET("export", controller.Role.RoleExport)      // 角色导出
 		}
 		menu := root.Group("menu")
 		{

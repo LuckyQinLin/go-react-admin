@@ -13,13 +13,13 @@ type RoleDao struct{}
 
 // Total 查询获取总条数
 func (r *RoleDao) Total(condition *gorm.DB) (total int64, err error) {
-	err = condition.Model(&entity.Role{}).Debug().Count(&total).Error
+	err = condition.Model(&entity.Role{}).Count(&total).Error
 	return
 }
 
 // Limit 角色获取数据
 func (r *RoleDao) Limit(condition *gorm.DB, offset int, limit int) (list []response.RolePageResponse, err error) {
-	err = condition.Limit(limit).Offset(offset).Model(&entity.Role{}).Debug().Find(&list).Error
+	err = condition.Limit(limit).Offset(offset).Model(&entity.Role{}).Find(&list).Error
 	return
 }
 
@@ -29,7 +29,7 @@ func (r *RoleDao) Exist(condition *gorm.DB) (bool, error) {
 		total int64
 		err   error
 	)
-	if err = condition.Model(&entity.Role{}).Debug().Count(&total).Error; err != nil {
+	if err = condition.Model(&entity.Role{}).Count(&total).Error; err != nil {
 		return false, err
 	}
 	if total > 0 {
@@ -54,5 +54,22 @@ func (r *RoleDao) GetRoleById(roleId int64) (role entity.Role, err error) {
 		Where("role_id = ? and del_flag = 1", roleId).
 		First(&role).
 		Error
+	return
+}
+
+// GetRoleMenu 获取角色授权菜单数据
+func (r *RoleDao) GetRoleMenu(roleId int64) (data []entity.RoleMenu, err error) {
+	err = core.DB.Where("role_id = ?", roleId).Find(&data).Error
+	return
+}
+
+// UpdateById 角色修改通过ID
+func (r *RoleDao) UpdateById(tx *gorm.DB, update map[string]any, roleId ...int64) error {
+	return tx.Model(&entity.Role{}).Where("role_id in ?", roleId).Updates(update).Error
+}
+
+// List 角色列表
+func (r *RoleDao) List(condition *gorm.DB) (roles []entity.Role, err error) {
+	err = condition.Model(&entity.Role{}).Find(&roles).Error
 	return
 }

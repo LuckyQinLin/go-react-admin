@@ -27,3 +27,16 @@ type RoleUpdateRequest struct {
 	RoleId int64 `json:"roleId" binding:"required"` // 角色ID
 	RoleCreateRequest
 }
+
+// RoleStatusRequest 角色状态修改
+type RoleStatusRequest struct {
+	RoleId   int64  `json:"roleId" binding:"required"` // 角色ID
+	Status   int    `json:"status" binding:"required"` // 状态
+	UserName string `json:"userName"`                  // 创建用户名称
+}
+
+// RoleDeleteRequest 角色删除
+type RoleDeleteRequest struct {
+	Ids      []int64 `json:"ids" binding:"required"`
+	UserName string  `json:"userName"`
+}

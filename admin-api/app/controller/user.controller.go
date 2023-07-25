@@ -61,3 +61,8 @@ func (u *UserController) GetUserInfo(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, response.Ok(result))
 }
+
+// AllotRole 用户分配角色
+func (u *UserController) AllotRole(ctx *gin.Context) {
+
+}

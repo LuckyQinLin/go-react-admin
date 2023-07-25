@@ -1,11 +1,11 @@
-import {Button, Divider, Input, Select, Space, DatePicker, Table, Switch} from "antd";
-import {DeleteOutlined, EditFilled, DownloadOutlined, PlusOutlined} from "@ant-design/icons";
+import {Button, Divider, Input, Select, Space, DatePicker, Table, Switch, Modal, message} from "antd";
+import {DeleteOutlined, EditFilled, DownloadOutlined, PlusOutlined, ExclamationCircleFilled} from "@ant-design/icons";
 import {ColumnsType} from "antd/es/table";
 import {RoleDrawerProp, RolePageProp, RolePageQueryProp} from "@/pages/system/role/modules.ts";
 import {useRequest} from "ahooks";
-import {rolePage} from "@/api/role.ts";
+import {roleDelete, rolePage} from "@/api/role.ts";
 import {useEffect, useState} from "react";
-import {RoleCreateDrawer} from "@/pages/system/role/components";
+import {RoleCreateDrawer, RoleUpdateDrawer} from "@/pages/system/role/components";
 
 const SystemRolePage = () => {
 
@@ -53,8 +53,8 @@ const SystemRolePage = () => {
                 <Space size={'small'}>
                     <Button type="link" style={{padding: 4}}>数据权限</Button>
                     <Button type="link" style={{padding: 4}}>分配用户</Button>
-                    <Button type="link" style={{padding: 4}}>修改</Button>
-                    <Button type="link" danger style={{padding: 4}}>删除</Button>
+                    <Button type="link" style={{padding: 4}} onClick={() => openDrawer('update', record.roleId)}>修改</Button>
+                    <Button type="link" danger style={{padding: 4}} onClick={() => deleteRoleHandler(record.roleId)}>删除</Button>
                 </Space>
             ),
         },
@@ -64,7 +64,7 @@ const SystemRolePage = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
     const [datasource, setDatasource] = useState<RolePageProp[]>([]);
     const [pageQuery, setPageQuery] = useState<RolePageQueryProp>({page: 1, size: 10});
-    const [roleDrawer, setRoleDrawer] = useState<RoleDrawerProp>({createVisible: false});
+    const [roleDrawer, setRoleDrawer] = useState<RoleDrawerProp>({createVisible: false, updateVisible: false});
 
     const {loading, run} = useRequest(rolePage, {
         manual: true,
@@ -74,10 +74,31 @@ const SystemRolePage = () => {
         }
     })
 
-    const openDrawer = (types: 'create' | 'update') => {
+    const deleteRoleHandler = async (id?: number) => {
+        Modal.confirm({
+            title: '警告',
+            icon: <ExclamationCircleFilled />,
+            content: '确认删除当前角色？',
+            okText: '删除',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk: async () => {
+                await roleDelete(id ? [id] : selectedRowKeys);
+                run(pageQuery)
+                message.success('删除成功')
+                setSelectedRowKeys([]);
+            },
+            onCancel: () => {}
+        });
+    }
+
+    const openDrawer = (types: 'create' | 'update', roleId?: number) => {
         switch (types) {
             case 'create':
-                setRoleDrawer({createVisible: true});
+                setRoleDrawer({createVisible: true, updateVisible: false});
+                break;
+            case 'update':
+                setRoleDrawer({createVisible: false, updateVisible: true, roleId: roleId});
                 break;
             default:
                 break
@@ -87,7 +108,8 @@ const SystemRolePage = () => {
     const closeDrawer = (types: 'create' | 'update', isLoad: boolean) => {
         switch (types) {
             case 'create':
-                setRoleDrawer({createVisible: false});
+            case 'update':
+                setRoleDrawer({createVisible: false, updateVisible: false});
                 break;
             default:
                 break
@@ -102,10 +124,9 @@ const SystemRolePage = () => {
 
     return <>
         <Space>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => openDrawer('create')}>新增</Button>
-            <Button type="primary" icon={<EditFilled />}>修改</Button>
-            <Button type="primary" icon={<DownloadOutlined />}>导出</Button>
-            <Button type="primary" danger icon={<DeleteOutlined />}>删除</Button>
+            <Button type="primary" icon={<PlusOutlined />} disabled={selectedRowKeys.length > 0} onClick={() => openDrawer('create')}>新增</Button>
+            <Button type="primary" icon={<DownloadOutlined />} disabled={selectedRowKeys.length <= 0}>导出</Button>
+            <Button type="primary" disabled={selectedRowKeys.length <= 0} danger icon={<DeleteOutlined />} onClick={() => deleteRoleHandler()}>删除</Button>
             <Divider type="vertical" />
             <Input style={{ width: 220 }} placeholder="请输入角色名称或者权限字符" />
             <Select
@@ -145,6 +166,7 @@ const SystemRolePage = () => {
             }}
         />
         <RoleCreateDrawer visible={roleDrawer.createVisible} close={(isLoad) => closeDrawer('create', isLoad)} />
+        <RoleUpdateDrawer visible={roleDrawer.updateVisible} close={isLoad => closeDrawer('update', isLoad)} roleId={roleDrawer.roleId} />
     </>
 }
 

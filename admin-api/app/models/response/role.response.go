@@ -32,3 +32,14 @@ type RoleKeyValueResponse struct {
 	RoleId   int64  `json:"value"` // 角色ID
 	RoleName string `json:"label"` // 角色名称
 }
+
+// RoleInfoResponse 角色详情
+type RoleInfoResponse struct {
+	RoleId   int64   `json:"roleId"`   // 角色Id
+	RoleKey  string  `json:"roleKey"`  // 角色编码
+	RoleName string  `json:"roleName"` // 角色名称
+	RoleSort int     `json:"roleSort"` // 角色排序
+	Status   int     `json:"status"`   // 角色状态
+	Remark   string  `json:"remark"`   // 备注
+	MenuIds  []int64 `json:"menuIds"`  // 菜单ID
+}

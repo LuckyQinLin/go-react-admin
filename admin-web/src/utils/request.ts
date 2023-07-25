@@ -6,6 +6,7 @@ export enum ResultEnum {
 	SUCCESS = 100200,
 	DATA_NOT_EXIST = 100100,
 	TIMEOUT = 10042,
+	CODE_EXPIRE = 100499,
 	PARAM_ERROR = 100500,
 	BUSINESS_ERROR = 100510,
 	TYPE = 'success',
@@ -381,6 +382,9 @@ const transform: AxiosTransform = {
 		// 接口请求错误，统一提示错误信息 这里逻辑可以根据项目进行修改
 		const errorMsg = message;
 		switch (code) {
+			case ResultEnum.CODE_EXPIRE:
+				Message.error(result);
+				break;
 			case ResultEnum.BUSINESS_ERROR:
 				Message.error(errorMsg);
 				break;
