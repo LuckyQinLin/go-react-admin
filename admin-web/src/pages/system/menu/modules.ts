@@ -5,6 +5,12 @@ interface MenuTreeProp {
     children: MenuTreeProp[];
 }
 
+// MenuTableTreeQueryProp 菜单表格查询
+interface MenuTableTreeQueryProp {
+    name?: string;
+    status?: number;
+}
+
 // MenuTableTreeProp 菜单表格树属性
 interface MenuTableTreeProp {
     id: number;       // 主键
@@ -16,6 +22,7 @@ interface MenuTableTreeProp {
     status: number;   // 状态
     order: number;    // 排序
     createTime: string; // 创建时间
+    children: MenuTableTreeProp[];
 }
 
 // DrawerProp 抽屉参数
@@ -30,5 +37,6 @@ interface DrawerProp {
 export type {
     MenuTreeProp,
     DrawerProp,
-    MenuTableTreeProp
+    MenuTableTreeProp,
+    MenuTableTreeQueryProp
 }

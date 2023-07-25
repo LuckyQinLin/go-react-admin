@@ -30,7 +30,7 @@ func (m *MenuController) MenuTable(ctx *gin.Context) {
 	var (
 		err       error
 		result    []*response.MenuTableResponse
-		param     *request.MenuTableQueryRequest
+		param     request.MenuTableQueryRequest
 		customErr *response.BusinessError
 	)
 	if err = ctx.ShouldBind(&param); err != nil {
