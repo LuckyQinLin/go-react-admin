@@ -1,5 +1,5 @@
 import {Button, Divider, Input, Select, Space, DatePicker, Table, Switch, Modal, message} from "antd";
-import {DeleteOutlined, EditFilled, DownloadOutlined, PlusOutlined, ExclamationCircleFilled} from "@ant-design/icons";
+import {DeleteOutlined, DownloadOutlined, PlusOutlined, ExclamationCircleFilled} from "@ant-design/icons";
 import {ColumnsType} from "antd/es/table";
 import {RoleDrawerProp, RolePageProp, RolePageQueryProp} from "@/pages/system/role/modules.ts";
 import {useRequest} from "ahooks";
@@ -63,7 +63,7 @@ const SystemRolePage = () => {
     const [total, setTotal] = useState<number>(0);
     const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
     const [datasource, setDatasource] = useState<RolePageProp[]>([]);
-    const [pageQuery, setPageQuery] = useState<RolePageQueryProp>({page: 1, size: 10});
+    const [pageQuery] = useState<RolePageQueryProp>({page: 1, size: 10});
     const [roleDrawer, setRoleDrawer] = useState<RoleDrawerProp>({createVisible: false, updateVisible: false});
 
     const {loading, run} = useRequest(rolePage, {
