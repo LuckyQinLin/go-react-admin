@@ -86,3 +86,21 @@ func (m *MenuService) Table(param *request.MenuTableQueryRequest) ([]*response.M
 	result = recursionBuild(0, all)
 	return result, nil
 }
+
+// Create 菜单创建
+func (m *MenuService) Create(param *request.MenuCreateRequest) *response.BusinessError {
+
+	return nil
+}
+
+// Update 菜单修改
+func (m *MenuService) Update(param *request.MenuUpdateRequest) *response.BusinessError {
+
+	return nil
+}
+
+// Delete 菜单删除
+func (m *MenuService) Delete(param *request.MenuDeleteRequest) *response.BusinessError {
+
+	return nil
+}

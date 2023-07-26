@@ -43,8 +43,11 @@ func initRouter() {
 		}
 		menu := root.Group("menu")
 		{
-			menu.GET("tree", controller.Menu.MenuTree)    // 菜单树
-			menu.POST("table", controller.Menu.MenuTable) // 菜单表格
+			menu.GET("tree", controller.Menu.MenuTree)      // 菜单树
+			menu.POST("table", controller.Menu.MenuTable)   // 菜单表格
+			menu.POST("create", controller.Menu.MenuCreate) // 菜单创建
+			menu.POST("update", controller.Menu.MenuUpdate) // 菜单修改
+			menu.GET("delete", controller.Menu.MenuDelete)  // 菜单删除
 		}
 	}
 }
