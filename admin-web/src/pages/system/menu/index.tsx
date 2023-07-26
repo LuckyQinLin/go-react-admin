@@ -8,27 +8,8 @@ import {
 import {ColumnsType} from "antd/es/table";
 import {menuTable} from "@/api/menu.ts";
 import {useRequest} from "ahooks";
+import {MenuCreateDrawer, MenuUpdateDrawer} from "@/pages/system/menu/components";
 
-// const loadTree = (list: MenuTableTreeProp[], key: React.Key, children: MenuTableTreeProp[]): MenuTableTreeProp[] =>
-//     list.map((node) => {
-//         if (node.key === key) {
-//             if (node.children) {
-//                 const keys = node.children.map(item => item.key);
-//                 const temp = children.filter(item => !keys.includes(item.key));
-//                 const sorts = [...children, ...temp].sort((a, b) => a.order - b.order);
-//                 return { ...node, sorts };
-//             } else {
-//                 return { ...node, children };
-//             }
-//         }
-//         if (node.children) {
-//             return {
-//                 ...node,
-//                 children: loadTree(node.children, key, children),
-//             };
-//         }
-//         return node;
-//     });
 
 const AuthorityPermissionPage = () => {
 
@@ -100,7 +81,7 @@ const AuthorityPermissionPage = () => {
         }
     ];
 
-    const [tableQuery, setTableQuery] = useState<MenuTableTreeQueryProp>({});
+    const [tableQuery] = useState<MenuTableTreeQueryProp>({});
     const [drawerProp, setDrawerProp] = useState<DrawerProp>({types: 1, parentId: 0, createVisible: false, updateVisible: false});
     const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
     const [datasource, setDatasource] = useState<MenuTableTreeProp[]>([]);
@@ -122,15 +103,12 @@ const AuthorityPermissionPage = () => {
     }
 
 
-    // const closeDrawer = (isLoad: boolean, data?: PermissionListProp) => {
-    //     setDrawerProp({...drawerProp, updateVisible: false, createVisible: false})
-    //     if (isLoad) {
-    //         loadList(drawerProp.parentId!);
-    //     }
-    //     if (data) {
-    //         // TODO 修改左侧树
-    //     }
-    // }
+    const closeDrawer = (isLoad: boolean) => {
+        setDrawerProp({...drawerProp, updateVisible: false, createVisible: false})
+        if (isLoad) {
+            run(tableQuery);
+        }
+    }
 
     useEffect(() => {
         run(tableQuery)
@@ -138,38 +116,37 @@ const AuthorityPermissionPage = () => {
 
 
     return <>
-    <Space>
-        <Button type='primary' onClick={() => setDrawerProp({...drawerProp, createVisible: true})}>创建</Button>
-        <Button type='primary'>刷新</Button>
-        <Button type='primary' danger>删除</Button>
-    </Space>
-    <Table
-        bordered
-        size={'small'}
-        loading={loading}
-        columns={columns}
-        dataSource={datasource}
-        style={{ marginTop: 10 }}
-        rowKey={(record) => record.key}
-        pagination={false}
-        rowSelection={{
-            type: 'checkbox',
-            selectedRowKeys: selectedRowKeys,
-            onChange: (selectedRowKeys: React.Key[]) => {
-                setSelectedRowKeys([...selectedRowKeys.map(item => item as number)])
-            }
-        }}
-    />
-        {/*<MenuCreateDrawer*/}
-        {/*    types={drawerProp.types!}*/}
-        {/*    parentId={drawerProp.parentId!}*/}
-        {/*    visible={drawerProp.createVisible}*/}
-        {/*    close={closeDrawer}*/}
-        {/*/>*/}
-        {/*<MenuUpdateDrawer*/}
-        {/*    id={drawerProp.currId!}*/}
-        {/*    visible={drawerProp.updateVisible}*/}
-        {/*    close={closeDrawer} />*/}
+        <Space>
+            <Button type='primary' onClick={() => setDrawerProp({...drawerProp, createVisible: true})}>创建</Button>
+            <Button type='primary'>刷新</Button>
+            <Button type='primary' danger>删除</Button>
+        </Space>
+        <Table
+            bordered
+            size={'small'}
+            loading={loading}
+            columns={columns}
+            dataSource={datasource}
+            style={{ marginTop: 10 }}
+            rowKey={(record) => record.key}
+            pagination={false}
+            rowSelection={{
+                type: 'checkbox',
+                selectedRowKeys: selectedRowKeys,
+                onChange: (selectedRowKeys: React.Key[]) => {
+                    setSelectedRowKeys([...selectedRowKeys.map(item => item as number)])
+                }
+            }}
+        />
+        <MenuCreateDrawer
+            parentId={drawerProp.parentId!}
+            visible={drawerProp.createVisible}
+            close={closeDrawer}
+        />
+        <MenuUpdateDrawer
+            menuId={drawerProp.currId!}
+            visible={drawerProp.updateVisible}
+            close={closeDrawer} />
     </>
 }
 

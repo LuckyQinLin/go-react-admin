@@ -34,9 +34,45 @@ interface DrawerProp {
     updateVisible: boolean;
 }
 
+// MenuCreateDrawerProp 菜单创建抽屉属性
+interface MenuCreateDrawerProp {
+    visible: boolean;
+    parentId: number;
+    close: (isLoad: boolean) => void;
+}
+
+// MenuUpdateDrawerProp 菜单更新抽屉属性
+interface MenuUpdateDrawerProp {
+    visible: boolean;
+    menuId?: number;
+    close: (isLoad: boolean) => void;
+}
+
+// MenuCreateFormProp 菜单创建表单属性
+interface MenuCreateFormProp {
+    parentId: number;  // 上级菜单
+    menuType: number;  // 菜单类型
+    icon: string;      // 图标
+    menuName: string;  // 菜单名称
+    menuSort: number;  // 菜单排序
+    isLink: boolean;   // 是否外链
+    path: string;      // 路由地址
+    show: boolean;     // 显示状态
+    status: boolean;   // 菜单状态
+}
+
+// MenuUpdateFormProp 菜单创建表单属性
+interface MenuUpdateFormProp extends MenuCreateFormProp{
+    menuId: number; // 菜单ID
+}
+
 export type {
     MenuTreeProp,
     DrawerProp,
     MenuTableTreeProp,
-    MenuTableTreeQueryProp
+    MenuTableTreeQueryProp,
+    MenuCreateDrawerProp,
+    MenuUpdateDrawerProp,
+    MenuCreateFormProp,
+    MenuUpdateFormProp
 }
