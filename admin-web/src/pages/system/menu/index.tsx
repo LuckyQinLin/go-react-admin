@@ -7,7 +7,6 @@ import {
 } from "@/pages/system/menu/modules";
 import {ColumnsType} from "antd/es/table";
 import {menuTable} from "@/api/menu.ts";
-import {Icon} from "@/components";
 import {useRequest} from "ahooks";
 
 // const loadTree = (list: MenuTableTreeProp[], key: React.Key, children: MenuTableTreeProp[]): MenuTableTreeProp[] =>
