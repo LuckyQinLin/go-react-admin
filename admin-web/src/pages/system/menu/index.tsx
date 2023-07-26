@@ -1,4 +1,4 @@
-import {Button, Col, Row, Space, Table, Tag} from "antd";
+import {Button, Space, Table, Tag} from "antd";
 import React, {useEffect, useState} from "react";
 import {
     DrawerProp,
@@ -6,7 +6,6 @@ import {
     MenuTableTreeQueryProp,
 } from "@/pages/system/menu/modules";
 import {ColumnsType} from "antd/es/table";
-import Search from "antd/es/input/Search";
 import {menuTable} from "@/api/menu.ts";
 import {Icon} from "@/components";
 import {useRequest} from "ahooks";
@@ -48,7 +47,7 @@ const AuthorityPermissionPage = () => {
             dataIndex: 'icon',
             align: 'center',
             width: 80,
-            render: (_, record) => record.icon ? <Icon icon={record.icon} /> : null
+            // render: (_, record) => record.icon ? <Icon icon={record.icon} /> : null
         },
         {
             title: '排序',
@@ -94,8 +93,8 @@ const AuthorityPermissionPage = () => {
             width: 200,
             render: (_, record) => (
                 <Space size={'small'}>
-                    <Button size="small" type="primary" onClick={() => openDrawer('edit', record.id)}>编辑</Button>
-                    <Button size="small" type="primary" onClick={() => openDrawer('info', record.id)}>增加</Button>
+                    <Button size="small" type="primary" onClick={() => openDrawer('edit', record.key)}>编辑</Button>
+                    <Button size="small" type="primary" onClick={() => openDrawer('info', record.key)}>增加</Button>
                     <Button size="small" type="primary" danger>删除</Button>
                 </Space>
             ),
@@ -152,7 +151,7 @@ const AuthorityPermissionPage = () => {
         columns={columns}
         dataSource={datasource}
         style={{ marginTop: 10 }}
-        rowKey={(record) => record.id}
+        rowKey={(record) => record.key}
         pagination={false}
         rowSelection={{
             type: 'checkbox',

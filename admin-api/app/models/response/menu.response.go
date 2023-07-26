@@ -25,7 +25,7 @@ type MenuTree struct {
 //	order: number;    // 排序
 //	createTime: string; // 创建时间
 type MenuTableResponse struct {
-	MenuId     int64                `json:"id"`         // 主键
+	MenuId     int64                `json:"key"`        // 主键
 	MenuName   string               `json:"title"`      // 菜单名称
 	Perms      string               `json:"code"`       // 权限标识
 	Icon       string               `json:"icon"`       // 图标
