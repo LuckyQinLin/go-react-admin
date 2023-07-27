@@ -98,17 +98,17 @@ func (m *MenuController) MenuDelete(ctx *gin.Context) {
 		err       error
 		claims    *vo.UserClaims
 		operate   *entity.Operate
-		param     request.MenuDeleteRequest
+		menuId    int64
 		customErr *response.BusinessError
 	)
 	claims, operate = m.Parse(ctx, "菜单删除", vo.Delete, nil)
-	if err = ctx.ShouldBind(&param); err != nil {
+
+	if menuId, err = ctx.QueryInt64("menuId"); err != nil {
 		m.Failed(ctx, operate, response.Fail("请求参数不存在"))
 		return
 	}
-	param.UserName = claims.Username
-	operate.ParamToJson(param)
-	if customErr = service.Menu.Delete(&param); customErr != nil {
+	operate.ParamToJson(menuId)
+	if customErr = service.Menu.Delete(menuId, claims.Username); customErr != nil {
 		m.Failed(ctx, operate, response.ResultCustom(customErr))
 		return
 	}
