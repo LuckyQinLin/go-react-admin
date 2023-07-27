@@ -48,6 +48,7 @@ func initRouter() {
 			menu.POST("create", controller.Menu.MenuCreate) // 菜单创建
 			menu.POST("update", controller.Menu.MenuUpdate) // 菜单修改
 			menu.GET("delete", controller.Menu.MenuDelete)  // 菜单删除
+			menu.GET("info", controller.Menu.MenuInfo)      // 菜单详情
 		}
 	}
 }

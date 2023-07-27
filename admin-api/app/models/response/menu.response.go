@@ -14,16 +14,6 @@ type MenuTree struct {
 }
 
 // MenuTableResponse 菜单表
-// id: number;       // 主键
-//
-//	title: string;    // 菜单名称
-//	code: string;     // 权限字符
-//	icon: string;     // 图标
-//	path?: string;    // 路由
-//	parentId: number; // 上级ID
-//	status: number;   // 状态
-//	order: number;    // 排序
-//	createTime: string; // 创建时间
 type MenuTableResponse struct {
 	MenuId     int64                `json:"key"`        // 主键
 	MenuName   string               `json:"title"`      // 菜单名称
@@ -46,4 +36,18 @@ func (s MenuTableResponse) MarshalJSON() ([]byte, error) {
 		temp:       (temp)(s),
 		CreateTime: utils.DateTime(*s.CreateTime),
 	})
+}
+
+// MenuInfoResponse 菜单详情
+type MenuInfoResponse struct {
+	MenuId   int64  `json:"menuId"`   // 菜单ID
+	ParentId int64  `json:"parentId"` // 上级菜单
+	MenuType string `json:"menuType"` // 菜单类型 (M目录 C菜单 F按钮)
+	Icon     string `json:"icon"`     // 图标
+	MenuName string `json:"menuName"` // 菜单名称
+	MenuSort int    `json:"menuSort"` // 显示顺序
+	IsLink   bool   `json:"isLink"`   // 是否外链
+	Path     string `json:"path"`     // 路由地址
+	Show     bool   `json:"show"`     // 显示状态
+	Status   int    `json:"status"`   // 菜单状态
 }

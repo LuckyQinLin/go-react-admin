@@ -199,3 +199,27 @@ func (m *MenuService) Delete(menuId int64, updateName string) *response.Business
 	}
 	return nil
 }
+
+// Info 菜单详情
+func (m *MenuService) Info(menuId int64) (*response.MenuInfoResponse, *response.BusinessError) {
+	var (
+		menu entity.Menu
+		err  error
+	)
+	if menu, err = dao.Menu.GetMenuById(menuId); err != nil {
+		core.Log.Info("获取菜单失败：%s", menuId)
+		return nil, response.CustomBusinessError(response.Failed, "获取菜单失败")
+	}
+	return &response.MenuInfoResponse{
+		MenuId:   menu.MenuId,
+		ParentId: menu.ParentId,
+		MenuType: menu.MenuType,
+		Icon:     menu.Icon,
+		MenuName: menu.MenuName,
+		MenuSort: menu.OrderNum,
+		IsLink:   menu.IsFrame,
+		Path:     menu.Path,
+		Show:     menu.Visible,
+		Status:   menu.Status,
+	}, nil
+}

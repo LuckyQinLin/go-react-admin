@@ -102,7 +102,6 @@ func (m *MenuController) MenuDelete(ctx *gin.Context) {
 		customErr *response.BusinessError
 	)
 	claims, operate = m.Parse(ctx, "菜单删除", vo.Delete, nil)
-
 	if menuId, err = ctx.QueryInt64("menuId"); err != nil {
 		m.Failed(ctx, operate, response.Fail("请求参数不存在"))
 		return
@@ -113,4 +112,23 @@ func (m *MenuController) MenuDelete(ctx *gin.Context) {
 		return
 	}
 	m.Success(ctx, operate, response.Ok("删除菜单数据成功"))
+}
+
+// MenuInfo 菜单详情
+func (m *MenuController) MenuInfo(ctx *gin.Context) {
+	var (
+		err       error
+		menuId    int64
+		info      *response.MenuInfoResponse
+		customErr *response.BusinessError
+	)
+	if menuId, err = ctx.QueryInt64("menuId"); err != nil {
+		ctx.JSON(http.StatusOK, response.Fail(response.RequestParamError))
+		return
+	}
+	if info, customErr = service.Menu.Info(menuId); customErr != nil {
+		ctx.JSON(http.StatusOK, response.ResultCustom(customErr))
+		return
+	}
+	ctx.JSON(http.StatusOK, response.Ok(info))
 }
