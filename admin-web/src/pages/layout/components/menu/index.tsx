@@ -11,6 +11,7 @@ type MenuItem = Required<MenuProps>['items'][number];
 import {Icon} from "@/components";
 import './index.less';
 import {permsKeys} from "@/pages/layout";
+import IconFont from "@/components/IconFont";
 
 interface LayoutHeaderProp {
 	collapsed: boolean;
@@ -58,86 +59,101 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed, breadcrumb}) => {
 		{
 			label: '系统首页',
 			key: '/index',
-			icon: <Icon icon="HomeOutlined" />
+			icon: <IconFont type="lucky-shouye1" />
 		},
 		{
 			label: '系统管理',
 			key: '/system',
-			icon: <Icon icon="SettingOutlined" />,
+			icon: <IconFont type="lucky-shezhi1" />,
 			children: [
 				{
 					label: '用户管理',
-					key: '/system/user'
+					key: '/system/user',
+					icon: <IconFont type="lucky-yonghu" />,
 				},
 				{
 					label: '角色管理',
-					key: '/system/role'
+					key: '/system/role',
+					icon: <IconFont type="lucky-jiaose" />,
 				},
 				{
 					label: '菜单管理',
-					key: '/system/menu'
+					key: '/system/menu',
+					icon: <IconFont type="lucky-caidan" />,
 				},
 				{
 					label: '部门管理',
-					key: '/system/dept'
+					key: '/system/dept',
+					icon: <IconFont type="lucky-bumenguanli" />,
 				},
 				{
 					label: '岗位管理',
-					key: '/system/post'
+					key: '/system/post',
+					icon: <IconFont type="lucky-gangwei" />,
 				},
 				{
 					label: '字典管理',
-					key: '/system/dict'
+					key: '/system/dict',
+					icon: <IconFont type="lucky-zidianmuluguanli" />,
 				},
 				{
 					label: '参数管理',
-					key: '/system/param'
+					key: '/system/param',
+					icon: <IconFont type="lucky-shujucanshu" />,
 				},
 				{
 					label: '通知公告',
-					key: '/system/inform'
+					key: '/system/inform',
+					icon: <IconFont type="lucky-tongzhi" />,
 				},
 			]
 		},
 		{
 			label: '日志管理',
 			key: '/logger',
-			icon: <Icon icon="FileTextOutlined" />,
+			icon: <IconFont type="lucky-nav_icon_rzgl_spe" />,
 			children: [
 				{
 					label: '操作日志',
-					key: '/logger/operate'
+					key: '/logger/operate',
+					icon: <IconFont type="lucky-caozuorizhi" />,
 				},
 				{
 					label: '登录日志',
-					key: '/logger/login'
+					key: '/logger/login',
+					icon: <IconFont type="lucky-denglurizhi" />,
 				},
 			]
 		},
 		{
 			label: '系统监控',
 			key: '/monitor',
-			icon: <Icon icon="FundProjectionScreenOutlined" />,
+			icon: <IconFont type="lucky-jiankong" />,
 			children: [
 				{
 					label: '在线用户',
-					key: '/monitor/onlineUser'
+					key: '/monitor/onlineUser',
+					icon: <IconFont type="lucky-zaixianyonghuguanli1" />,
 				},
 				{
 					label: '定时任务',
-					key: '/monitor/timeTask'
+					key: '/monitor/timeTask',
+					icon: <IconFont type="lucky-dingshirenwuguanli" />,
 				},
 				{
 					label: '服务器监控',
-					key: '/monitor/server'
+					key: '/monitor/server',
+					icon: <IconFont type="lucky-fuwuqijiankong" />,
 				},
 				{
 					label: '缓冲监控',
-					key: '/monitor/cache'
+					key: '/monitor/cache',
+					icon: <IconFont type="lucky-huanchongfenxi" />,
 				},
 				{
 					label: '缓冲列表',
-					key: '/monitor/cacheList'
+					key: '/monitor/cacheList',
+					icon: <IconFont type="lucky-cityworksjichugongnengtubiao-" />,
 				},
 			]
 		},
