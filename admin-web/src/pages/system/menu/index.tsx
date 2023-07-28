@@ -11,7 +11,6 @@ import {useRequest} from "ahooks";
 import {MenuCreateDrawer, MenuUpdateDrawer} from "@/pages/system/menu/components";
 import IconFont from "@/components/IconFont";
 import {ExclamationCircleFilled} from "@ant-design/icons";
-import {roleDelete} from "@/api/role.ts";
 
 
 const AuthorityPermissionPage = () => {
