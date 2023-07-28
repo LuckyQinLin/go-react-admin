@@ -31,7 +31,7 @@ func (m *MenuDao) Exist(condition *gorm.DB) (bool, error) {
 		total int64
 		err   error
 	)
-	if err = condition.Model(&entity.Menu{}).Count(&total).Error; err != nil {
+	if err = condition.Model(&entity.Menu{}).Count(&total).Debug().Error; err != nil {
 		return false, err
 	}
 	if total > 0 {
@@ -42,7 +42,7 @@ func (m *MenuDao) Exist(condition *gorm.DB) (bool, error) {
 
 // Create 创建菜单
 func (m *MenuDao) Create(tx *gorm.DB, menu *entity.Menu) error {
-	return tx.Create(menu).Error
+	return tx.Create(menu).Debug().Error
 }
 
 // UpdateById 更新菜单

@@ -15,7 +15,7 @@ type OperateService struct {
 }
 
 func NewOperateService() *OperateService {
-	result := &OperateService{pool: make(chan *entity.Operate, 50), batchSize: 10}
+	result := &OperateService{pool: make(chan *entity.Operate, 50), batchSize: 3}
 	result.handler = func() {
 		for {
 			select {

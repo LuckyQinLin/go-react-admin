@@ -1,4 +1,4 @@
-import {Button, Space, Table, Tag} from "antd";
+import {Button, message, Modal, Space, Table, Tag} from "antd";
 import React, {useEffect, useState} from "react";
 import {
     DrawerProp,
@@ -6,9 +6,12 @@ import {
     MenuTableTreeQueryProp,
 } from "@/pages/system/menu/modules";
 import {ColumnsType} from "antd/es/table";
-import {menuTable} from "@/api/menu.ts";
+import {menuDelete, menuTable} from "@/api/menu.ts";
 import {useRequest} from "ahooks";
 import {MenuCreateDrawer, MenuUpdateDrawer} from "@/pages/system/menu/components";
+import IconFont from "@/components/IconFont";
+import {ExclamationCircleFilled} from "@ant-design/icons";
+import {roleDelete} from "@/api/role.ts";
 
 
 const AuthorityPermissionPage = () => {
@@ -27,7 +30,7 @@ const AuthorityPermissionPage = () => {
             dataIndex: 'icon',
             align: 'center',
             width: 80,
-            // render: (_, record) => record.icon ? <Icon icon={record.icon} /> : null
+            render: (_, record) => record.icon ? <IconFont type={record.icon} /> : null
         },
         {
             title: '排序',
@@ -42,7 +45,7 @@ const AuthorityPermissionPage = () => {
             dataIndex: 'code',
             align: 'center',
             width: 150,
-            render: (text) => <Tag color="red">{text}</Tag>
+            render: (text) => text ? <Tag color="red">{text}</Tag> : null
         },
         {
             title: '组件路径',
@@ -57,7 +60,7 @@ const AuthorityPermissionPage = () => {
             dataIndex: 'status',
             align: 'center',
             width: 150,
-            render: (text) => text === 0 ? <Tag color="blue">正常</Tag>: <Tag color="red">禁用</Tag>
+            render: (text) => text === 1 ? <Tag color="blue">正常</Tag>: <Tag color="red">禁用</Tag>
         },
         {
             title: '创建时间',
@@ -74,15 +77,15 @@ const AuthorityPermissionPage = () => {
             render: (_, record) => (
                 <Space size={'small'}>
                     <Button size="small" type="primary" onClick={() => openDrawer('edit', record.key)}>编辑</Button>
-                    <Button size="small" type="primary" onClick={() => openDrawer('info', record.key)}>增加</Button>
-                    <Button size="small" type="primary" danger>删除</Button>
+                    <Button size="small" type="primary" onClick={() => openDrawer('add', record.key)}>增加</Button>
+                    <Button size="small" type="primary" danger onClick={() => deleteMenu(record.key)}>删除</Button>
                 </Space>
             ),
         }
     ];
 
     const [tableQuery] = useState<MenuTableTreeQueryProp>({});
-    const [drawerProp, setDrawerProp] = useState<DrawerProp>({types: 1, parentId: 0, createVisible: false, updateVisible: false});
+    const [drawerProp, setDrawerProp] = useState<DrawerProp>({createVisible: false, updateVisible: false});
     const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
     const [datasource, setDatasource] = useState<MenuTableTreeProp[]>([]);
 
@@ -93,18 +96,38 @@ const AuthorityPermissionPage = () => {
         }
     })
 
-    const openDrawer = (types: 'info' | 'edit', id: number) => {
-        if (types === 'info') {
-            setDrawerProp({...drawerProp, currId: id, createVisible: false, updateVisible: false});
+    const openDrawer = (types: 'add' | 'edit', id: number) => {
+        if (types === 'add') {
+            setDrawerProp({...drawerProp, parentId: id, createVisible: true});
         } else if (types === 'edit') {
-            setDrawerProp({...drawerProp, updateVisible: true, currId: id, createVisible: false});
+            setDrawerProp({...drawerProp, updateVisible: true, currId: id});
         }
+    }
 
+    const deleteMenu = (menuId: number) => {
+        Modal.confirm({
+            title: '警告',
+            icon: <ExclamationCircleFilled />,
+            content: '确认删除当前菜单？',
+            okText: '删除',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk: async () => {
+                const msg = await menuDelete(menuId);
+                message.success(msg)
+            },
+            onCancel: () => {}
+        });
     }
 
 
     const closeDrawer = (isLoad: boolean) => {
-        setDrawerProp({...drawerProp, updateVisible: false, createVisible: false})
+        setDrawerProp({...drawerProp,
+                                updateVisible: false,
+                                createVisible: false,
+                                currId: undefined,
+                                parentId: undefined
+                              })
         if (isLoad) {
             run(tableQuery);
         }
@@ -117,9 +140,8 @@ const AuthorityPermissionPage = () => {
 
     return <>
         <Space>
-            <Button type='primary' onClick={() => setDrawerProp({...drawerProp, createVisible: true})}>创建</Button>
-            <Button type='primary'>刷新</Button>
-            <Button type='primary' danger>删除</Button>
+            <Button type='primary' onClick={() => setDrawerProp({...drawerProp, createVisible: true, parentId: 0})}>创建</Button>
+            <Button type='primary' onClick={() => run(tableQuery)}>刷新</Button>
         </Space>
         <Table
             bordered

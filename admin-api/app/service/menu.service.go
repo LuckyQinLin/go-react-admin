@@ -99,7 +99,7 @@ func (m *MenuService) Create(param *request.MenuCreateRequest) *response.Busines
 		exist     bool
 	)
 	// 检测菜单名称是否唯一
-	condition = core.DB.Where("menu_code = ? or parent_id = ?", param.MenuName, param.ParentId)
+	condition = core.DB.Where("menu_code = ? and parent_id = ?", param.MenuName, param.ParentId)
 	if exist, err = dao.Menu.Exist(condition); err != nil || exist {
 		core.Log.Error("存在相同的资源名称")
 		return response.CustomBusinessError(response.Failed, "存在相同的资源名称")
@@ -110,15 +110,30 @@ func (m *MenuService) Create(param *request.MenuCreateRequest) *response.Busines
 		MenuName:   param.MenuName,
 		ParentId:   param.ParentId,
 		OrderNum:   param.MenuSort,
-		Path:       param.Path,
-		IsFrame:    param.IsLink,
-		IsCache:    true,
 		MenuType:   param.MenuType,
-		Visible:    param.Show,
-		Status:     param.Status,
-		Icon:       param.Icon,
 		CreateBy:   param.UserName,
 		CreateTime: &now,
+	}
+	if param.MenuType == "M" {
+		// 目录
+		menu.Icon = param.Icon
+		menu.Path = param.Path
+		menu.IsFrame = param.IsLink
+		menu.Visible = param.IsShow
+		menu.Status = param.Status
+	} else if param.MenuType == "C" {
+		// 菜单
+		menu.Perms = param.Perms
+		menu.Icon = param.Icon
+		menu.Path = param.Path
+		menu.Component = param.Component
+		menu.IsFrame = param.IsLink
+		menu.IsCache = param.IsCache
+		menu.Visible = param.IsShow
+		menu.Status = param.Status
+	} else if param.MenuType == "F" {
+		// 按钮
+		menu.Perms = param.Perms
 	}
 	if err = core.DB.Transaction(func(tx *gorm.DB) error {
 		return dao.Menu.Create(tx, &menu)
@@ -154,14 +169,29 @@ func (m *MenuService) Update(param *request.MenuUpdateRequest) *response.Busines
 	old.ParentId = param.ParentId
 	old.MenuType = param.MenuType
 	old.MenuName = param.MenuName
-	old.OrderNum = param.MenuSort
-	old.IsFrame = param.IsLink
-	old.Path = param.Path
-	old.Visible = param.Show
-	old.Status = param.Status
-	old.Icon = param.Icon
 	old.UpdateBy = param.UserName
 	old.UpdateTime = &now
+	if param.MenuType == "M" {
+		// 目录
+		old.Icon = param.Icon
+		old.Path = param.Path
+		old.IsFrame = param.IsLink
+		old.Visible = param.IsShow
+		old.Status = param.Status
+	} else if param.MenuType == "C" {
+		// 菜单
+		old.Perms = param.Perms
+		old.Icon = param.Icon
+		old.Path = param.Path
+		old.Component = param.Component
+		old.IsFrame = param.IsLink
+		old.IsCache = param.IsCache
+		old.Visible = param.IsShow
+		old.Status = param.Status
+	} else if param.MenuType == "F" {
+		// 按钮
+		old.Perms = param.Perms
+	}
 	if err = core.DB.Transaction(func(tx *gorm.DB) error {
 		return dao.Menu.UpdateById(tx, &old)
 	}); err != nil {

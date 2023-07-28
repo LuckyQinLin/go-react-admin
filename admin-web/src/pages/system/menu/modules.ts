@@ -50,15 +50,19 @@ interface MenuUpdateDrawerProp {
 
 // MenuCreateFormProp 菜单创建表单属性
 interface MenuCreateFormProp {
-    parentId: number;  // 上级菜单
-    menuType: number;  // 菜单类型
-    icon: string;      // 图标
-    menuName: string;  // 菜单名称
-    menuSort: number;  // 菜单排序
-    isLink: boolean;   // 是否外链
-    path: string;      // 路由地址
-    show: boolean;     // 显示状态
-    status: boolean;   // 菜单状态
+    parentId:  number;  // 上级菜单
+    menuType:  string;  // 菜单类型 (M目录 C菜单 F按钮)
+    perms: string; // 权限字符
+    icon:      string;  // 图标
+    menuName:  string;  // 菜单名称
+    menuSort:  number;  // 菜单排序
+    path:      string;  // 路由地址
+    component: string;  // 组件路径
+    param:     string;  // 路由参数
+    isLink:    boolean; // 是否外链 true:是 false:不是
+    isShow:    boolean; // 显示状态 true:是 false:不是
+    isCache:   boolean; // 缓冲 true:是 false:不是
+    status:    number;  // 菜单状态 1:正常 0:停用
 }
 
 // MenuUpdateFormProp 菜单创建表单属性
