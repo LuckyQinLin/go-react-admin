@@ -5,6 +5,7 @@ import (
 	"admin-api/core"
 	"admin-api/internal/gin"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -87,7 +88,7 @@ func Run(port int64) {
 	}
 
 	go func() {
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			core.Log.Error("启动服务失败：%s\n", err.Error())
 		}
 	}()
