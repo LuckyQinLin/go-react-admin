@@ -1,11 +1,11 @@
 import {useEffect, useState} from "react";
 import {useRequest} from "ahooks";
-import {postPage} from "@/api/post.ts";
+import {postDelete, postPage} from "@/api/post.ts";
 import {PostDrawerProp, PostPageProp, PostPageQueryProp} from "@/pages/system/post/modules.ts";
 import {Button, message, Modal, Space, Switch, Table} from "antd";
 import {ColumnsType} from "antd/es/table";
 import {DeleteOutlined, DownloadOutlined, ExclamationCircleFilled, PlusOutlined} from "@ant-design/icons";
-import {roleDelete} from "@/api/role.ts";
+import {PostCreateDrawer, PostUpdateDrawer} from "@/pages/system/post/components";
 
 const SystemPostPage = () => {
 
@@ -64,16 +64,30 @@ const SystemPostPage = () => {
     const [pageQuery] = useState<PostPageQueryProp>({page: 1, size: 10});
     const [postDrawer, setPostDrawer] = useState<PostDrawerProp>({createVisible: false, updateVisible: false});
 
-    const openDrawer = (types: 'create' | 'update', roleId?: number) => {
+    const openDrawer = (types: 'create' | 'update', postId?: number) => {
         switch (types) {
             case 'create':
                 setPostDrawer({createVisible: true, updateVisible: false});
                 break;
             case 'update':
-                setPostDrawer({createVisible: false, updateVisible: true, roleId: roleId});
+                setPostDrawer({createVisible: false, updateVisible: true, postId: postId});
                 break;
             default:
                 break
+        }
+    }
+
+    const closeDrawer = (types: 'create' | 'update', isLoad: boolean) => {
+        switch (types) {
+            case 'create':
+            case 'update':
+                setPostDrawer({createVisible: false, updateVisible: false});
+                break;
+            default:
+                break
+        }
+        if (isLoad) {
+            run(pageQuery)
         }
     }
 
@@ -86,7 +100,7 @@ const SystemPostPage = () => {
             okType: 'danger',
             cancelText: '取消',
             onOk: async () => {
-                await roleDelete(id ? [id] : selectedRowKeys);
+                await postDelete(id ? [id] : selectedRowKeys);
                 run(pageQuery)
                 message.success('删除成功')
                 setSelectedRowKeys([]);
@@ -138,6 +152,8 @@ const SystemPostPage = () => {
                 }
             }}
         />
+        <PostCreateDrawer visible={postDrawer.createVisible} close={(isLoad) => closeDrawer('create', isLoad)} />
+        <PostUpdateDrawer visible={postDrawer.updateVisible} close={(isLoad) => closeDrawer('update', isLoad)} postId={postDrawer.postId} />
     </>
 }
 

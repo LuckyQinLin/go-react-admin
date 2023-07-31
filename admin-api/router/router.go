@@ -65,7 +65,7 @@ func initRouter() {
 			post.POST("page", controller.Post.PostPage)     // 岗位分页
 			post.POST("create", controller.Post.PostCreate) // 岗位创建
 			post.POST("update", controller.Post.PostUpdate) // 岗位修改
-			post.GET("delete", controller.Post.PostDelete)  // 岗位删除
+			post.POST("delete", controller.Post.PostDelete) // 岗位删除
 			post.GET("info", controller.Post.PostInfo)      // 岗位详情
 			post.GET("export", controller.Post.PostExport)  // 岗位导出
 		}

@@ -66,13 +66,13 @@ func (p *PostService) Create(param *request.PostCreateRequest) *response.Busines
 	)
 	// 检测岗位名称是否唯一
 	condition = core.DB.Where("post_name = ?", param.PostName)
-	if exist, err = dao.Dept.Exist(condition); err != nil || exist {
+	if exist, err = dao.Post.Exist(condition); err != nil || exist {
 		core.Log.Error("存在相同的岗位名称")
 		return response.CustomBusinessError(response.Failed, "存在相同的岗位名称")
 	}
 	// 检测岗位编码是否唯一
 	condition = core.DB.Where("post_code = ?", param.PostCode)
-	if exist, err = dao.Dept.Exist(condition); err != nil || exist {
+	if exist, err = dao.Post.Exist(condition); err != nil || exist {
 		core.Log.Error("存在相同的岗位编码")
 		return response.CustomBusinessError(response.Failed, "存在相同的岗位编码")
 	}
@@ -150,15 +150,19 @@ func (p *PostService) Update(param *request.PostUpdateRequest) *response.Busines
 	)
 	// 检测岗位名称是否唯一
 	condition = core.DB.Where("post_name = ? and post_id != ?", param.PostName, param.PostId)
-	if exist, err = dao.Dept.Exist(condition); err != nil || exist {
+	if exist, err = dao.Post.Exist(condition); err != nil || exist {
 		core.Log.Error("存在相同的岗位名称")
 		return response.CustomBusinessError(response.Failed, "存在相同的岗位名称")
 	}
 	// 检测岗位编码是否唯一
 	condition = core.DB.Where("post_code = ? and post_id != ?", param.PostCode, param.PostId)
-	if exist, err = dao.Dept.Exist(condition); err != nil || exist {
+	if exist, err = dao.Post.Exist(condition); err != nil || exist {
 		core.Log.Error("存在相同的岗位编码")
 		return response.CustomBusinessError(response.Failed, "存在相同的岗位编码")
+	}
+	if old, err = dao.Post.GetById(param.PostId); err != nil {
+		core.Log.Error("当前岗位不存在：%s", err.Error())
+		return response.CustomBusinessError(response.Failed, "当前岗位不存在")
 	}
 	// 保存部门数据
 	now = time.Now()

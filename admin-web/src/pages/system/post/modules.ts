@@ -23,7 +23,7 @@ interface PostPageProp {
 interface PostDrawerProp {
     createVisible: boolean;
     updateVisible: boolean;
-    roleId?: number;
+    postId?: number;
 }
 
 // PostCreateDrawerProp 岗位创建属性
@@ -41,6 +41,13 @@ interface PostCreateFormProp {
     remark?: string; // 备注
 }
 
+// PostUpdateDrawerProp 岗位更新属性
+interface PostUpdateDrawerProp {
+    visible: boolean;
+    postId?: number;
+    close: (isLoad: boolean) => void;
+}
+
 // PostUpdateFormProp 岗位修改
 interface PostUpdateFormProp extends PostCreateFormProp {
     postId: number; // 岗位ID
@@ -53,5 +60,6 @@ export type {
     PostDrawerProp,
     PostCreateDrawerProp,
     PostCreateFormProp,
+    PostUpdateDrawerProp,
     PostUpdateFormProp
 }

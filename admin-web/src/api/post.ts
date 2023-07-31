@@ -27,3 +27,21 @@ export const postUpdate = (data: PostUpdateFormProp): Promise<boolean> => {
         data: data
     })
 }
+
+// postInfo 岗位详情
+export const postInfo = (postId: number): Promise<PostUpdateFormProp> => {
+    return https.request({
+        url: '/post/info',
+        method: 'get',
+        params: {postId: postId}
+    })
+}
+
+// postDelete 岗位删除
+export const postDelete = (ids: number[]): Promise<boolean> => {
+    return https.request({
+        url: '/post/delete',
+        method: 'post',
+        data: {ids: ids}
+    })
+}
