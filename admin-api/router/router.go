@@ -69,6 +69,30 @@ func initRouter() {
 			post.GET("info", controller.Post.PostInfo)      // 岗位详情
 			post.GET("export", controller.Post.PostExport)  // 岗位导出
 		}
+		dict := root.Group("dict") // 字典模块
+		{
+			dict.POST("page", controller.Dict.DictPage)     // 字典分页
+			dict.POST("create", controller.Dict.DictCreate) // 字典创建
+			dict.POST("update", controller.Dict.DictUpdate) // 字典修改
+			dict.POST("delete", controller.Dict.DictDelete) // 字典删除
+			dict.GET("info", controller.Dict.DictInfo)      // 字典详情
+		}
+		config := root.Group("config") // 字典模块
+		{
+			config.POST("page", controller.Config.ConfigPage)     // 字典分页
+			config.POST("create", controller.Config.ConfigCreate) // 字典创建
+			config.POST("update", controller.Config.ConfigUpdate) // 字典修改
+			config.POST("delete", controller.Config.ConfigDelete) // 字典删除
+			config.GET("info", controller.Config.ConfigInfo)      // 字典详情
+		}
+		notice := root.Group("notice") // 通知模块
+		{
+			notice.POST("page", controller.Notice.NoticePage)     // 通知分页
+			notice.POST("create", controller.Notice.NoticeCreate) // 通知创建
+			notice.POST("update", controller.Notice.NoticeUpdate) // 通知修改
+			notice.POST("delete", controller.Notice.NoticeDelete) // 通知删除
+			notice.GET("info", controller.Notice.NoticeInfo)      // 通知详情
+		}
 	}
 }
 
