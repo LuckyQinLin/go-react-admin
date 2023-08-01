@@ -4,11 +4,11 @@ import "time"
 
 // DictData 字典数据表
 type DictData struct {
-	DictCode   int64      `gorm:"column:dict_code;primaryKey;not null;autoIncrement;comment:字典编码" json:"dict_code"`
-	DictSort   int        `gorm:"column:dict_sort;default:0;comment:字典排序" json:"dictSort"`
-	DictLabel  string     `gorm:"column:dict_label;size:100;default:'';comment:字典标签" json:"dictLabel"`
-	DictValue  string     `gorm:"column:dict_value;size:100;default:'';comment:字典键值" json:"dictValue"`
-	DictType   string     `gorm:"column:dict_type;size:100;default:'';comment:字典类型" json:"dictType"`
+	DataId     int64      `gorm:"column:data_id;primaryKey;not null;autoIncrement;comment:字典编码" json:"dataId"`
+	DataSort   int        `gorm:"column:data_sort;default:0;comment:字典排序" json:"dataSort"`
+	DataLabel  string     `gorm:"column:data_label;size:100;default:'';comment:字典标签" json:"dataLabel"`
+	DataValue  string     `gorm:"column:data_value;size:100;default:'';comment:字典键值" json:"dataValue"`
+	DataType   string     `gorm:"column:data_type;size:100;default:'';comment:字典类型" json:"dataType"`
 	CssClass   string     `gorm:"column:css_class;size:100;default:null;comment:样式属性（其他样式扩展）" json:"cssClass"`
 	ListClass  string     `gorm:"column:list_class;size:100;default:null;comment:表格回显样式" json:"listClass"`
 	IsDefault  bool       `gorm:"column:is_default;default:false;comment:是否默认(true是 false否)" son:"isDefault"`

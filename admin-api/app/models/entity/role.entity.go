@@ -4,7 +4,7 @@ import "time"
 
 // Role 角色表
 type Role struct {
-	RoleId            int64      `gorm:"column:role_id;primaryKey;not null;autoIncrement;comment:角色id" json:"roleId"`
+	RoleId            int64      `gorm:"column:role_id;primaryKey;not null;autoIncrement:false;comment:角色id" json:"roleId"`
 	RoleName          string     `gorm:"column:role_name;not null;size:64;comment:角色名称" json:"roleName"`
 	RoleKey           string     `gorm:"column:role_key;not null;size:50;comment:角色权限字符串" json:"roleKey"`
 	RoleSort          int        `gorm:"column:role_sort;default:0;comment:显示顺序" json:"roleSort"`

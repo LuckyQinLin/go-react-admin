@@ -249,7 +249,7 @@ func (m *MenuService) Info(menuId int64) (*response.MenuInfoResponse, *response.
 		MenuSort: menu.OrderNum,
 		IsLink:   menu.IsFrame,
 		Path:     menu.Path,
-		Show:     menu.Visible,
+		IsShow:   menu.Visible,
 		Status:   menu.Status,
 	}, nil
 }
