@@ -99,7 +99,7 @@ insert into sys_user_post values (1, 1);
 insert into sys_user_post values (2, 2);
 
 
-
+-- 初始化 菜单
 INSERT INTO sys_menu  VALUES (1, '系统首页', 0, 1, '/index', null, null, false, true, 'M', true, 1, null, 'lucky-shouye1', null, 'admin', '2023-07-28 07:59:34.297618 +00:00', '', null);
 INSERT INTO sys_menu  VALUES (2, '系统管理', 0, 2, '/system', null, null, false, true, 'M', true, 1, null, 'lucky-shezhi1', null, 'admin', '2023-07-28 08:02:51.773475 +00:00', '', null);
 INSERT INTO sys_menu  VALUES (3, '用户管理', 2, 1, '/system/user', null, null, false, true, 'C', true, 1, 'system:user', 'lucky-yonghu', null, 'admin', '2023-07-28 08:07:03.809457 +00:00', '', null);
@@ -119,3 +119,15 @@ INSERT INTO sys_menu  VALUES (16, '服务器监控', 13, 3, '/monitor/server', n
 INSERT INTO sys_menu  VALUES (17, '缓冲监控', 13, 4, '/monitor/cache', null, null, false, true, 'C', true, 1, 'monitor:cache', 'lucky-huanchongfenxi', null, 'admin', '2023-07-28 08:27:55.814870 +00:00', '', null);
 INSERT INTO sys_menu  VALUES (18, '缓冲列表', 13, 5, '/monitor/cacheList', null, null, false, true, 'C', true, 1, 'monitor:cacheList', 'lucky-cityworksjichugongnengtubiao-', null, 'admin', '2023-07-28 08:28:59.204073 +00:00', '', null);
 INSERT INTO sys_menu  VALUES (19, '操作日志', 11, 4, '/logger/operate', '', '', false, true, 'C', true, 1, 'logger:operate', 'lucky-caozuorizhi', '', 'admin', '2023-07-28 08:23:19.839112 +00:00', 'admin', '2023-07-28 08:50:57.410301 +00:00');
+
+
+-- 更新自增主键的下标
+SELECT setval('sys_role_role_id_seq', (SELECT max(role_id) FROM sys_role));
+SELECT setval('sys_user_user_id_seq', (SELECT max(user_id) FROM sys_user));
+SELECT setval('sys_dept_dept_id_seq', (SELECT max(dept_id) FROM sys_dept));
+SELECT setval('sys_menu_menu_id_seq', (SELECT max(menu_id) FROM sys_menu));
+SELECT setval('sys_post_post_id_seq', (SELECT max(post_id) FROM sys_post));
+SELECT setval('sys_dict_type_dict_id_seq', (SELECT max(dict_id) FROM sys_dict_type));
+SELECT setval('sys_dict_data_data_id_seq', (SELECT max(data_id) FROM sys_dict_data));
+SELECT setval('sys_setting_config_id_seq', (SELECT max(config_id) FROM sys_setting));
+SELECT setval('sys_notice_notice_id_seq', (SELECT max(notice_id) FROM sys_notice));
