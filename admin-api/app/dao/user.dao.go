@@ -2,6 +2,7 @@ package dao
 
 import (
 	"admin-api/app/models/entity"
+	"admin-api/app/models/response"
 	"admin-api/core"
 	"admin-api/internal/gorm"
 )
@@ -35,4 +36,16 @@ func (u *UserDao) Exist(condition *gorm.DB) (bool, error) {
 		return true, nil
 	}
 	return false, nil
+}
+
+// Total 查询获取总条数
+func (u *UserDao) Total(condition *gorm.DB) (total int64, err error) {
+	err = condition.Model(&entity.User{}).Count(&total).Error
+	return
+}
+
+// Limit 用户获取数据
+func (u *UserDao) Limit(condition *gorm.DB, offset int, limit int) (list []response.RolePageResponse, err error) {
+	err = condition.Limit(limit).Offset(offset).Model(&entity.User{}).Find(&list).Error
+	return
 }

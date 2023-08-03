@@ -1,5 +1,7 @@
 package response
 
+import "time"
+
 // CaptchaImageResponse 验证码返回
 type CaptchaImageResponse struct {
 	Uuid       string `json:"uuid"`       // uuid码
@@ -28,4 +30,15 @@ type UserInfoResponse struct {
 	Token      string         `json:"token"`      // token信息
 	ExpireTime int64          `json:"expireTime"` // 到期时间
 	Roles      []UserRoleProp `json:"roles"`      // 用户角色
+}
+
+// UserPageResponse 用户分页
+type UserPageResponse struct {
+	UserId     int64      `json:"userId"`     // 用户ID
+	UserName   string     `json:"userName"`   // 用户名称
+	NickName   string     `json:"nickName"`   // 昵称
+	DeptName   string     `json:"deptName"`   // 部门名称
+	Phone      string     `json:"phone"`      // 手机号
+	Status     int        `json:"status"`     // 状态
+	CreateTime *time.Time `json:"createTime"` // 创建时间
 }

@@ -8,6 +8,7 @@ import (
 	"admin-api/app/models/vo"
 	"admin-api/core"
 	"admin-api/internal/gin"
+	"admin-api/internal/gorm"
 	"admin-api/utils"
 	"errors"
 	"fmt"
@@ -217,4 +218,50 @@ func (u *UserService) GetUserInfo(claims *vo.UserClaims) (*response.UserInfoResp
 		Roles:      nil,
 	}, nil
 
+}
+
+// Page 用户分页
+func (u *UserService) Page(param *request.UserPageRequest) (*response.PageData, *response.BusinessError) {
+	var (
+		buildCondition = func(param *request.UserPageRequest) func(db *gorm.DB) *gorm.DB {
+			return func(db *gorm.DB) *gorm.DB {
+				db.Model(&entity.User{}).
+					Select("sys_user.user_id,sys_user.dept_id,sys_user.nick_name,sys_user.user_name,sys_user.email,sys_user.avatar,sys_user.phone,sys_user.status,sys_user.create_time,sys_dept.dept_name").
+					Joins("left join sys_dept on sys_user.dept_id = sys_dept.dept_id").
+					Where(" sys_user.del_flag = 1")
+				if param.Status != nil {
+					db.Where("sys_user.status = ?", param.Status)
+				}
+				if param.UserName != "" {
+					db.Where("sys_user.user_name like concat('%', ?, '%')", param.UserName)
+				}
+				if param.Phone != "" {
+					db.Where("sys_user.phone like concat('%', ?, '%')", param.Phone)
+				}
+				if param.DeptId != nil && *param.DeptId != 0 {
+					db.Where("(sys_user.dept_id = ? or sys_user.dept_id in (select t.dept_id from sys_dept t where ?::varchar = any (string_to_array(t.ancestors, ','))))", param.DeptId)
+				}
+				return db
+			}
+		}
+		list  []response.UserPageResponse
+		total int64
+		err   error
+	)
+	if err = core.DB.Scopes(buildCondition(param)).Count(&total).Debug().Error; err != nil {
+		core.Log.Error("统计用户数据失败, 异常信息如下：%s", err.Error())
+		return nil, response.CustomBusinessError(response.Failed, "获取用户数据失败")
+	}
+	if err = core.DB.Scopes(buildCondition(param)).
+		Find(&list).Debug().
+		Error; err != nil {
+		core.Log.Error("查询用户数据失败, 异常信息如下：%s", err.Error())
+		return nil, response.CustomBusinessError(response.Failed, "获取用户数据失败")
+	}
+	return &response.PageData{
+		Total: total,
+		Page:  param.Page,
+		Size:  param.Size,
+		Data:  list,
+	}, nil
 }

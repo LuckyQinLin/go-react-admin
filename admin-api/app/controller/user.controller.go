@@ -66,3 +66,22 @@ func (u *UserController) GetUserInfo(c *gin.Context) {
 func (u *UserController) AllotRole(ctx *gin.Context) {
 
 }
+
+// Page 分页
+func (u *UserController) Page(c *gin.Context) {
+	var (
+		param     request.UserPageRequest
+		result    *response.PageData
+		customErr *response.BusinessError
+		err       error
+	)
+	if err = c.ShouldBind(&param); err != nil {
+		c.JSON(http.StatusOK, response.Fail(response.RequestParamError))
+		return
+	}
+	if result, customErr = service.User.Page(&param); customErr != nil {
+		c.JSON(http.StatusOK, response.ResultCustom(customErr))
+		return
+	}
+	c.JSON(http.StatusOK, response.Ok(result))
+}
