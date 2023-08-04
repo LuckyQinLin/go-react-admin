@@ -1,5 +1,19 @@
 import {https, PageData} from "@/utils/request.ts";
-import {PostCreateFormProp, PostPageProp, PostPageQueryProp, PostUpdateFormProp} from "@/pages/system/post/modules.ts";
+import {
+    PostCreateFormProp,
+    PostInfoProp,
+    PostPageProp,
+    PostPageQueryProp,
+    PostUpdateFormProp
+} from "@/pages/system/post/modules.ts";
+
+// postList 全部岗位
+export const postList = (): Promise<PostInfoProp[]> => {
+    return https.request({
+        url: '/post/list',
+        method: 'get'
+    })
+}
 
 // postPage 岗位分页查询
 export const postPage = (data: PostPageQueryProp): Promise<PageData<PostPageProp>> => {

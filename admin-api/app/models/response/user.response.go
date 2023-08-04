@@ -1,6 +1,10 @@
 package response
 
-import "time"
+import (
+	"admin-api/utils"
+	"encoding/json"
+	"time"
+)
 
 // CaptchaImageResponse 验证码返回
 type CaptchaImageResponse struct {
@@ -41,4 +45,15 @@ type UserPageResponse struct {
 	Phone      string     `json:"phone"`      // 手机号
 	Status     int        `json:"status"`     // 状态
 	CreateTime *time.Time `json:"createTime"` // 创建时间
+}
+
+func (s UserPageResponse) MarshalJSON() ([]byte, error) {
+	type temp UserPageResponse
+	return json.Marshal(&struct {
+		temp
+		CreateTime utils.DateTime `json:"createTime"`
+	}{
+		temp:       (temp)(s),
+		CreateTime: utils.DateTime(*s.CreateTime),
+	})
 }

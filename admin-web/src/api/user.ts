@@ -2,7 +2,7 @@ import {LoginFormProp} from "@/pages/login";
 import {UserState} from "@/redux/user/reducer.ts";
 import {https, PageData} from "@/utils/request.ts";
 import {LoginCaptchaProp, RegisterFormProp} from "@/pages/login/modules.ts";
-import {UserPageQueryProp, UserTableProp} from "@/pages/system/user/modules.ts";
+import {UserCreateFormProp, UserPageQueryProp, UserTableProp} from "@/pages/system/user/modules.ts";
 
 // userLogin 用户登录
 export const userLogin = (data: LoginFormProp): Promise<UserState> => {
@@ -51,6 +51,15 @@ export const userInfo = (): Promise<UserState> => {
 export const userPage = (data: UserPageQueryProp): Promise<PageData<UserTableProp>> => {
     return https.request({
         url: '/user/page',
+        method: 'post',
+        data: data
+    })
+}
+
+// rolePage 角色分页查询
+export const userCreate = (data: UserCreateFormProp): Promise<string> => {
+    return https.request({
+        url: '/user/create',
         method: 'post',
         data: data
     })

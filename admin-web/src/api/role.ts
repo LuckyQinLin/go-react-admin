@@ -1,6 +1,20 @@
-import {RoleCreateFormProp, RolePageProp, RolePageQueryProp, RoleUpdateFormProp} from "@/pages/system/role/modules.ts";
+import {
+    RoleCreateFormProp,
+    RoleInfoProp,
+    RolePageProp,
+    RolePageQueryProp,
+    RoleUpdateFormProp
+} from "@/pages/system/role/modules.ts";
 import {PageData} from "@/utils/request.ts";
 import {https} from "@/utils/request.ts";
+
+// postList 全部岗位
+export const roleList = (): Promise<RoleInfoProp[]> => {
+    return https.request({
+        url: '/role/list',
+        method: 'get'
+    })
+}
 
 // rolePage 角色分页查询
 export const rolePage = (data: RolePageQueryProp): Promise<PageData<RolePageProp>> => {

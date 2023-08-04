@@ -43,3 +43,9 @@ type RoleInfoResponse struct {
 	Remark   string  `json:"remark"`   // 备注
 	MenuIds  []int64 `json:"menuIds"`  // 菜单ID
 }
+
+// RoleListResponse 角色信息
+type RoleListResponse struct {
+	RoleId   int64  `json:"value"`
+	RoleName string `json:"label"`
+}

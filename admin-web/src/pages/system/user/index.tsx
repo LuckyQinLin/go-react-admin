@@ -67,18 +67,12 @@ const SystemUserPage = () => {
     ]
 
 
-    const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
     const [searchValue, setSearchValue] = useState('');
-    const [autoExpandParent, setAutoExpandParent] = useState(true);
     const [tree, setTree] = useState<DeptTreeProp[]>([]);
     const [total, setTotal] = useState<number>(0);
     const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
     const [datasource, setDatasource] = useState<UserTableProp[]>([]);
     const [pageQuery] = useState<UserPageQueryProp>({page: 1, size: 10});
-    const onExpand = (newExpandedKeys: React.Key[]) => {
-        setExpandedKeys(newExpandedKeys);
-        setAutoExpandParent(false);
-    };
 
     const loadTree = useRequest(deptTree, {
         manual: true,
@@ -99,13 +93,16 @@ const SystemUserPage = () => {
 
     return <Row gutter={[16, 16]}>
         <Col flex="250px">
-            <Input placeholder="输入部门名称搜索" value={searchValue} />
-            <Tree
-                onExpand={onExpand}
-                expandedKeys={expandedKeys}
-                autoExpandParent={autoExpandParent}
-                treeData={tree}
-            />
+            <Input placeholder="输入部门名称搜索" value={searchValue} style={{marginBottom: 10}} />
+            {
+                tree.length > 0 && <Tree
+                    defaultExpandAll={true}
+                    defaultExpandParent
+                    onExpand={onExpand}
+                    treeData={tree}
+                />
+            }
+
         </Col>
         <Col flex="auto">
             <Space>

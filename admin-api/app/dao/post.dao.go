@@ -48,3 +48,9 @@ func (p *PostDao) GetById(postId int64) (post entity.Post, err error) {
 		Error
 	return
 }
+
+// List 岗位列表
+func (p *PostDao) List(condition *gorm.DB) (post []entity.Post, err error) {
+	err = condition.Model(&entity.Post{}).Find(&post).Error
+	return
+}

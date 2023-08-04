@@ -30,6 +30,8 @@ func initRouter() {
 			user.GET("info", controller.User.GetUserInfo)          // 获取用户信息
 			user.POST("userAllot", controller.User.AllotRole)      // 用户分配角色
 			user.POST("page", controller.User.Page)                // 用户分页
+			user.POST("create", controller.User.UserCreate)        // 用户创建
+			user.POST("update", controller.User.UserUpdate)        // 用户更新
 
 		}
 		role := root.Group("role") // 角色模块
@@ -64,6 +66,7 @@ func initRouter() {
 		}
 		post := root.Group("post") // 岗位模块
 		{
+			post.POST("all", controller.Post.PostList)      // 全部岗位
 			post.POST("page", controller.Post.PostPage)     // 岗位分页
 			post.POST("create", controller.Post.PostCreate) // 岗位创建
 			post.POST("update", controller.Post.PostUpdate) // 岗位修改

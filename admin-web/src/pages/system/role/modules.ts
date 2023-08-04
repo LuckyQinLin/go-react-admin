@@ -7,6 +7,11 @@ interface RolePageQueryProp {
     endTime?: number;
 }
 
+interface RoleInfoProp {
+    value: number;
+    label: string;
+}
+
 // RolePageProp 角色分页查询返回属性
 interface RolePageProp {
     roleId: number;
@@ -53,6 +58,7 @@ interface RoleDrawerProp {
 }
 
 export type {
+    RoleInfoProp,
     RolePageQueryProp,
     RolePageProp,
     RoleCreateDrawerProp,

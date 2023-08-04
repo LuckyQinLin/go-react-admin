@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"admin-api/app/models/entity"
 	"admin-api/app/models/request"
 	"admin-api/app/models/response"
 	"admin-api/app/models/vo"
@@ -11,7 +12,9 @@ import (
 
 var User = new(UserController)
 
-type UserController struct{}
+type UserController struct {
+	BaseController
+}
 
 // CaptchaImage 获取验证码
 func (u *UserController) CaptchaImage(c *gin.Context) {
@@ -84,4 +87,49 @@ func (u *UserController) Page(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response.Ok(result))
+}
+
+// UserCreate 用户创建
+func (u *UserController) UserCreate(ctx *gin.Context) {
+	var (
+		claims    *vo.UserClaims
+		operate   *entity.Operate
+		param     request.UserCreateRequest
+		customErr *response.BusinessError
+		err       error
+	)
+	claims, operate = u.Parse(ctx, "用户创建", vo.Add, nil)
+	if err = ctx.ShouldBind(&param); err != nil {
+		u.Failed(ctx, operate, response.Fail(response.RequestParamError))
+		return
+	}
+	param.UserName = claims.Username
+	operate.ParamToJson(param)
+	if customErr = service.User.Create(&param); customErr != nil {
+		u.Failed(ctx, operate, response.ResultCustom(customErr))
+		return
+	}
+	u.Success(ctx, operate, response.Ok("用户创建成功"))
+}
+
+// UserUpdate 用户更新
+func (u *UserController) UserUpdate(ctx *gin.Context) {
+	var (
+		claims    *vo.UserClaims
+		operate   *entity.Operate
+		param     request.UserUpdateRequest
+		customErr *response.BusinessError
+		err       error
+	)
+	claims, operate = u.Parse(ctx, "用户修改", vo.Update, nil)
+	if err = ctx.ShouldBind(&param); err != nil {
+		u.Failed(ctx, operate, response.Fail(response.RequestParamError))
+		return
+	}
+	param.UserName = claims.Username
+	operate.ParamToJson(param)
+	if customErr = service.User.Update(&param); customErr != nil {
+		u.Failed(ctx, operate, response.ResultCustom(customErr))
+	}
+	u.Success(ctx, operate, response.Ok("用户修改成功"))
 }
