@@ -29,6 +29,8 @@ func initRouter() {
 			user.POST("login", controller.User.Login)              // 登陆
 			user.GET("info", controller.User.GetUserInfo)          // 获取用户信息
 			user.POST("userAllot", controller.User.AllotRole)      // 用户分配角色
+			user.POST("page", controller.User.Page)                // 用户分页
+
 		}
 		role := root.Group("role") // 角色模块
 		{

@@ -23,6 +23,7 @@ type Statement struct {
 	*DB
 	TableExpr            *clause.Expr
 	Table                string
+	Alias                string // 表的别名
 	Model                interface{}
 	Unscoped             bool
 	Dest                 interface{}
@@ -90,6 +91,7 @@ func (stmt *Statement) QuoteTo(writer clause.Writer, field interface{}) {
 	switch v := field.(type) {
 	case clause.Table:
 		if v.Name == clause.CurrentTable {
+			v.Alias = stmt.Alias
 			if stmt.TableExpr != nil {
 				stmt.TableExpr.Build(stmt)
 			} else {

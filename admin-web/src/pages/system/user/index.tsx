@@ -94,6 +94,7 @@ const SystemUserPage = () => {
 
     useEffect(() => {
         loadTree.run();
+        loadUser.run(pageQuery);
     }, [])
 
     return <Row gutter={[16, 16]}>

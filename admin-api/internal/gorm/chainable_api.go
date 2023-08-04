@@ -21,6 +21,12 @@ func (db *DB) Model(value interface{}) (tx *DB) {
 	return
 }
 
+func (db *DB) Alias(value string) (tx *DB) {
+	tx = db.getInstance()
+	tx.Statement.Alias = value
+	return
+}
+
 // Clauses Add clauses
 //
 // This supports both standard clauses (clause.OrderBy, clause.Limit, clause.Where) and more

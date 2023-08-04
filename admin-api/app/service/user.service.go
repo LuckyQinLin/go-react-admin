@@ -226,20 +226,19 @@ func (u *UserService) Page(param *request.UserPageRequest) (*response.PageData, 
 		buildCondition = func(param *request.UserPageRequest) func(db *gorm.DB) *gorm.DB {
 			return func(db *gorm.DB) *gorm.DB {
 				db.Model(&entity.User{}).
-					Select("sys_user.user_id,sys_user.dept_id,sys_user.nick_name,sys_user.user_name,sys_user.email,sys_user.avatar,sys_user.phone,sys_user.status,sys_user.create_time,sys_dept.dept_name").
-					Joins("left join sys_dept on sys_user.dept_id = sys_dept.dept_id").
-					Where(" sys_user.del_flag = 1")
+					Alias("u").
+					Where("u.del_flag = 1")
 				if param.Status != nil {
-					db.Where("sys_user.status = ?", param.Status)
+					db.Where("u.status = ?", param.Status)
 				}
 				if param.UserName != "" {
-					db.Where("sys_user.user_name like concat('%', ?, '%')", param.UserName)
+					db.Where("u.user_name like concat('%', ?, '%')", param.UserName)
 				}
 				if param.Phone != "" {
-					db.Where("sys_user.phone like concat('%', ?, '%')", param.Phone)
+					db.Where("u.phone like concat('%', ?, '%')", param.Phone)
 				}
 				if param.DeptId != nil && *param.DeptId != 0 {
-					db.Where("(sys_user.dept_id = ? or sys_user.dept_id in (select t.dept_id from sys_dept t where ?::varchar = any (string_to_array(t.ancestors, ','))))", param.DeptId)
+					db.Where("(u.dept_id = ? or u.dept_id in (select t.dept_id from sys_dept t where ?::varchar = any (string_to_array(t.ancestors, ','))))", param.DeptId)
 				}
 				return db
 			}
@@ -253,6 +252,8 @@ func (u *UserService) Page(param *request.UserPageRequest) (*response.PageData, 
 		return nil, response.CustomBusinessError(response.Failed, "获取用户数据失败")
 	}
 	if err = core.DB.Scopes(buildCondition(param)).
+		Select("u.user_id,u.dept_id,u.nick_name,u.user_name,u.email,u.avatar,u.phone,u.status,u.create_time,d.dept_name").
+		Joins("left join sys_dept d on u.dept_id = d.dept_id").
 		Find(&list).Debug().
 		Error; err != nil {
 		core.Log.Error("查询用户数据失败, 异常信息如下：%s", err.Error())
