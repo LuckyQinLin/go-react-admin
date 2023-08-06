@@ -111,7 +111,7 @@ const RoleCreateDrawer: React.FC<RoleCreateDrawerProp> = ({visible, close}) => {
                     />
                 </Form.Item>
                 <Form.Item name="remark" label="备注">
-                    <Input placeholder="请输入备注" />
+                    <Input.TextArea placeholder="请输入备注" />
                 </Form.Item>
             </Form>
         </Spin>

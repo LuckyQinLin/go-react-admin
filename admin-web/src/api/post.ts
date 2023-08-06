@@ -10,7 +10,7 @@ import {
 // postList 全部岗位
 export const postList = (): Promise<PostInfoProp[]> => {
     return https.request({
-        url: '/post/list',
+        url: '/post/all',
         method: 'get'
     })
 }

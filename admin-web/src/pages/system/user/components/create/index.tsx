@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {UserCreateDrawerProp, UserCreateFormProp} from "@/pages/system/user/modules.ts";
+import {UserCreateDrawerProp, UserCreateFormProp, validateEmail, validateMobile} from "@/pages/system/user/modules.ts";
 import {
     Button,
     Drawer,
@@ -47,7 +47,7 @@ const UserCreateDrawer: React.FC<UserCreateDrawerProp> = ({visible, deptId, clos
             loadDepts.run();
             loadPosts.run();
             loadRoles.run();
-            form.setFieldsValue({deptId: deptId, sex: 2, status: 1})
+            form.setFieldsValue({password: '123456', deptId: deptId, sex: 2, status: 1})
         }
     }, [visible])
 
@@ -78,8 +78,11 @@ const UserCreateDrawer: React.FC<UserCreateDrawerProp> = ({visible, deptId, clos
                 <Form.Item name="nickName" label="用户昵称" rules={[{ required: true, message: '请输入用户昵称' }]}>
                     <Input placeholder="请输入用户昵称" />
                 </Form.Item>
-                <Form.Item name="deptId" label="所属部门">
-                    <TreeSelect treeData={depts}/>
+                <Form.Item name="password" label="密码" rules={[{ required: true, message: '请输入用户密码' }]}>
+                    <Input.Password placeholder="请输入用户密码" />
+                </Form.Item>
+                <Form.Item name="deptId" label="所属部门" rules={[{ required: true, message: '请选择所属部门' }]}>
+                    <TreeSelect placeholder="请选择所属部门" treeData={depts} fieldNames={{label: 'title', value: 'key', children: 'children'}}/>
                 </Form.Item>
                 <Form.Item name="postId" label="归属岗位">
                     <Select
@@ -90,26 +93,28 @@ const UserCreateDrawer: React.FC<UserCreateDrawerProp> = ({visible, deptId, clos
                         options={posts}
                     />
                 </Form.Item>
-                <Form.Item name="phone" label="手机号码">
+                <Form.Item name="phone" label="手机号码" rules={[{validator: validateMobile, required: false, message: '请输入正确的手机号码'}]}>
                     <Input placeholder="请输入手机号码" />
                 </Form.Item>
-                <Form.Item name="email" label="邮箱">
+                <Form.Item name="email" label="邮箱" rules={[{validator: validateEmail, required: false, message: '请输入正确的邮箱格式'}]}>
                     <Input placeholder="请输入邮箱" />
                 </Form.Item>
                 <Form.Item name="sex" label="性别">
-                    <Radio.Group>
-                        <Radio value={0}>男</Radio>
-                        <Radio value={1}>女</Radio>
-                        <Radio value={2}>未知</Radio>
-                    </Radio.Group>
+                    <Select
+                        options={[
+                            { value: 0, label: '女' },
+                            { value: 1, label: '男' },
+                            { value: 2, label: '未知' },
+                        ]}
+                    />
                 </Form.Item>
                 <Form.Item name="status" label="状态">
                     <Radio.Group>
-                        <Radio value={0}>停用</Radio>
                         <Radio value={1}>正常</Radio>
+                        <Radio value={0}>停用</Radio>
                     </Radio.Group>
                 </Form.Item>
-                <Form.Item name="roleId" label="角色">
+                <Form.Item name="roleId" label="选择角色">
                     <Select
                         mode="multiple"
                         allowClear
@@ -119,7 +124,7 @@ const UserCreateDrawer: React.FC<UserCreateDrawerProp> = ({visible, deptId, clos
                     />
                 </Form.Item>
                 <Form.Item name="remark" label="备注">
-                    <Input placeholder="请输入备注" />
+                    <Input.TextArea rows={3} placeholder="请输入备注" />
                 </Form.Item>
             </Form>
         </Spin>

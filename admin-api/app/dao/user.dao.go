@@ -7,35 +7,36 @@ import (
 	"admin-api/internal/gorm"
 )
 
-var User = new(UserDao)
+var User = NewUserDao()
 
-type UserDao struct{}
+type UserDao struct {
+	BaseDao[entity.User]
+}
+
+func NewUserDao() *UserDao {
+	return &UserDao{struct {
+		model entity.User
+	}{
+		model: entity.User{},
+	},
+	}
+}
+
+// Create 创建用户
+func (u *UserDao) Create(tx *gorm.DB, user *entity.User) error {
+	return tx.Create(user).Error
+}
 
 // GetUserByUserName 获取用户信息通过用户名称
 func (u *UserDao) GetUserByUserName(username string) (user entity.User, err error) {
-	err = core.DB.Model(&entity.User{}).Where("user_name = ?", username).First(&user).Error
-	return
+	return u.GetOne(core.DB.Where("user_name = ?", username))
+	//err = core.DB.Model(&entity.User{}).Where("user_name = ?", username).First(&user).Error
+	//return
 }
 
 // GetUserById 获取用户信息
 func (u *UserDao) GetUserById(id int64) (user entity.User, err error) {
-	err = core.DB.Model(&entity.User{}).Where("user_id = ?", id).First(&user).Error
-	return
-}
-
-// Exist 条件查询菜单信息是否存在
-func (u *UserDao) Exist(condition *gorm.DB) (bool, error) {
-	var (
-		total int64
-		err   error
-	)
-	if err = condition.Model(&entity.User{}).Count(&total).Debug().Error; err != nil {
-		return false, err
-	}
-	if total > 0 {
-		return true, nil
-	}
-	return false, nil
+	return u.GetById(id)
 }
 
 // Total 查询获取总条数
@@ -47,5 +48,25 @@ func (u *UserDao) Total(condition *gorm.DB) (total int64, err error) {
 // Limit 用户获取数据
 func (u *UserDao) Limit(condition *gorm.DB, offset int, limit int) (list []response.RolePageResponse, err error) {
 	err = condition.Limit(limit).Offset(offset).Model(&entity.User{}).Find(&list).Error
+	return
+}
+
+// UserPostId 用户岗位
+func (u *UserDao) UserPostId(userId int64) (data []int64, err error) {
+	err = core.DB.Model(&entity.UserPost{}).
+		Where("user_id = ?", userId).
+		Distinct().
+		Pluck("post_id", &data).
+		Error
+	return
+}
+
+// UserRoleId 用户角色
+func (u *UserDao) UserRoleId(userId int64) (data []int64, err error) {
+	err = core.DB.Model(&entity.UserRole{}).
+		Where("user_id = ?", userId).
+		Distinct().
+		Pluck("role_id", &data).
+		Error
 	return
 }

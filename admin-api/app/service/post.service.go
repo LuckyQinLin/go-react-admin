@@ -188,7 +188,7 @@ func (p *PostService) All() (list []*response.PostListResponse, customErr *respo
 		posts []entity.Post
 		err   error
 	)
-	if posts, err = dao.Post.List(nil); err != nil {
+	if posts, err = dao.Post.List(core.DB); err != nil {
 		return nil, response.CustomBusinessError(response.Failed, "获取岗位失败")
 	}
 	for _, post := range posts {

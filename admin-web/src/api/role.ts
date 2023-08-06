@@ -11,7 +11,7 @@ import {https} from "@/utils/request.ts";
 // postList 全部岗位
 export const roleList = (): Promise<RoleInfoProp[]> => {
     return https.request({
-        url: '/role/list',
+        url: '/role/all',
         method: 'get'
     })
 }

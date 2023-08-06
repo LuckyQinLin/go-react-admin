@@ -7,6 +7,7 @@ import (
 	"admin-api/app/models/vo"
 	"admin-api/app/service"
 	"admin-api/internal/gin"
+	"admin-api/utils"
 	"net/http"
 )
 
@@ -35,7 +36,7 @@ func (u *UserController) Login(c *gin.Context) {
 		err       error
 		customErr *response.BusinessError
 		param     request.UserLoginRequest
-		result    *response.UserInfoResponse
+		result    *response.UserLoginResponse
 	)
 	if err = c.ShouldBindJSON(&param); err != nil {
 		c.JSON(http.StatusOK, response.Fail(response.RequestParamError))
@@ -51,14 +52,16 @@ func (u *UserController) Login(c *gin.Context) {
 // GetUserInfo 获取用户信息
 func (u *UserController) GetUserInfo(c *gin.Context) {
 	var (
-		value     any
-		claims    *vo.UserClaims
+		userId    int64
 		customErr *response.BusinessError
 		result    *response.UserInfoResponse
+		err       error
 	)
-	value, _ = c.Get(vo.ClaimsInfo)
-	claims = value.(*vo.UserClaims)
-	if result, customErr = service.User.GetUserInfo(claims); customErr != nil {
+	if userId, err = c.QueryInt64("userId"); err != nil {
+		c.JSON(http.StatusOK, response.Fail(response.RequestParamError))
+		return
+	}
+	if result, customErr = service.User.GetUserInfo(userId); customErr != nil {
 		c.JSON(http.StatusOK, response.ResultCustom(customErr))
 		return
 	}
@@ -103,7 +106,7 @@ func (u *UserController) UserCreate(ctx *gin.Context) {
 		u.Failed(ctx, operate, response.Fail(response.RequestParamError))
 		return
 	}
-	param.UserName = claims.Username
+	param.CreateName = claims.Username
 	operate.ParamToJson(param)
 	if customErr = service.User.Create(&param); customErr != nil {
 		u.Failed(ctx, operate, response.ResultCustom(customErr))
@@ -126,10 +129,80 @@ func (u *UserController) UserUpdate(ctx *gin.Context) {
 		u.Failed(ctx, operate, response.Fail(response.RequestParamError))
 		return
 	}
-	param.UserName = claims.Username
+	param.UpdateName = claims.Username
 	operate.ParamToJson(param)
 	if customErr = service.User.Update(&param); customErr != nil {
 		u.Failed(ctx, operate, response.ResultCustom(customErr))
 	}
 	u.Success(ctx, operate, response.Ok("用户修改成功"))
+}
+
+// ResetPassword 重置密码
+func (u *UserController) ResetPassword(ctx *gin.Context) {
+	var (
+		claims    *vo.UserClaims
+		operate   *entity.Operate
+		param     request.UserPasswordRequest
+		customErr *response.BusinessError
+		err       error
+	)
+	claims, operate = u.Parse(ctx, "修改用户密码", vo.Update, nil)
+	if err = ctx.ShouldBind(&param); err != nil {
+		u.Failed(ctx, operate, response.Fail(response.RequestParamError))
+		return
+	}
+	param.UpdateName = claims.Username
+	operate.ParamToJson(param)
+	if customErr = service.User.ResetPassword(&param); customErr != nil {
+		u.Failed(ctx, operate, response.ResultCustom(customErr))
+	}
+	u.Success(ctx, operate, response.Ok("修改用户密码成功"))
+}
+
+// ChangeStatus 修改状态
+func (u *UserController) ChangeStatus(ctx *gin.Context) {
+	var (
+		claims    *vo.UserClaims
+		operate   *entity.Operate
+		param     request.UserStatusRequest
+		customErr *response.BusinessError
+		err       error
+	)
+	claims, operate = u.Parse(ctx, "修改用户状态", vo.Update, nil)
+	if err = ctx.ShouldBind(&param); err != nil {
+		u.Failed(ctx, operate, response.Fail(response.RequestParamError))
+		return
+	}
+	param.UpdateName = claims.Username
+	operate.ParamToJson(param)
+	if customErr = service.User.ChangeStatus(&param); customErr != nil {
+		u.Failed(ctx, operate, response.ResultCustom(customErr))
+	}
+	u.Success(ctx, operate, response.Ok("修改用户状态成功"))
+}
+
+// UserDelete 用户删除
+func (u *UserController) UserDelete(ctx *gin.Context) {
+	var (
+		claims    *vo.UserClaims
+		operate   *entity.Operate
+		param     request.UserDeleteRequest
+		customErr *response.BusinessError
+		err       error
+	)
+	claims, operate = u.Parse(ctx, "删除用户", vo.Update, nil)
+	if err = ctx.ShouldBind(&param); err != nil {
+		u.Failed(ctx, operate, response.Fail(response.RequestParamError))
+		return
+	}
+	if utils.Include[int64](param.Ids, claims.UserId) {
+		u.Failed(ctx, operate, response.Fail(response.UserNotAllowDelete))
+		return
+	}
+	param.UpdateName = claims.Username
+	operate.ParamToJson(param)
+	if customErr = service.User.DeleteUser(&param); customErr != nil {
+		u.Failed(ctx, operate, response.ResultCustom(customErr))
+	}
+	u.Success(ctx, operate, response.Ok("删除用户成功"))
 }

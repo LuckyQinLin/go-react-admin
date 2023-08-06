@@ -1,4 +1,6 @@
 // UserPageQueryProp 用户分页查询
+import {RuleObject} from "rc-field-form/lib/interface";
+
 interface UserPageQueryProp {
     page:      number;
     size:      number;
@@ -37,6 +39,7 @@ interface UserUpdateDrawerProp {
 interface UserCreateFormProp {
     userName: string;   // 用户名称
     nickName: string;   // 用户昵称
+    password: string;   // 密码
     deptId:   number;   // 部门ID
     phone?:   string;   // 手机号
     email?:   string;   // 邮箱
@@ -47,10 +50,61 @@ interface UserCreateFormProp {
     remark?:  string;   // 备注
 }
 
+// UserUpdateFormProp 用户创建表单
+interface UserUpdateFormProp {
+    userName: string;   // 用户名称
+    nickName: string;   // 用户昵称
+    deptId:   number;   // 部门ID
+    phone?:   string;   // 手机号
+    email?:   string;   // 邮箱
+    sex:      number;   // 性别
+    status:   number;   // 状态
+    postId?:  number[]; // 岗位
+    roleId?:  number[]; // 角色
+    remark?:  string;   // 备注
+}
+
+// UserDrawerProp 用户抽屉属性
+interface UserDrawerProp {
+    createVisible: boolean;
+    updateVisible: boolean;
+    userId?: number;
+}
+
+// 验证手机号码
+const validateMobile = (_: RuleObject, value: string, callback: (error?: string) => void) => {
+    if (value !== "") {
+        const phoneReg = /^1[3456789]\d{9}$/;
+        if (!phoneReg.test(value)) {
+            callback('手机号码格式不正确，请重新输入');
+        }
+    }
+    callback();
+};
+// 验证邮箱
+const validateEmail = (_: RuleObject, value: string, callback: (error?: string) => void) => {
+    debugger;
+    if (value !== "") {
+        const mailReg = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/;
+        if (!mailReg.test(value)) {
+            // return Promise.reject('邮箱格式不正确，请重新输入');
+            callback('邮箱格式不正确，请重新输入');
+        }
+    }
+    callback();
+};
+
+export {
+    validateMobile,
+    validateEmail
+}
+
 export type {
     UserPageQueryProp,
     UserCreateDrawerProp,
     UserUpdateDrawerProp,
     UserCreateFormProp,
-    UserTableProp
+    UserUpdateFormProp,
+    UserTableProp,
+    UserDrawerProp,
 }

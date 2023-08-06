@@ -10,6 +10,7 @@ import (
 	"admin-api/internal/gin"
 	"admin-api/internal/gorm"
 	"admin-api/utils"
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
@@ -79,7 +80,7 @@ func (u *UserService) CaptchaImage() (*response.CaptchaImageResponse, *response.
 }
 
 // UserLogin 用户登陆
-func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Context) (*response.UserInfoResponse, *response.BusinessError) {
+func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Context) (*response.UserLoginResponse, *response.BusinessError) {
 	var (
 		captchaVerify = func(id, code string) error {
 			if !core.Cache.Exist(vo.RedisCaptcha + ":" + id) {
@@ -178,7 +179,7 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 	); err != nil {
 		core.Log.Error("写入用户Token[%s]失败: %s", token, err.Error())
 	}
-	return &response.UserInfoResponse{
+	return &response.UserLoginResponse{
 		Id:         user.UserId,
 		UserName:   user.UserName,
 		NickName:   user.NickName,
@@ -195,29 +196,37 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 }
 
 // GetUserInfo 获取用户信息
-func (u *UserService) GetUserInfo(claims *vo.UserClaims) (*response.UserInfoResponse, *response.BusinessError) {
+func (u *UserService) GetUserInfo(userId int64) (*response.UserInfoResponse, *response.BusinessError) {
 	var (
-		user entity.User
-		err  error
+		postId []int64
+		roleId []int64
+		user   entity.User
+		result *response.UserInfoResponse
+		err    error
 	)
-	if user, err = dao.User.GetUserById(claims.UserId); err != nil {
+	if user, err = dao.User.GetUserById(userId); err != nil {
 		return nil, response.NewBusinessError(response.DataNotExist)
 	}
-
-	return &response.UserInfoResponse{
-		Id:         claims.UserId,
-		UserName:   user.UserName,
-		NickName:   user.NickName,
-		Sex:        user.Sex,
-		Avatar:     user.Avatar,
-		DeptId:     user.DeptId,
-		Email:      user.Email,
-		Phone:      user.Phone,
-		Remark:     user.Remark,
-		ExpireTime: claims.ExpiresAt.Unix(),
-		Roles:      nil,
-	}, nil
-
+	result = &response.UserInfoResponse{
+		UserId:   user.UserId,
+		UserName: user.UserName,
+		NickName: user.NickName,
+		DeptId:   user.DeptId,
+		Email:    user.Email,
+		Phone:    user.Phone,
+		Remark:   user.Remark,
+		Status:   user.Status,
+		Sex:      user.Sex,
+	}
+	// 用户岗位
+	if postId, err = dao.User.UserPostId(user.UserId); err == nil && len(postId) > 0 {
+		result.PostId = postId
+	}
+	// 用户角色
+	if roleId, err = dao.User.UserRoleId(user.UserId); err == nil && len(roleId) > 0 {
+		result.RoleId = roleId
+	}
+	return result, nil
 }
 
 // Page 用户分页
@@ -229,16 +238,16 @@ func (u *UserService) Page(param *request.UserPageRequest) (*response.PageData, 
 					Alias("u").
 					Where("u.del_flag = 1")
 				if param.Status != nil {
-					db.Where("u.status = ?", param.Status)
+					db.Where("u.status = @status", sql.Named("status", param.Status))
 				}
 				if param.UserName != "" {
-					db.Where("u.user_name like concat('%', ?, '%')", param.UserName)
+					db.Where("u.user_name like concat('%', @userName, '%')", sql.Named("userName", param.UserName))
 				}
 				if param.Phone != "" {
-					db.Where("u.phone like concat('%', ?, '%')", param.Phone)
+					db.Where("u.phone like concat('%', @phone, '%')", sql.Named("phone", param.Phone))
 				}
 				if param.DeptId != nil && *param.DeptId != 0 {
-					db.Where("(u.dept_id = ? or u.dept_id in (select t.dept_id from sys_dept t where ?::varchar = any (string_to_array(t.ancestors, ','))))", param.DeptId)
+					db.Where("(u.dept_id = @deptId or u.dept_id in (select t.dept_id from sys_dept t where @deptId = any (string_to_array(t.ancestors, ',')::integer[])))", sql.Named("deptId", param.DeptId))
 				}
 				return db
 			}
@@ -269,10 +278,265 @@ func (u *UserService) Page(param *request.UserPageRequest) (*response.PageData, 
 
 // Create 创建用户
 func (u *UserService) Create(param *request.UserCreateRequest) *response.BusinessError {
+	var (
+		userPosts []*entity.UserPost
+		userRoles []*entity.UserRole
+		user      entity.User
+		condition *gorm.DB
+		now       time.Time
+		encode    string
+		err       error
+		isExist   bool
+	)
+	// 判断是否存在相同账号
+	condition = core.DB.Where("user_name = ? and del_flag = 1", param.UserName)
+	if isExist, err = dao.User.Exist(condition); err != nil || isExist {
+		core.Log.Error("新增用户'%s'失败，登录账号已存在", param.UserName)
+		return response.CustomBusinessError(response.Failed, "新增用户'"+param.UserName+"'失败，登录账号已存在")
+	}
+	// 判断是否存在相同手机
+	condition = core.DB.Where("phone = ? and del_flag = 1", param.Phone)
+	if isExist, err = dao.User.Exist(condition); err != nil || isExist {
+		core.Log.Error("新增用户'%s'失败，手机账号已存在", param.UserName)
+		return response.CustomBusinessError(response.Failed, "新增用户'"+param.UserName+"'失败，手机账号已存在")
+	}
+	// 判断是否存在相同的邮箱
+	condition = core.DB.Where("email = ? and del_flag = 1", param.Email)
+	if isExist, err = dao.User.Exist(condition); err != nil || isExist {
+		core.Log.Error("新增用户'%s'失败，邮箱账号已存在", param.UserName)
+		return response.CustomBusinessError(response.Failed, "新增用户'"+param.UserName+"'失败，邮箱账号已存在")
+	}
+	if err = core.DB.Transaction(func(tx *gorm.DB) error {
+		now = time.Now()
+		encode, _ = utils.BcryptEncode(param.Password)
+		// 创建角色
+		user = entity.User{
+			UserName:   param.UserName,
+			NickName:   param.NickName,
+			Password:   encode,
+			Email:      param.Email,
+			Phone:      param.Phone,
+			Sex:        param.Sex,
+			DeptId:     param.DeptId,
+			Status:     param.Status,
+			CreateBy:   param.CreateName,
+			Remark:     param.Remark,
+			DelFlag:    1,
+			CreateTime: &now,
+		}
+		if err = dao.User.Create(tx, &user); err != nil {
+			core.Log.Error("创建用户[%s]失败：%s", param.UserName, err.Error())
+			return err
+		}
+		// 创建角色菜单映射关系
+		if len(param.PostId) > 0 {
+			for _, id := range param.PostId {
+				userPosts = append(userPosts, &entity.UserPost{UserId: user.UserId, PostId: id})
+			}
+			if err = tx.Model(&entity.UserPost{}).Create(userPosts).Error; err != nil {
+				core.Log.Error("创建用户[%s]和岗位[%v]映射关系失败：%s", user.UserName, param.PostId, err.Error())
+				return err
+			}
+		}
+		if len(param.RoleId) > 0 {
+			for _, id := range param.RoleId {
+				userRoles = append(userRoles, &entity.UserRole{UserId: user.UserId, RoleId: id})
+			}
+			if err = tx.Model(&entity.UserRole{}).Create(userRoles).Error; err != nil {
+				core.Log.Error("创建用户[%s]和角色[%v]映射关系失败：%s", user.UserName, param.RoleId, err.Error())
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		return response.CustomBusinessError(response.Failed, "创建角色失败")
+	}
+	core.Log.Info("创建用户[%d:%s]成功", user.UserId, user.UserName)
 	return nil
 }
 
 // Update 更新用户
 func (u *UserService) Update(param *request.UserUpdateRequest) *response.BusinessError {
+	var (
+		err       error
+		isNeed    bool
+		posts     []*entity.UserPost
+		roles     []*entity.UserRole
+		now       time.Time
+		old       entity.User
+		customErr *response.BusinessError
+		contrast  = func(old *entity.User, param *request.UserUpdateRequest) (isNeed bool, bErr *response.BusinessError) {
+			var (
+				condition *gorm.DB
+				exist     bool
+				err       error
+			)
+			isNeed = false
+			if old.UserName != param.UserName {
+				// 判断新的角色名称是否存在相同的角色信息
+				condition = core.DB.Where("user_name = ? and del_flag = 1 and user_id != ?", param.UserName, old.UserId)
+				if exist, err = dao.User.Exist(condition); err != nil || exist {
+					return false, response.CustomBusinessError(response.Failed, "存在相同的账号名称["+param.UserName+"]")
+				}
+				old.UserName = param.UserName
+				isNeed = true
+			}
+			if old.Phone != param.Phone {
+				condition = core.DB.Where("phone = ? and del_flag = 1 and user_id != ?", param.Phone, old.UserId)
+				if exist, err = dao.User.Exist(condition); err != nil || exist {
+					return false, response.CustomBusinessError(response.Failed, "存在相同的手机号["+param.Phone+"]")
+				}
+				old.Phone = param.Phone
+				isNeed = true
+			}
+			if old.Email != param.Email {
+				condition = core.DB.Where("email = ? and del_flag = 1 and user_id != ?", param.Email, old.UserId)
+				if exist, err = dao.User.Exist(condition); err != nil || exist {
+					return false, response.CustomBusinessError(response.Failed, "存在相同的邮箱["+param.Phone+"]")
+				}
+				old.Email = param.Email
+				isNeed = true
+			}
+			if old.DeptId != param.DeptId {
+				old.DeptId = param.DeptId
+				isNeed = true
+			}
+			if old.Sex != param.Sex {
+				old.Status = param.Status
+				isNeed = true
+			}
+			if old.Status != param.Status {
+				old.Status = param.Status
+				isNeed = true
+			}
+			if old.NickName != param.NickName {
+				old.NickName = param.NickName
+				isNeed = true
+			}
+			if old.Remark != param.Remark {
+				old.Remark = param.Remark
+				isNeed = true
+			}
+			return isNeed, nil
+		} // 对比是否需要更新数据
+	)
+	// 获取修改数据
+	if old, err = dao.User.GetUserById(param.UserId); err != nil {
+		core.Log.Error("当前用户[%d]不存在", param.RoleId)
+		return response.CustomBusinessError(response.Failed, "当前用户不存在")
+	}
+	// 判断是否需要修改数据
+	if isNeed, customErr = contrast(&old, param); customErr != nil || !isNeed {
+		core.Log.Error("修改用户失败：%s", customErr.Error())
+		return customErr
+	}
+	// 判断是否需要更新用户和岗位
+	if len(param.PostId) > 0 {
+		for _, id := range param.PostId {
+			posts = append(posts, &entity.UserPost{UserId: param.UserId, PostId: id})
+		}
+	}
+	// 判断是否需要更新用户和角色
+	if len(param.RoleId) > 0 {
+		for _, id := range param.RoleId {
+			roles = append(roles, &entity.UserRole{UserId: param.UserId, RoleId: id})
+		}
+	}
+	// 执行更新
+	if err = core.DB.Transaction(func(tx *gorm.DB) (err error) {
+		if isNeed {
+			now = time.Now()
+			old.UpdateBy = param.UserName
+			old.UpdateTime = &now
+			if err = tx.Save(&old).Error; err != nil {
+				core.Log.Error("更新用户数据失败:%s", err.Error())
+				return
+			}
+		}
+		// 判断是否需要更新映射关系
+		if len(roles) > 0 {
+			if err = tx.Where("user_id = ?", old.UserId).Delete(&entity.UserRole{}).Error; err != nil {
+				core.Log.Error("删除用户和角色映射数据失败:%s", err.Error())
+				return
+			}
+			if err = tx.Save(&roles).Error; err != nil {
+				core.Log.Error("创建用户[%s]和角色映射关系失败：%s", param.UserId, err.Error())
+				return
+			}
+		}
+		if len(posts) > 0 {
+			if err = tx.Where("user_id = ?", old.UserId).Delete(&entity.UserPost{}).Error; err != nil {
+				core.Log.Error("删除用户和岗位映射数据失败:%s", err.Error())
+				return
+			}
+			if err = tx.Save(&posts).Error; err != nil {
+				core.Log.Error("创建用户[%s]和岗位映射关系失败：%s", param.UserId, err.Error())
+				return
+			}
+		}
+		return
+	}); err != nil {
+		return response.CustomBusinessError(response.Failed, "更新用户失败")
+	}
+	return nil
+}
+
+// ResetPassword 重置用户密码
+func (u *UserService) ResetPassword(param *request.UserPasswordRequest) *response.BusinessError {
+	var (
+		now      time.Time
+		password string
+		user     entity.User
+		err      error
+	)
+	if user, err = dao.User.GetUserById(param.UserId); err != nil {
+		core.Log.Error("当前用户[%d]不存在", param.UserId)
+		return response.CustomBusinessError(response.Failed, "当前用户不存在")
+	}
+	now = time.Now()
+	password, _ = utils.BcryptEncode(param.Password)
+	user.Password = password
+	user.UpdateBy = param.UpdateName
+	user.UpdateTime = &now
+	if err = core.DB.Model(&entity.User{}).Save(&user).Error; err != nil {
+		return response.CustomBusinessError(response.Failed, "重置密码失败")
+	}
+	return nil
+}
+
+// ChangeStatus 修改用户状态
+func (u *UserService) ChangeStatus(param *request.UserStatusRequest) *response.BusinessError {
+	var (
+		now   time.Time
+		exist bool
+		err   error
+	)
+	if exist, err = dao.User.Exist(core.DB.Where("user_id = ?", param.UserId)); err != nil || !exist {
+		core.Log.Error("当前用户[%d]不存在", param.UserId)
+		return response.CustomBusinessError(response.Failed, "当前用户不存在")
+	}
+	now = time.Now()
+	if err = dao.User.Update(
+		core.DB.Where("user_id = ?", param.UserId),
+		map[string]any{"update_by": param.UpdateName, "update_time": &now, "status": param.Status},
+	); err != nil {
+		return response.CustomBusinessError(response.Failed, "重置密码失败")
+	}
+	return nil
+}
+
+// DeleteUser 删除用户
+func (u *UserService) DeleteUser(param *request.UserDeleteRequest) *response.BusinessError {
+	var (
+		now time.Time
+		err error
+	)
+	now = time.Now()
+	if err = dao.User.Update(
+		core.DB.Where("user_id in ?", param.Ids),
+		map[string]any{"update_by": param.UpdateName, "update_time": &now, "del_flag": 0},
+	); err != nil {
+		return response.CustomBusinessError(response.Failed, "删除用户成功")
+	}
 	return nil
 }

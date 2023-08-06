@@ -66,7 +66,7 @@ func initRouter() {
 		}
 		post := root.Group("post") // 岗位模块
 		{
-			post.POST("all", controller.Post.PostList)      // 全部岗位
+			post.GET("all", controller.Post.PostList)       // 全部岗位
 			post.POST("page", controller.Post.PostPage)     // 岗位分页
 			post.POST("create", controller.Post.PostCreate) // 岗位创建
 			post.POST("update", controller.Post.PostUpdate) // 岗位修改

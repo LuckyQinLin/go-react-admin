@@ -20,8 +20,8 @@ type UserRoleProp struct {
 	RoleCode string `json:"roleCode"`
 }
 
-// UserInfoResponse 用户信息
-type UserInfoResponse struct {
+// UserLoginResponse 用户登录返回
+type UserLoginResponse struct {
 	Id         int64          `json:"id"`         // 用户ID
 	UserName   string         `json:"userName"`   // 姓名
 	NickName   string         `json:"nickName"`   // 昵称
@@ -33,7 +33,22 @@ type UserInfoResponse struct {
 	Remark     string         `json:"remark"`     // 备注
 	Token      string         `json:"token"`      // token信息
 	ExpireTime int64          `json:"expireTime"` // 到期时间
-	Roles      []UserRoleProp `json:"roles"`      // 用户角色
+	Roles      []UserRoleProp `json:"roles"`
+}
+
+// UserInfoResponse 用户信息
+type UserInfoResponse struct {
+	UserId   int64   `json:"userId"`   // 用户ID
+	UserName string  `json:"userName"` // 用户名称
+	NickName string  `json:"nickName"` // 用户昵称
+	DeptId   int64   `json:"deptId"`   // 部门ID
+	Phone    string  `json:"phone"`    // 手机号
+	Email    string  `json:"email"`    // 邮箱
+	Sex      int     `json:"sex"`      // 性别
+	Status   int     `json:"status"`   // 状态
+	PostId   []int64 `json:"postId"`   // 岗位
+	RoleId   []int64 `json:"roleId"`   // 角色
+	Remark   string  `json:"remark"`   // 备注
 }
 
 // UserPageResponse 用户分页
