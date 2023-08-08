@@ -4,11 +4,10 @@ import {deptTree} from "@/api/dept.ts";
 import {useEffect, useState} from "react";
 import {DeptTreeProp} from "@/pages/system/dept/modules.ts";
 import {UserDrawerProp, UserPageQueryProp, UserTableProp} from "@/pages/system/user/modules.ts";
-import {userDelete, userPage} from "@/api/user.ts";
+import {userDelete, userPage, userStatus} from "@/api/user.ts";
 import {ColumnsType} from "antd/es/table";
 import {UserCreateDrawer, UserUpdateDrawer} from "@/pages/system/user/components";
 import {ExclamationCircleFilled} from "@ant-design/icons";
-import {roleDelete} from "@/api/role.ts";
 
 const SystemUserPage = () => {
 
@@ -48,6 +47,7 @@ const SystemUserPage = () => {
                 checkedChildren="正常"
                 unCheckedChildren="停用"
                 checked={record.status === 1}
+                onChange={e => changeUserStatus(record.userId, e)}
             />
         },
         {
@@ -86,6 +86,20 @@ const SystemUserPage = () => {
         manual: true,
         onSuccess: (data) => setTree(data)
     });
+
+    const loadUserStatus = useRequest(userStatus, {
+        manual: true,
+        onSuccess: (data) => {
+            message.success(data)
+            loadUser.run(pageQuery)
+        }
+    });
+
+    // changeUserStatus 修改用户状态
+    const changeUserStatus = (userId: number, status: boolean) => {
+        loadUserStatus.run(userId, status)
+    }
+
     const loadUser = useRequest(userPage, {
         manual: true,
         onSuccess: ({records, total}) => {

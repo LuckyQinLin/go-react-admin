@@ -32,6 +32,7 @@ func initRouter() {
 			user.POST("page", controller.User.Page)                // 用户分页
 			user.POST("create", controller.User.UserCreate)        // 用户创建
 			user.POST("update", controller.User.UserUpdate)        // 用户更新
+			user.POST("status", controller.User.ChangeStatus)      // 修改用户状态
 
 		}
 		role := root.Group("role") // 角色模块

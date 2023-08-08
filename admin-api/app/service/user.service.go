@@ -260,7 +260,7 @@ func (u *UserService) Page(param *request.UserPageRequest) (*response.PageData, 
 		core.Log.Error("统计用户数据失败, 异常信息如下：%s", err.Error())
 		return nil, response.CustomBusinessError(response.Failed, "获取用户数据失败")
 	}
-	if err = core.DB.Debug().Scopes(buildCondition(param)).
+	if err = core.DB.Scopes(buildCondition(param)).
 		Select("u.user_id,u.dept_id,u.nick_name,u.user_name,u.email,u.avatar,u.phone,u.status,u.create_time,d.dept_name").
 		Joins("left join sys_dept d on u.dept_id = d.dept_id").
 		Find(&list).

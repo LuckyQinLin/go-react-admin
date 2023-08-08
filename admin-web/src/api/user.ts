@@ -88,3 +88,12 @@ export const userDelete = (ids: number[]): Promise<string> => {
         data: {ids: ids}
     })
 }
+
+// userDelete 用户状态
+export const userStatus = (userId: number, status: boolean): Promise<string> => {
+    return https.request({
+        url: '/user/status',
+        method: 'post',
+        data: {userId: userId, status: status ? 1 : 0}
+    })
+}
