@@ -206,3 +206,25 @@ func (u *UserController) UserDelete(ctx *gin.Context) {
 	}
 	u.Success(ctx, operate, response.Ok("删除用户成功"))
 }
+
+// UserRole 用户分配角色
+func (u *UserController) UserRole(ctx *gin.Context) {
+	var (
+		claims    *vo.UserClaims
+		operate   *entity.Operate
+		param     request.UserRoleRequest
+		customErr *response.BusinessError
+		err       error
+	)
+	claims, operate = u.Parse(ctx, "用户分配角色", vo.Update, nil)
+	if err = ctx.ShouldBind(&param); err != nil {
+		u.Failed(ctx, operate, response.Fail(response.RequestParamError))
+		return
+	}
+	param.CreateName = claims.Username
+	operate.ParamToJson(param)
+	if customErr = service.User.UserRole(&param); customErr != nil {
+		u.Failed(ctx, operate, response.ResultCustom(customErr))
+	}
+	u.Success(ctx, operate, response.Ok("用户分配角色成功"))
+}

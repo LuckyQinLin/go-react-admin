@@ -6,7 +6,7 @@ import {DeptTreeProp} from "@/pages/system/dept/modules.ts";
 import {UserDrawerProp, UserPageQueryProp, UserTableProp} from "@/pages/system/user/modules.ts";
 import {userDelete, userPage, userStatus} from "@/api/user.ts";
 import {ColumnsType} from "antd/es/table";
-import {UserCreateDrawer, UserUpdateDrawer} from "@/pages/system/user/components";
+import {UserCreateDrawer, UserRoleDrawer, UserUpdateDrawer} from "@/pages/system/user/components";
 import {ExclamationCircleFilled} from "@ant-design/icons";
 
 const SystemUserPage = () => {
@@ -66,7 +66,7 @@ const SystemUserPage = () => {
                 <Space size={'small'}>
                     <Button type="link" size='small' style={{padding: 4}} onClick={() => openDrawer('update', record.userId)}>修改</Button>
                     <Button type="link" size='small' style={{padding: 4}}>重置密码</Button>
-                    <Button type="link" size='small' style={{padding: 4}}>分配角色</Button>
+                    <Button type="link" size='small' style={{padding: 4}} onClick={() => openDrawer('role', record.userId)}>分配角色</Button>
                     <Button type="link" size='small' style={{padding: 4}} danger onClick={() => deleteRoleHandler(record.userId)}>删除</Button>
                 </Space>
             ),
@@ -80,7 +80,7 @@ const SystemUserPage = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
     const [datasource, setDatasource] = useState<UserTableProp[]>([]);
     const [pageQuery, setPageQuery] = useState<UserPageQueryProp>({page: 1, size: 10});
-    const [userDrawer, setUserDrawer] = useState<UserDrawerProp>({createVisible: false, updateVisible: false});
+    const [userDrawer, setUserDrawer] = useState<UserDrawerProp>({createVisible: false, updateVisible: false, roleVisible: false});
 
     const loadTree = useRequest(deptTree, {
         manual: true,
@@ -108,24 +108,28 @@ const SystemUserPage = () => {
         }
     });
 
-    const openDrawer = (types: 'create' | 'update', userId?: number) => {
+    const openDrawer = (types: 'create' | 'update' | 'role', userId?: number) => {
         switch (types) {
             case 'create':
-                setUserDrawer({createVisible: true, updateVisible: false});
+                setUserDrawer({createVisible: true, updateVisible: false, roleVisible: false});
                 break;
             case 'update':
-                setUserDrawer({createVisible: false, updateVisible: true, userId: userId});
+                setUserDrawer({createVisible: false, updateVisible: true, roleVisible: false, userId: userId});
+                break;
+            case 'role':
+                setUserDrawer({createVisible: false, updateVisible: false, roleVisible: true, userId: userId});
                 break;
             default:
                 break
         }
     }
 
-    const closeDrawer = (types: 'create' | 'update', isLoad: boolean) => {
+    const closeDrawer = (types: 'create' | 'update' | 'role', isLoad: boolean) => {
         switch (types) {
             case 'create':
             case 'update':
-                setUserDrawer({createVisible: false, updateVisible: false});
+            case 'role':
+                setUserDrawer({createVisible: false, updateVisible: false, roleVisible: false, userId: undefined});
                 break;
             default:
                 break
@@ -210,6 +214,7 @@ const SystemUserPage = () => {
         </Col>
         <UserCreateDrawer visible={userDrawer.createVisible} close={(isLoad) => closeDrawer('create', isLoad)} />
         <UserUpdateDrawer visible={userDrawer.updateVisible} close={(isLoad) => closeDrawer('update', isLoad)} userId={userDrawer.userId} />
+        <UserRoleDrawer visible={userDrawer.roleVisible} close={() => closeDrawer('role', false)} userId={userDrawer.userId} />
     </Row>
 }
 

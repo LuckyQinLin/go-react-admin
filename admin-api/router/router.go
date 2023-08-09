@@ -33,6 +33,7 @@ func initRouter() {
 			user.POST("create", controller.User.UserCreate)        // 用户创建
 			user.POST("update", controller.User.UserUpdate)        // 用户更新
 			user.POST("status", controller.User.ChangeStatus)      // 修改用户状态
+			user.POST("role", controller.User.UserRole)            // 用户分配角色
 
 		}
 		role := root.Group("role") // 角色模块
@@ -46,6 +47,7 @@ func initRouter() {
 			role.POST("delete", controller.Role.RoleDelete)     // 角色删除
 			role.POST("dataAuth", controller.Role.RoleDataAuth) // 角色数据权限分配
 			role.GET("export", controller.Role.RoleExport)      // 角色导出
+			role.GET("user", controller.Role.UserRole)          // 获取用户角色
 		}
 		menu := root.Group("menu") // 菜单模块
 		{

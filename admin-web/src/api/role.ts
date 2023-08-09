@@ -60,3 +60,12 @@ export const roleDelete = (ids: number[]): Promise<boolean> => {
         data: {ids: ids}
     })
 }
+
+// roleByUserId 获取用户的角色
+export const roleByUserId = (userId: number): Promise<number[]> => {
+    return https.request({
+        url: '/role/user',
+        method: 'get',
+        params: {userId: userId}
+    })
+}

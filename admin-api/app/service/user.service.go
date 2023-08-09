@@ -540,3 +540,29 @@ func (u *UserService) DeleteUser(param *request.UserDeleteRequest) *response.Bus
 	}
 	return nil
 }
+
+// UserRole 用户分配角色
+func (u *UserService) UserRole(param *request.UserRoleRequest) *response.BusinessError {
+	var userRoles = make([]*entity.UserRole, 0)
+	for _, item := range param.Ids {
+		userRoles = append(userRoles, &entity.UserRole{
+			UserId: param.UserId,
+			RoleId: item,
+		})
+	}
+	if err := core.DB.Transaction(func(tx *gorm.DB) (err error) {
+		if err = tx.Where("user_id = ?", param.UserId).Delete(&entity.UserRole{}).Error; err != nil {
+			core.Log.Error("删除用户和角色映射数据失败:%s", err.Error())
+			return
+		}
+		if err = tx.Save(userRoles).Error; err != nil {
+			core.Log.Error("创建用户[%s]和角色映射关系失败：%s", param.UserId, err.Error())
+			return
+		}
+		return nil
+	}); err != nil {
+		return response.CustomBusinessError(response.Failed, "分配角色失败")
+	}
+	return nil
+
+}

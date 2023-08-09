@@ -308,3 +308,15 @@ func (r *RoleService) DataExport(ids []int64) (file *excelize.File, customErr *r
 	file.SetActiveSheet(sheet)
 	return file, nil
 }
+
+// UserRole 获取用户拥有的角色
+func (r *RoleService) UserRole(userId int64) ([]int64, *response.BusinessError) {
+	var (
+		ids []int64
+		err error
+	)
+	if ids, err = dao.Role.UserRole(userId); err != nil {
+		return nil, response.CustomBusinessError(response.Failed, "获取用户角色数据失败")
+	}
+	return ids, nil
+}

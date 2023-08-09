@@ -7,9 +7,19 @@ import (
 	"admin-api/internal/gorm"
 )
 
-var Role = new(RoleDao)
+var Role = NewRoleDao()
 
-type RoleDao struct{}
+type RoleDao struct {
+	role     BaseDao[entity.Role]
+	userRole BaseDao[entity.UserRole]
+}
+
+func NewRoleDao() *RoleDao {
+	return &RoleDao{
+		role:     BaseDao[entity.Role]{},
+		userRole: BaseDao[entity.UserRole]{},
+	}
+}
 
 // Total 查询获取总条数
 func (r *RoleDao) Total(condition *gorm.DB) (total int64, err error) {
@@ -72,4 +82,20 @@ func (r *RoleDao) UpdateById(tx *gorm.DB, update map[string]any, roleId ...int64
 func (r *RoleDao) List(condition *gorm.DB) (roles []entity.Role, err error) {
 	err = condition.Model(&entity.Role{}).Find(&roles).Error
 	return
+}
+
+// UserRole 获取用户角色
+func (r *RoleDao) UserRole(userId int64) ([]int64, error) {
+	var (
+		result []int64
+		data   []entity.UserRole
+		err    error
+	)
+	if err = r.userRole.FindByMap(map[string]any{"user_id": userId}, &data); err != nil {
+		return nil, err
+	}
+	for _, userRole := range data {
+		result = append(result, userRole.RoleId)
+	}
+	return result, nil
 }

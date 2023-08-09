@@ -68,6 +68,7 @@ interface UserUpdateFormProp {
 interface UserDrawerProp {
     createVisible: boolean;
     updateVisible: boolean;
+    roleVisible: boolean;
     userId?: number;
 }
 
@@ -94,6 +95,12 @@ const validateEmail = (_: RuleObject, value: string, callback: (error?: string) 
     callback();
 };
 
+interface UserRoleDrawerProp {
+    userId?: number;
+    visible: boolean;
+    close: () => void;
+}
+
 export {
     validateMobile,
     validateEmail
@@ -107,4 +114,5 @@ export type {
     UserUpdateFormProp,
     UserTableProp,
     UserDrawerProp,
+    UserRoleDrawerProp
 }

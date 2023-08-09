@@ -7,7 +7,7 @@ import (
 )
 
 type BaseRestraint interface {
-	entity.Dept | entity.User | entity.Role
+	entity.Dept | entity.User | entity.Role | entity.UserRole
 }
 
 type BaseDao[T BaseRestraint] struct {
@@ -28,6 +28,11 @@ func (b *BaseDao[T]) TUpdate(tx *gorm.DB, condition *gorm.DB, data map[string]an
 func (b *BaseDao[T]) Find(condition *gorm.DB) (data []any, err error) {
 	err = condition.Model(&b.model).Find(data).Error
 	return
+}
+
+// FindByMap 条件查询
+func (b *BaseDao[T]) FindByMap(condition map[string]any, data any) error {
+	return core.DB.Model(&b.model).Where(condition).Find(data).Error
 }
 
 // Limit 分页查询

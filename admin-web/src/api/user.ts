@@ -97,3 +97,12 @@ export const userStatus = (userId: number, status: boolean): Promise<string> => 
         data: {userId: userId, status: status ? 1 : 0}
     })
 }
+
+// userRole 用户分配角色
+export const userRole = (userId: number, ids: number[]): Promise<string> => {
+    return https.request({
+        url: '/user/role',
+        method: 'post',
+        data: {userId: userId, ids: ids}
+    })
+}

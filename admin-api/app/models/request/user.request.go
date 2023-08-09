@@ -68,3 +68,10 @@ type UserDeleteRequest struct {
 	Ids        []int64 `json:"ids"`        // 修改用户ID
 	UpdateName string  `json:"updateName"` // 修改人名称
 }
+
+// UserRoleRequest 用户分配角色
+type UserRoleRequest struct {
+	Ids        []int64 `json:"ids"`        // 角色ID
+	UserId     int64   `json:"userId"`     // 用户ID
+	CreateName string  `json:"createName"` // 创建人名称
+}

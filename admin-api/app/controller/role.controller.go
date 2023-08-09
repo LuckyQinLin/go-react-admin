@@ -194,6 +194,25 @@ func (r *RoleController) RoleExport(ctx *gin.Context) {
 	}
 }
 
+// UserRole 用户拥有的角色
+func (r *RoleController) UserRole(ctx *gin.Context) {
+	var (
+		customErr *response.BusinessError
+		roleIds   []int64
+		userId    int64
+		err       error
+	)
+	if userId, err = ctx.QueryInt64("userId"); err != nil {
+		ctx.JSON(http.StatusOK, response.Fail(response.RequestParamError))
+		return
+	}
+	if roleIds, customErr = service.Role.UserRole(userId); customErr != nil {
+		ctx.JSON(http.StatusOK, response.ResultCustom(customErr))
+		return
+	}
+	ctx.JSON(http.StatusOK, response.Ok(roleIds))
+}
+
 // RoleDataAuth 角色分配数据权限
 func (r *RoleController) RoleDataAuth(ctx *gin.Context) {
 
