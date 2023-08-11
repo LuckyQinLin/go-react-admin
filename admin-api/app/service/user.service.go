@@ -191,7 +191,6 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 		Remark:     user.Remark,
 		Token:      token,
 		ExpireTime: claims.ExpiresAt.Unix(),
-		Roles:      nil,
 	}, nil
 }
 

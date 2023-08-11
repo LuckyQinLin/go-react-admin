@@ -74,7 +74,7 @@ const SystemUserPage = () => {
     ]
 
 
-    const [searchValue, setSearchValue] = useState('');
+    const [searchValue] = useState('');
     const [tree, setTree] = useState<DeptTreeProp[]>([]);
     const [total, setTotal] = useState<number>(0);
     const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
