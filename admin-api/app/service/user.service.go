@@ -11,9 +11,9 @@ import (
 	"admin-api/internal/gorm"
 	"admin-api/utils"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/mojocn/base64Captcha"
 	"github.com/mssola/useragent"
 	"sync"
@@ -91,47 +91,40 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 			}
 			return nil
 		} // 验证码验证
-		generateToken = func(user entity.User) (claims vo.UserClaims, token string, err error) {
-			claims = vo.UserClaims{
-				UserId:   user.UserId,
-				DeptId:   user.DeptId,
-				Username: user.UserName,
-				Email:    user.Email,
-				Phone:    user.Phone,
-				RegisteredClaims: jwt.RegisteredClaims{
-					ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(core.Config.Jwt.ExpiresTime) * time.Minute)), // 这里不配置过期时间，放到Redis中管理Token的过期时间，方便后面做续期
-					IssuedAt:  jwt.NewNumericDate(time.Now()),                                                               // 签发时间
-					NotBefore: jwt.NewNumericDate(time.Now()),                                                               // 生效时间
-					Issuer:    core.Config.Jwt.Issuer,
-				},
-			}
-			t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-			token, err = t.SignedString([]byte(core.Config.Jwt.SecretKey))
-			return
-		} // 生成token信息
-		getUserInfoWithVerity = func(username, password string) (user entity.User, err error) {
+		getUserInfoWithVerity = func(username, password string) (*vo.UserClaims, error) {
+			var (
+				user entity.User
+				dept entity.Dept
+				err  error
+			)
 			if user, err = dao.User.GetUserByUserName(username); err != nil {
-				err = errors.New("登录用户" + username + "不存在")
-				return
+				return nil, errors.New("登录用户" + username + "不存在")
 			}
 			// 删除
 			if user.DelFlag == 0 {
-				err = errors.New("对不起，您的账号：" + username + " 已被删除")
-				return
+				return nil, errors.New("对不起，您的账号：" + username + " 已被删除")
 			}
 			// 状态
 			if user.Status == 0 {
-				err = errors.New("对不起，您的账号：" + username + " 已停用")
-				return
+				return nil, errors.New("对不起，您的账号：" + username + " 已停用")
 			}
 			// 密码
 			pd, _ := utils.BcryptEncode(password)
 			core.Log.Info("密码：%s", pd)
 			if !utils.BcryptVerify(user.Password, password) {
-				err = errors.New("账号密码不正确")
-				return
+				return nil, errors.New("账号密码不正确")
 			}
-			return
+			if dept, err = dao.Dept.GetDeptById(user.DeptId); err != nil {
+				return nil, errors.New("部门不存在")
+			}
+			return &vo.UserClaims{
+				UserId:   user.UserId,
+				DeptId:   user.DeptId,
+				DeptName: dept.DeptName,
+				Username: user.UserName,
+				Email:    user.Email,
+				Phone:    user.Phone,
+			}, nil
 		} // 验证用户信息
 		loginLogger = func(c *gin.Context, username, msg string, status int) {
 			userAgent := useragent.New(c.GetHeader("User-Agent"))
@@ -149,10 +142,21 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 				Status:        status,
 			})
 		}
-		token  string
-		user   entity.User
-		claims vo.UserClaims
-		err    error
+		cacheUserInfo = func(user *vo.UserClaims, token string) (err error) {
+			bytes, _ := json.Marshal(user)
+			if _, err = core.Cache.SetKeyValue(
+				fmt.Sprintf("%s:%s", vo.RedisToken, token),
+				string(bytes),
+				time.Duration(core.Config.Jwt.ExpiresTime)*time.Minute,
+			); err != nil {
+				core.Log.Error("缓冲用户信息失败：%s", err.Error())
+				return
+			}
+			return nil
+		} // 缓冲用户信息
+		token string
+		user  *vo.UserClaims
+		err   error
 	)
 	// 验证码校验
 	if err = captchaVerify(param.Uuid, param.Captcha); err != nil {
@@ -166,65 +170,50 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 		go loginLogger(ctx, param.Username, err.Error(), 0)
 		return nil, response.LoginBusinessError(err.Error())
 	}
-	go loginLogger(ctx, user.UserName, "登录成功", 1)
+	go loginLogger(ctx, user.Username, "登录成功", 1)
 	// 构建jwt
-	if claims, token, err = generateToken(user); err != nil {
-		core.Log.Error("生成认证Token错误:%s", err.Error())
-		return nil, response.NewBusinessError(response.TokenBuildError)
-	}
-	if _, err = core.Cache.SetKeyValue(
-		fmt.Sprintf("%s:%d", vo.RedisToken, user.UserId),
-		token,
-		time.Duration(core.Config.Jwt.ExpiresTime)*time.Minute,
-	); err != nil {
-		core.Log.Error("写入用户Token[%s]失败: %s", token, err.Error())
+	token, _ = utils.GenerateRandomToken(64)
+	// 缓冲用户信息
+	if err = cacheUserInfo(user, token); err != nil {
+		return nil, response.LoginBusinessError(err.Error())
 	}
 	return &response.UserLoginResponse{
-		Id:         user.UserId,
-		UserName:   user.UserName,
-		NickName:   user.NickName,
-		Sex:        user.Sex,
-		Avatar:     user.Avatar,
-		DeptId:     user.DeptId,
-		Email:      user.Email,
-		Phone:      user.Phone,
-		Remark:     user.Remark,
 		Token:      token,
-		ExpireTime: claims.ExpiresAt.Unix(),
+		ExpireTime: time.Now().Add(time.Duration(core.Config.Jwt.ExpiresTime) * time.Minute).Unix(),
 	}, nil
 }
 
 // GetUserInfo 获取用户信息
 func (u *UserService) GetUserInfo(userId int64) (*response.UserInfoResponse, *response.BusinessError) {
 	var (
-		postId []int64
-		roleId []int64
-		user   entity.User
+		//postId []int64
+		//roleId []int64
+		//user   entity.User
 		result *response.UserInfoResponse
-		err    error
+		//err    error
 	)
-	if user, err = dao.User.GetUserById(userId); err != nil {
-		return nil, response.NewBusinessError(response.DataNotExist)
-	}
-	result = &response.UserInfoResponse{
-		UserId:   user.UserId,
-		UserName: user.UserName,
-		NickName: user.NickName,
-		DeptId:   user.DeptId,
-		Email:    user.Email,
-		Phone:    user.Phone,
-		Remark:   user.Remark,
-		Status:   user.Status,
-		Sex:      user.Sex,
-	}
-	// 用户岗位
-	if postId, err = dao.User.UserPostId(user.UserId); err == nil && len(postId) > 0 {
-		result.PostId = postId
-	}
-	// 用户角色
-	if roleId, err = dao.User.UserRoleId(user.UserId); err == nil && len(roleId) > 0 {
-		result.RoleId = roleId
-	}
+	//if user, err = dao.User.GetUserById(userId); err != nil {
+	//	return nil, response.NewBusinessError(response.DataNotExist)
+	//}
+	//result = &response.UserInfoResponse{
+	//	UserId:   user.UserId,
+	//	UserName: user.UserName,
+	//	NickName: user.NickName,
+	//	DeptId:   user.DeptId,
+	//	Email:    user.Email,
+	//	Phone:    user.Phone,
+	//	Remark:   user.Remark,
+	//	Status:   user.Status,
+	//	Sex:      user.Sex,
+	//}
+	//// 用户岗位
+	//if postId, err = dao.User.UserPostId(user.UserId); err == nil && len(postId) > 0 {
+	//	result.PostId = postId
+	//}
+	//// 用户角色
+	//if roleId, err = dao.User.UserRoleId(user.UserId); err == nil && len(roleId) > 0 {
+	//	result.RoleId = roleId
+	//}
 	return result, nil
 }
 

@@ -5,8 +5,9 @@ import (
 	"admin-api/app/models/vo"
 	"admin-api/core"
 	"admin-api/internal/gin"
+	"encoding/json"
 	"errors"
-	"github.com/golang-jwt/jwt/v5"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -26,30 +27,36 @@ func authPath(list []string, path string) bool {
 func JwtMiddle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
-			parseJwt = func(tokenClaims string) (claims *vo.UserClaims, isExpired bool, err error) {
+			parseJwt = func(token string) (*vo.UserClaims, bool, float64, error) {
 				var (
-					t  *jwt.Token
-					ok bool
+					key    string
+					value  string
+					expire float64
+					user   vo.UserClaims
+					err    error
 				)
-				if t, err = jwt.ParseWithClaims(tokenClaims, &vo.UserClaims{}, func(token *jwt.Token) (any, error) {
-					return []byte(core.Config.Jwt.SecretKey), nil
-				}); err != nil {
-					return nil, false, err
+				key = fmt.Sprintf("%s:%s", vo.RedisToken, token)
+				// 判断是否过期
+				if expire = core.Cache.IsExpire(key); expire == -2 {
+					return nil, true, 0, nil
 				}
-				if !t.Valid {
-					return nil, true, nil
+				// 获取数据
+				if value, err = core.Cache.GetKey(key); err != nil {
+					return nil, false, 0, errors.New("获取用户数据失败")
 				}
-				if claims, ok = t.Claims.(*vo.UserClaims); ok {
-					return claims, false, nil
+				// 序列化
+				if err = json.Unmarshal([]byte(value), &user); err != nil {
+					return nil, false, 0, errors.New("解析用户数据失败")
 				}
-				return nil, false, errors.New("Token解析或非法Token")
+				return &user, false, expire, nil
 			} // 解析Token
+
 			whiteList = core.Config.Web.Whites()
 			path      = c.Request.URL.Path
-			claims    *vo.UserClaims
+			user      *vo.UserClaims
 			isExpired bool
+			expired   float64
 			auth      string
-			newToken  string
 			err       error
 		)
 		// 后续打包后放过 /admin开头的前端路由
@@ -65,7 +72,7 @@ func JwtMiddle() gin.HandlerFunc {
 				return
 			}
 			// 解析Token
-			if claims, isExpired, err = parseJwt(auth); err != nil {
+			if user, isExpired, expired, err = parseJwt(auth); err != nil {
 				c.Abort()
 				core.Log.Info("当前请求路径[%s], 认证信息错误[%s]", path, err.Error())
 				c.JSON(http.StatusUnauthorized, response.Fail(response.AuthFail))
@@ -79,17 +86,17 @@ func JwtMiddle() gin.HandlerFunc {
 				return
 			}
 			// 续期
-			if (claims.ExpiresAt.Sub(time.Now()).Minutes() * 3) <= float64(core.Config.Jwt.ExpiresTime) {
+			if expired*3 <= float64(core.Config.Jwt.ExpiresTime) {
 				core.Log.Info("Token剩余时间小于1/3，系统进行续期操作")
-				claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Duration(core.Config.Jwt.ExpiresTime) * time.Minute))
-				t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-				if newToken, err = t.SignedString([]byte(core.Config.Jwt.SecretKey)); err != nil {
-					core.Log.Info("Token续期失败[%s]", err.Error())
+				key := fmt.Sprintf("%s:%s", vo.RedisToken, auth)
+				if _, err = core.Cache.KeyExpired(
+					key,
+					time.Duration(core.Config.Jwt.ExpiresTime)*time.Minute,
+				); err != nil {
+					core.Log.Info("认证Token[%s]续期失败", key, err.Error())
 				}
-				// 将新的Token写入Header中
-				c.Header("NewToken", newToken)
 			}
-			c.Set(vo.ClaimsInfo, claims)
+			c.Set(vo.ClaimsInfo, user)
 			c.Next()
 			c.Set(vo.ClaimsInfo, "")
 		}

@@ -13,24 +13,8 @@ type CaptchaImageResponse struct {
 	ExpireTime int64  `json:"expireTime"` // 到期时间
 }
 
-// UserRoleProp 用户角色属性
-type UserRoleProp struct {
-	RoleId   int64  `json:"roleId"`
-	RoleName string `json:"roleName"`
-	RoleCode string `json:"roleCode"`
-}
-
 // UserLoginResponse 用户登录返回
 type UserLoginResponse struct {
-	Id         int64  `json:"id"`         // 用户ID
-	UserName   string `json:"userName"`   // 姓名
-	NickName   string `json:"nickName"`   // 昵称
-	Sex        int    `json:"sex"`        // 性别
-	Avatar     string `json:"avatar"`     // 头像
-	DeptId     int64  `json:"deptId"`     // 部门ID
-	Email      string `json:"email"`      // 邮箱
-	Phone      string `json:"phone"`      // 手机号
-	Remark     string `json:"remark"`     // 备注
 	Token      string `json:"token"`      // token信息
 	ExpireTime int64  `json:"expireTime"` // 到期时间
 
@@ -38,9 +22,40 @@ type UserLoginResponse struct {
 
 // UserInfoResponse 用户信息
 type UserInfoResponse struct {
-	Menus      []any    `json:"menus"`      // 菜单
-	Roles      []string `json:"roles"`      // 角色字符
-	Permission []string `json:"permission"` // 权限字符
+	User        UserInfoProp `json:"user"`        // 菜单
+	Roles       []string     `json:"roles"`       // 角色字符
+	Permissions []string     `json:"permissions"` // 权限字符
+}
+
+// UserInfoProp 用户信息
+type UserInfoProp struct {
+	Admin    bool           `json:"admin"`    // 是否管理员
+	Avatar   string         `json:"avatar"`   // 头像
+	UserId   int64          `json:"userId"`   // 用户ID
+	UserName string         `json:"userName"` // 用户名称
+	Sex      int            `json:"sex"`      // 性别
+	Phone    string         `json:"phone"`    // 手机号
+	NickName string         `json:"nickName"` // 昵称
+	Email    string         `json:"email"`    // 邮箱
+	DeptId   int64          `json:"deptId"`   // 部门ID
+	Dept     UserDeptProp   `json:"dept"`     // 部门
+	Roles    []UserRoleProp `json:"roles"`    // 角色信息
+	Posts    []UserPostProp `json:"posts"`    // 岗位
+}
+
+// UserDeptProp 用户部门
+type UserDeptProp struct {
+}
+
+// UserPostProp 用户岗位
+type UserPostProp struct {
+}
+
+// UserRoleProp 用户角色
+type UserRoleProp struct {
+	RoleId   int64  `json:"roleId"`
+	RoleName string `json:"roleName"`
+	RoleCode string `json:"roleCode"`
 }
 
 // UserPageResponse 用户分页

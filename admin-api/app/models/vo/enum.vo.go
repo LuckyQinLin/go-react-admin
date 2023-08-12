@@ -3,6 +3,7 @@ package vo
 const (
 	ClaimsInfo    = "Claims"
 	AuthHeader    = "Authorization"
+	NewToken      = "NewToken"
 	HeaderUserKey = "userId"
 	WSHeaderKey   = "WsValid"
 )

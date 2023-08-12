@@ -52,16 +52,11 @@ func (u *UserController) Login(c *gin.Context) {
 // GetUserInfo 获取用户信息
 func (u *UserController) GetUserInfo(c *gin.Context) {
 	var (
-		userId    int64
+		claims    *vo.UserClaims
 		customErr *response.BusinessError
 		result    *response.UserInfoResponse
-		err       error
 	)
-	if userId, err = c.QueryInt64("userId"); err != nil {
-		c.JSON(http.StatusOK, response.Fail(response.RequestParamError))
-		return
-	}
-	if result, customErr = service.User.GetUserInfo(userId); customErr != nil {
+	if result, customErr = service.User.GetUserInfo(claims.UserId); customErr != nil {
 		c.JSON(http.StatusOK, response.ResultCustom(customErr))
 		return
 	}

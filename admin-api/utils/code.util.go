@@ -2,6 +2,7 @@ package utils
 
 import (
 	"crypto/md5"
+	"encoding/base64"
 	"encoding/hex"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
@@ -44,4 +45,21 @@ func BcryptVerify(ciphertext string, cleartext string) bool {
 		return false
 	}
 	return true
+}
+
+// GenerateRandomToken 生成随机token串
+func GenerateRandomToken(length int) (string, error) {
+	// 计算需要生成的字节数
+	byteLength := (length * 3) / 4
+
+	// 生成随机字节数组
+	randomBytes := make([]byte, byteLength)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		return "", err
+	}
+
+	// 将随机字节数组转换为 base64 编码的字符串
+	token := base64.URLEncoding.EncodeToString(randomBytes)[:length]
+	return token, nil
 }
