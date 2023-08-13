@@ -124,6 +124,7 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 				Username: user.UserName,
 				Email:    user.Email,
 				Phone:    user.Phone,
+				IsSuper:  user.UserId == vo.SUPER_USER_ID,
 			}, nil
 		} // 验证用户信息
 		loginLogger = func(c *gin.Context, username, msg string, status int) {
@@ -186,34 +187,75 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 // GetUserInfo 获取用户信息
 func (u *UserService) GetUserInfo(userId int64) (*response.UserInfoResponse, *response.BusinessError) {
 	var (
-		//postId []int64
-		//roleId []int64
-		//user   entity.User
+		posts  []entity.Post
+		menus  []entity.Menu
+		user   entity.User
+		dept   entity.Dept
+		roles  []entity.Role
 		result *response.UserInfoResponse
-		//err    error
+		err    error
 	)
-	//if user, err = dao.User.GetUserById(userId); err != nil {
-	//	return nil, response.NewBusinessError(response.DataNotExist)
-	//}
-	//result = &response.UserInfoResponse{
-	//	UserId:   user.UserId,
-	//	UserName: user.UserName,
-	//	NickName: user.NickName,
-	//	DeptId:   user.DeptId,
-	//	Email:    user.Email,
-	//	Phone:    user.Phone,
-	//	Remark:   user.Remark,
-	//	Status:   user.Status,
-	//	Sex:      user.Sex,
-	//}
-	//// 用户岗位
-	//if postId, err = dao.User.UserPostId(user.UserId); err == nil && len(postId) > 0 {
-	//	result.PostId = postId
-	//}
-	//// 用户角色
-	//if roleId, err = dao.User.UserRoleId(user.UserId); err == nil && len(roleId) > 0 {
-	//	result.RoleId = roleId
-	//}
+	result = &response.UserInfoResponse{}
+	// 获取用户信息
+	if user, err = dao.User.GetUserById(userId); err == nil {
+		result.User = response.UserInfoProp{
+			Admin:    user.UserId == vo.SUPER_USER_ID,
+			Avatar:   user.Avatar,
+			UserId:   user.UserId,
+			UserName: user.UserName,
+			NickName: user.NickName,
+			Sex:      user.Sex,
+			Phone:    user.Phone,
+			Email:    user.Email,
+			DeptId:   user.DeptId,
+		}
+	}
+	// 获取部门信息
+	if dept, err = dao.Dept.GetDeptById(user.DeptId); err == nil {
+		result.User.Dept = response.UserDeptProp{
+			DeptId:    dept.DeptId,
+			ParentId:  dept.ParentId,
+			DeptName:  dept.DeptName,
+			Leader:    dept.Leader,
+			Ancestors: dept.Ancestors,
+			OrderNum:  dept.OrderNum,
+			Status:    dept.Status,
+		}
+	}
+	// 获取角色信息
+	if roles, err = dao.Role.GetRoleByUserId(userId); err == nil && len(roles) > 0 {
+		result.Roles = make([]string, 0)
+		result.User.Roles = make([]response.UserRoleProp, 0)
+		for _, item := range roles {
+			result.Roles = append(result.Roles, item.RoleKey)
+			result.User.Roles = append(result.User.Roles, response.UserRoleProp{
+				RoleId:   item.RoleId,
+				RoleName: item.RoleName,
+				RoleCode: item.RoleKey,
+			})
+		}
+	}
+	// 获取资源信息
+	if menus, err = dao.Menu.GetMenuByUserId(userId); err == nil && len(menus) > 0 {
+		result.Permissions = make([]string, 0)
+		for _, item := range menus {
+			result.Permissions = append(result.Permissions, item.Perms)
+		}
+	}
+	// 获取岗位信息
+	if posts, err = dao.Post.GetPostByUserId(userId); err == nil && len(posts) > 0 {
+		result.User.Posts = make([]response.UserPostProp, 0)
+		for _, item := range posts {
+			result.User.Posts = append(result.User.Posts, response.UserPostProp{
+				PostId:   item.PostId,
+				PostName: item.PostName,
+				PostCode: item.PostCode,
+			})
+		}
+	}
+	if err != nil {
+		return nil, response.CustomBusinessError(response.Failed, "获取用户信息失败")
+	}
 	return result, nil
 }
 

@@ -56,6 +56,7 @@ func (u *UserController) GetUserInfo(c *gin.Context) {
 		customErr *response.BusinessError
 		result    *response.UserInfoResponse
 	)
+	claims = u.GetCurrentUser(c)
 	if result, customErr = service.User.GetUserInfo(claims.UserId); customErr != nil {
 		c.JSON(http.StatusOK, response.ResultCustom(customErr))
 		return

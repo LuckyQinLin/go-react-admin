@@ -8,4 +8,5 @@ type UserClaims struct {
 	Username string
 	Email    string
 	Phone    string
+	IsSuper  bool // 是否为超级用户
 }

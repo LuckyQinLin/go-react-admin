@@ -45,10 +45,20 @@ type UserInfoProp struct {
 
 // UserDeptProp 用户部门
 type UserDeptProp struct {
+	DeptId    int64  `json:"deptId"`    // 部门ID
+	ParentId  int64  `json:"parentId"`  // 上级部门ID
+	DeptName  string `json:"deptName"`  // 部门名称
+	Leader    string `json:"leader"`    // 部门领导
+	Ancestors string `json:"ancestors"` // 部门路径
+	OrderNum  int    `json:"orderNum"`  // 排序
+	Status    int    `json:"status"`    // 状态
 }
 
 // UserPostProp 用户岗位
 type UserPostProp struct {
+	PostId   int64  `json:"postId"`   // 岗位ID
+	PostName string `json:"postName"` // 岗位名称
+	PostCode string `json:"postCode"` // 岗位编码
 }
 
 // UserRoleProp 用户角色

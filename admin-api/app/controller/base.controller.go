@@ -22,6 +22,12 @@ func (b *BaseController) FunctionName() string {
 	return f.Name()
 }
 
+// GetCurrentUser 获取当前登录用户的信息
+func (b *BaseController) GetCurrentUser(c *gin.Context) *vo.UserClaims {
+	value, _ := c.Get(vo.ClaimsInfo)
+	return value.(*vo.UserClaims)
+}
+
 // Parse 解析前置数据
 func (b *BaseController) Parse(c *gin.Context, title string, businessType vo.BusinessType, param any) (*vo.UserClaims, *entity.Operate) {
 	var (
