@@ -101,6 +101,51 @@ interface UserRoleDrawerProp {
     close: () => void;
 }
 
+// UserLoginInfoProp 用户登录信息
+interface UserLoginInfoProp {
+    user: UserProp;
+    roles: string[];
+    permissions: string[];
+}
+
+interface DeptProp {
+    deptId: number;
+    parentId: number;
+    deptName: string;
+    leader: string;
+    ancestors: string;
+    orderNum: number;
+    status: number;
+}
+
+interface RoleProp {
+    roleId: number;
+    roleName: string;
+    roleCode: string;
+}
+
+interface PostProp {
+    postId: number;
+    postName: string;
+    postCode: string;
+}
+
+interface UserProp {
+    admin: boolean;
+    avatar: string;
+    userId: number;
+    userName: string;
+    sex: number;
+    phone: string;
+    nickName: string;
+    email: string;
+    deptId: number;
+    dept: DeptProp;
+    roles: RoleProp[];
+    posts: PostProp[];
+}
+
+
 export {
     validateMobile,
     validateEmail
@@ -114,5 +159,6 @@ export type {
     UserUpdateFormProp,
     UserTableProp,
     UserDrawerProp,
-    UserRoleDrawerProp
+    UserRoleDrawerProp,
+    UserLoginInfoProp
 }

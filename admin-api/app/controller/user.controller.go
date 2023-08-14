@@ -52,21 +52,35 @@ func (u *UserController) Login(c *gin.Context) {
 // GetUserInfo 获取用户信息
 func (u *UserController) GetUserInfo(c *gin.Context) {
 	var (
-		claims    *vo.UserClaims
+		userId    int64
 		customErr *response.BusinessError
 		result    *response.UserInfoResponse
+		err       error
 	)
-	claims = u.GetCurrentUser(c)
-	if result, customErr = service.User.GetUserInfo(claims.UserId); customErr != nil {
+	if userId, err = c.QueryInt64("userId"); err != nil {
+		c.JSON(http.StatusOK, response.Fail(response.RequestParamError))
+		return
+	}
+	if result, customErr = service.User.GetUserInfo(userId); customErr != nil {
 		c.JSON(http.StatusOK, response.ResultCustom(customErr))
 		return
 	}
 	c.JSON(http.StatusOK, response.Ok(result))
 }
 
-// AllotRole 用户分配角色
-func (u *UserController) AllotRole(ctx *gin.Context) {
-
+// UserLoginInfo 获取用户登录信息
+func (u *UserController) UserLoginInfo(c *gin.Context) {
+	var (
+		claims    *vo.UserClaims
+		customErr *response.BusinessError
+		result    *response.UserLoginInfoResponse
+	)
+	claims = u.GetCurrentUser(c)
+	if result, customErr = service.User.UserLoginInfo(claims.UserId); customErr != nil {
+		c.JSON(http.StatusOK, response.ResultCustom(customErr))
+		return
+	}
+	c.JSON(http.StatusOK, response.Ok(result))
 }
 
 // Page 分页
@@ -223,4 +237,9 @@ func (u *UserController) UserRole(ctx *gin.Context) {
 		u.Failed(ctx, operate, response.ResultCustom(customErr))
 	}
 	u.Success(ctx, operate, response.Ok("用户分配角色成功"))
+}
+
+// UserRoutes 获取用户菜单
+func (u *UserController) UserRoutes(ctx *gin.Context) {
+
 }

@@ -3,7 +3,7 @@ import {UserState} from "@/redux/user/reducer.ts";
 import {https, PageData} from "@/utils/request.ts";
 import {LoginCaptchaProp, RegisterFormProp} from "@/pages/login/modules.ts";
 import {
-    UserCreateFormProp,
+    UserCreateFormProp, UserLoginInfoProp,
     UserPageQueryProp,
     UserTableProp,
     UserUpdateFormProp
@@ -104,5 +104,13 @@ export const userRole = (userId: number, ids: number[]): Promise<string> => {
         url: '/user/role',
         method: 'post',
         data: {userId: userId, ids: ids}
+    })
+}
+
+// userLoginInfo 获取用户登录信息
+export const userLoginInfo = (): Promise<UserLoginInfoProp> => {
+    return https.request({
+        url: '/user/loginInfo',
+        method: 'get',
     })
 }

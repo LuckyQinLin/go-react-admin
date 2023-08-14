@@ -187,15 +187,49 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 // GetUserInfo 获取用户信息
 func (u *UserService) GetUserInfo(userId int64) (*response.UserInfoResponse, *response.BusinessError) {
 	var (
+		postId []int64
+		roleId []int64
+		user   entity.User
+		result *response.UserInfoResponse
+		err    error
+	)
+	if user, err = dao.User.GetUserById(userId); err != nil {
+		return nil, response.NewBusinessError(response.DataNotExist)
+	}
+	result = &response.UserInfoResponse{
+		UserId:   user.UserId,
+		UserName: user.UserName,
+		NickName: user.NickName,
+		DeptId:   user.DeptId,
+		Email:    user.Email,
+		Phone:    user.Phone,
+		Remark:   user.Remark,
+		Status:   user.Status,
+		Sex:      user.Sex,
+	}
+	// 用户岗位
+	if postId, err = dao.User.UserPostId(user.UserId); err == nil && len(postId) > 0 {
+		result.PostId = postId
+	}
+	// 用户角色
+	if roleId, err = dao.User.UserRoleId(user.UserId); err == nil && len(roleId) > 0 {
+		result.RoleId = roleId
+	}
+	return result, nil
+}
+
+// UserLoginInfo 获取用户登录信息
+func (u *UserService) UserLoginInfo(userId int64) (*response.UserLoginInfoResponse, *response.BusinessError) {
+	var (
 		posts  []entity.Post
 		menus  []entity.Menu
 		user   entity.User
 		dept   entity.Dept
 		roles  []entity.Role
-		result *response.UserInfoResponse
+		result *response.UserLoginInfoResponse
 		err    error
 	)
-	result = &response.UserInfoResponse{}
+	result = &response.UserLoginInfoResponse{}
 	// 获取用户信息
 	if user, err = dao.User.GetUserById(userId); err == nil {
 		result.User = response.UserInfoProp{
@@ -235,11 +269,18 @@ func (u *UserService) GetUserInfo(userId int64) (*response.UserInfoResponse, *re
 			})
 		}
 	}
+	if userId == vo.SUPER_USER_ID {
+		result.Roles = []string{"admin"}
+	}
 	// 获取资源信息
-	if menus, err = dao.Menu.GetMenuByUserId(userId); err == nil && len(menus) > 0 {
-		result.Permissions = make([]string, 0)
-		for _, item := range menus {
-			result.Permissions = append(result.Permissions, item.Perms)
+	if userId == vo.SUPER_USER_ID {
+		result.Permissions = []string{"*:*:*"}
+	} else {
+		if menus, err = dao.Menu.GetMenuByUserId(userId); err == nil && len(menus) > 0 {
+			result.Permissions = make([]string, 0)
+			for _, item := range menus {
+				result.Permissions = append(result.Permissions, item.Perms)
+			}
 		}
 	}
 	// 获取岗位信息

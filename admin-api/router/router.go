@@ -28,12 +28,13 @@ func initRouter() {
 			user.GET("captchaImage", controller.User.CaptchaImage) // 获取验证码
 			user.POST("login", controller.User.Login)              // 登陆
 			user.GET("info", controller.User.GetUserInfo)          // 获取用户信息
-			user.POST("userAllot", controller.User.AllotRole)      // 用户分配角色
 			user.POST("page", controller.User.Page)                // 用户分页
 			user.POST("create", controller.User.UserCreate)        // 用户创建
 			user.POST("update", controller.User.UserUpdate)        // 用户更新
 			user.POST("status", controller.User.ChangeStatus)      // 修改用户状态
 			user.POST("role", controller.User.UserRole)            // 用户分配角色
+			user.GET("loginInfo", controller.User.UserLoginInfo)   // 用户登录信息
+			user.GET("routes", controller.User.UserRoutes)         // 用户菜单信息
 
 		}
 		role := root.Group("role") // 角色模块

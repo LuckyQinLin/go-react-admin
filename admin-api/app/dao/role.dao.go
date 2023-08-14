@@ -105,7 +105,7 @@ func (r *RoleDao) GetRoleByUserId(userId int64) (roles []entity.Role, err error)
 	err = core.DB.Model(entity.Role{}).
 		Alias("sr").
 		Where("sr.del_flag = 1 and exists(select 1 from sys_user_role sur where sur.user_id = ? and sur.role_id = sr.role_id)", userId).
-		First(&roles).
+		Find(&roles).
 		Error
 	return
 }

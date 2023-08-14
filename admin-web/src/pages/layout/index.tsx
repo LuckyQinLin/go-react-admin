@@ -6,6 +6,8 @@ import {BreadcrumbProp} from "@/pages/layout/components/header";
 import {PermInfo} from "@/redux/user/reducer";
 import "./index.less";
 import {useSelector} from "@/redux/hooks.ts";
+import {useRequest} from "ahooks";
+import {userLoginInfo} from "@/api/user.ts";
 
 export const paths = (perms: PermInfo[]): Set<string> => {
     let path = new Set<string>()
@@ -47,9 +49,21 @@ const LayoutPage: React.FC = () => {
     const [breadcrumb, setBreadcrumb] = useState<BreadcrumbProp[]>([]);
     const user = useSelector((state) => state.user)
 
+    const loadInfo = useRequest(userLoginInfo, {
+        manual: true,
+        onSuccess: (data) => {
+            console.log(data)
+        }
+    })
+
     useEffect(() => {
         console.log("user", user);
     }, [user])
+
+    useEffect(() => {
+        console.log("加载用户信息......");
+        loadInfo.run()
+    }, []);
 
 
     const contentCss: React.CSSProperties = {

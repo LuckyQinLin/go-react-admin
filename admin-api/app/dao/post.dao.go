@@ -60,6 +60,7 @@ func (p *PostDao) GetPostByUserId(userId int64) (posts []entity.Post, err error)
 	err = core.DB.Model(entity.Post{}).
 		Alias("sp").
 		Where("exists(select 1 from sys_user_post sup where sup.user_id = ? and sup.post_id = sp.post_id)", userId).
+		Find(&posts).
 		Error
 	return
 }
