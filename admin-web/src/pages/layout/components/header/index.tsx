@@ -35,7 +35,7 @@ const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapse
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
-    const userState = useSelector((state) => state.user);
+    const {user} = useSelector((state) => state.user);
 
     const dropdownItems: MenuProps['items'] = [
         { key: '1', icon: <SettingOutlined />, label: '个人设置'},
@@ -102,7 +102,7 @@ const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapse
             <Dropdown menu={{items: dropdownItems, onClick}} placement="top" arrow className="header-right">
                 <span className="alhr-dropdown">
                     <Avatar src={<img src={'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png'} alt="avatar" />} />
-                    <span className="alhrd-title">{userState.username}</span>
+                    <span className="alhrd-title">{user?.userName}</span>
                 </span>
             </Dropdown>
             <Dropdown menu={languageItems} placement="bottomRight" arrow className="header-right">

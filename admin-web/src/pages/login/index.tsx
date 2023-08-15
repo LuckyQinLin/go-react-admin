@@ -170,7 +170,7 @@ const LoginPage: React.FC = () => {
     const {run} = useRequest(userLogin, {
         manual: true,
         onSuccess: (data)=> {
-            dispatch(changeLoginStatusActionCreator({...data, status: true}));
+            dispatch(changeLoginStatusActionCreator({...data}));
             navigate('/index');
         }
     })

@@ -1,26 +1,11 @@
 import {CHANGE_LONGIN_STATUS, CLEAN_USER_STORE, UserTypes} from "./action";
 
 export interface UserState {
-	status: boolean;
-	userId?: number; // 用户ID
-	sex?: number; // 性别
-	username?: string; // 用户名称
-	nickName?: string; // 用户昵称
-	avatar?: string;// 头像
-	deptId?: number; // 部门ID
-	phone?: string; // 手机号
-	email?: string; // 邮箱
-	remark?: string; // 备注
 	token?: string;
 	expireTime?: number; // 到期时间
-	roles?: RoleInfo[]; // 角色信息
-	perms?: PermInfo[]; // 资源
-}
-
-export interface RoleInfo {
-	id: number;
-	code: string;
-	name: string;
+	user?: UserProp; // 用户信息
+	roles?: string[]; // 角色
+	permissions?: string[]; // 资源
 }
 
 export interface PermInfo {
@@ -36,7 +21,44 @@ export interface PermInfo {
 	children?: PermInfo[];
 }
 
-export const defaultUserState: UserState = {status: false}
+export interface DeptProp {
+	deptId: number;
+	parentId: number;
+	deptName: string;
+	leader: string;
+	ancestors: string;
+	orderNum: number;
+	status: number;
+}
+
+export interface RoleProp {
+	roleId: number;
+	roleName: string;
+	roleCode: string;
+}
+
+export interface PostProp {
+	postId: number;
+	postName: string;
+	postCode: string;
+}
+
+export interface UserProp {
+	admin: boolean;   // 是否admin
+	avatar: string;   // 头像
+	userId: number;   // 用户ID
+	userName: string; // 用户名称
+	sex: number;      // 性别
+	phone: string;    // 手机号
+	nickName: string; // 昵称
+	email: string;    // 邮箱
+	deptId: number;   // 部门ID
+	dept: DeptProp;   // 部门信息
+	roles: RoleProp[];// 角色
+	posts: PostProp[];// 岗位
+}
+
+export const defaultUserState: UserState = {}
 
 export default function userReducer(state = defaultUserState, action: UserTypes) {
 	switch (action.type) {

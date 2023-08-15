@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Outlet} from "react-router-dom";
+import {matchRoutes, Outlet, RouteObject, useLocation, useNavigate} from "react-router-dom";
 import {Layout, theme} from "antd";
 import {LayoutHeader, LayoutSider} from "@/pages/layout/components";
 import {BreadcrumbProp} from "@/pages/layout/components/header";
@@ -8,6 +8,9 @@ import "./index.less";
 import {useSelector} from "@/redux/hooks.ts";
 import {useRequest} from "ahooks";
 import {userLoginInfo} from "@/api/user.ts";
+import {changeLoginStatusActionCreator} from "@/redux/user/action.ts";
+import {useDispatch} from "react-redux";
+import {IRouteObject, Routes} from "@/router";
 
 export const paths = (perms: PermInfo[]): Set<string> => {
     let path = new Set<string>()
@@ -45,25 +48,48 @@ export const permsKeys = (perms: PermInfo[]): string[] => {
 const LayoutPage: React.FC = () => {
 
     const {token: { colorBgContainer }} = theme.useToken();
+    const dispatch = useDispatch();
     const [collapsed, setCollapsed] = useState(false);
     const [breadcrumb, setBreadcrumb] = useState<BreadcrumbProp[]>([]);
-    const user = useSelector((state) => state.user)
+    const {token, permissions } = useSelector((state) => state.user);
+    const navigate = useNavigate();
+    const location = useLocation();
+
 
     const loadInfo = useRequest(userLoginInfo, {
         manual: true,
         onSuccess: (data) => {
-            console.log(data)
+            dispatch(changeLoginStatusActionCreator({...data}));
         }
-    })
-
-    useEffect(() => {
-        console.log("user", user);
-    }, [user])
+    });
 
     useEffect(() => {
         console.log("加载用户信息......");
         loadInfo.run()
     }, []);
+
+    useEffect(() => {
+        const routes = matchRoutes(Routes as RouteObject[], location);
+        const map = routes?.filter(item => item.pathname === location.pathname).map(item => item.route as IRouteObject);
+        if (['/login', '/index', '/500', '/404', '/405'].includes(location.pathname)) {
+            return;
+        }
+        if (!token) {
+            navigate('/login');
+            return
+        }
+        if (permissions) {
+            if (permissions.length === 1 && permissions[0] === "*:*:*") {
+                return;
+            }
+            if (map && map[0] && map[0].meta) {
+                if (!permissions.some(item => item === map[0].meta?.perm)) {
+                    navigate('/404');
+                    return;
+                }
+            }
+        }
+    }, [navigate, location]);
 
 
     const contentCss: React.CSSProperties = {
