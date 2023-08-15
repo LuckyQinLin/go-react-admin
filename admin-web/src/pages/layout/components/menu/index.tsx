@@ -7,11 +7,11 @@ import {changeMenuActionCreator} from "@/redux/system/action";
 import {BreadcrumbProp} from "@/pages/layout/components/header";
 import {MenuItemType, SubMenuType} from "antd/es/menu/hooks/useItems";
 import {PermInfo} from "@/redux/user/reducer";
-type MenuItem = Required<MenuProps>['items'][number];
 import {Icon} from "@/components";
 import './index.less';
 import {permsKeys} from "@/pages/layout";
 import IconFont from "@/components/IconFont";
+type MenuItem = Required<MenuProps>['items'][number];
 
 interface LayoutHeaderProp {
 	collapsed: boolean;
@@ -157,6 +157,11 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed, breadcrumb}) => {
 				},
 			]
 		},
+		{
+			label: '个人中心',
+			key: '/user/setting',
+			icon: <IconFont type="lucky-jiankong" />
+		}
 	]);
 
 	const userStore = useSelector((state) => state.user);

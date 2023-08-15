@@ -20,6 +20,7 @@ import MonitorTaskPage from "@/pages/monitor/task";
 import MonitorServerPage from "@/pages/monitor/server";
 import MonitorCachePage from "@/pages/monitor/cache";
 import MonitorCacheListPage from "@/pages/monitor/cacheList";
+import UserCenterPage from "@/pages/user";
 
 export interface IRouteObject {
     children?: IRouteObject[]
@@ -108,6 +109,10 @@ export const Routes: IRouteObject[] = [
             {
                 path: '/monitor/cacheList',
                 element: <MonitorCacheListPage />
+            },
+            {
+                path: '/user/setting',
+                element: <UserCenterPage />,
             },
             {
                 path: '/403',
