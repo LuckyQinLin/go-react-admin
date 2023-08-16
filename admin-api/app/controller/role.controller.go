@@ -217,3 +217,43 @@ func (r *RoleController) UserRole(ctx *gin.Context) {
 func (r *RoleController) RoleDataAuth(ctx *gin.Context) {
 
 }
+
+// RoleUser 获取角色的用户信息
+func (r *RoleController) RoleUser(ctx *gin.Context) {
+	var (
+		customErr *response.BusinessError
+		userIds   []int64
+		roleId    int64
+		err       error
+	)
+	if roleId, err = ctx.QueryInt64("roleId"); err != nil {
+		ctx.JSON(http.StatusOK, response.Fail(response.RequestParamError))
+		return
+	}
+	if userIds, customErr = service.Role.RoleUser(roleId); customErr != nil {
+		ctx.JSON(http.StatusOK, response.ResultCustom(customErr))
+		return
+	}
+	ctx.JSON(http.StatusOK, response.Ok(userIds))
+}
+
+// SaveAllocateUser 保存角色的用户信息
+func (r *RoleController) SaveAllocateUser(ctx *gin.Context) {
+	var (
+		err       error
+		operate   *entity.Operate
+		param     request.RoleUserRequest
+		customErr *response.BusinessError
+	)
+	_, operate = r.Parse(ctx, "角色分配用户", vo.Delete, nil)
+	if err = ctx.ShouldBind(&param); err != nil {
+		r.Failed(ctx, operate, response.Fail("请求参数不存在"))
+		return
+	}
+	operate.ParamToJson(param)
+	if customErr = service.Role.RoleAllocateUser(&param); customErr != nil {
+		r.Failed(ctx, operate, response.ResultCustom(customErr))
+		return
+	}
+	r.Success(ctx, operate, response.Ok("角色分配用户成功"))
+}

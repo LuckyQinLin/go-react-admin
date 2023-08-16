@@ -40,3 +40,9 @@ type RoleDeleteRequest struct {
 	Ids      []int64 `json:"ids" binding:"required"`
 	UserName string  `json:"userName"`
 }
+
+// RoleUserRequest 角色分配用户
+type RoleUserRequest struct {
+	RoleId  int64   `json:"roleId"`
+	UserIds []int64 `json:"userIds"`
+}

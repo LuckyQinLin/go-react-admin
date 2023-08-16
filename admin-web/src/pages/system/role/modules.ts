@@ -57,6 +57,21 @@ interface RoleDrawerProp {
     roleId?: number;
 }
 
+// AllocateUserDrawerProp 分配用户
+interface AllocateUserDrawerProp {
+    roleId: number;
+    visible: boolean;
+    close: () => void;
+}
+
+// AllocatePermDrawerProp 分配资源
+interface AllocatePermDrawerProp {
+    visible: boolean;
+    roleId: number;
+    close: () => void;
+}
+
+
 export type {
     RoleInfoProp,
     RolePageQueryProp,
@@ -65,5 +80,7 @@ export type {
     RoleUpdateDrawerProp,
     RoleCreateFormProp,
     RoleUpdateFormProp,
-    RoleDrawerProp
+    RoleDrawerProp,
+    AllocateUserDrawerProp,
+    AllocatePermDrawerProp
 }

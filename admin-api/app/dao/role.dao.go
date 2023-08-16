@@ -109,3 +109,19 @@ func (r *RoleDao) GetRoleByUserId(userId int64) (roles []entity.Role, err error)
 		Error
 	return
 }
+
+// RoleUser 获取角色用户
+func (r *RoleDao) RoleUser(roleId int64) ([]int64, error) {
+	var (
+		result []int64
+		data   []entity.UserRole
+		err    error
+	)
+	if err = r.userRole.FindByMap(map[string]any{"role_id": roleId}, &data); err != nil {
+		return nil, err
+	}
+	for _, userRole := range data {
+		result = append(result, userRole.UserId)
+	}
+	return result, nil
+}

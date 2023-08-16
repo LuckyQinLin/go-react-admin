@@ -69,3 +69,12 @@ export const roleByUserId = (userId: number): Promise<number[]> => {
         params: {userId: userId}
     })
 }
+
+// roleAllocateUser 角色分配用户
+export const roleAllocateUser = (roleId: number, userIds: number[]): Promise<boolean> => {
+    return https.request({
+        url: '/role/allocateUser',
+        method: 'post',
+        params: {roleId: roleId, userIds: userIds}
+    })
+}

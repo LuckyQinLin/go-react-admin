@@ -320,3 +320,40 @@ func (r *RoleService) UserRole(userId int64) ([]int64, *response.BusinessError) 
 	}
 	return ids, nil
 }
+
+// RoleUser 获取角色拥有的用户信息
+func (r *RoleService) RoleUser(roleId int64) ([]int64, *response.BusinessError) {
+	var (
+		ids []int64
+		err error
+	)
+	if ids, err = dao.Role.RoleUser(roleId); err != nil {
+		return nil, response.CustomBusinessError(response.Failed, "获取角色用户数据失败")
+	}
+	return ids, nil
+}
+
+// RoleAllocateUser 角色分配用户
+func (r *RoleService) RoleAllocateUser(param *request.RoleUserRequest) *response.BusinessError {
+	if err := core.DB.Transaction(func(tx *gorm.DB) error {
+		if err := dao.UserRole.DeleteByRoleId(tx, param.RoleId); err != nil {
+			core.Log.Error("删除角色已有用户映射关系失败:%s", err.Error())
+			return err
+		}
+		list := make([]*entity.UserRole, 0)
+		for _, userId := range param.UserIds {
+			list = append(list, &entity.UserRole{
+				UserId: userId,
+				RoleId: param.RoleId,
+			})
+		}
+		if err := dao.UserRole.InsertBatch(tx, list); err != nil {
+			core.Log.Error("保存角色已有用户映射关系失败:%s", err.Error())
+			return err
+		}
+		return nil
+	}); err != nil {
+		return response.CustomBusinessError(response.Failed, "给角色分配用户失败")
+	}
+	return nil
+}

@@ -39,16 +39,18 @@ func initRouter() {
 		}
 		role := root.Group("role") // 角色模块
 		{
-			role.GET("all", controller.Role.RoleAll)            // 所有角色
-			role.POST("page", controller.Role.Page)             // 角色分页
-			role.POST("create", controller.Role.RoleCreate)     // 角色创建
-			role.POST("update", controller.Role.RoleUpdate)     // 角色修改
-			role.GET("info", controller.Role.RoleInfo)          // 角色详情
-			role.POST("status", controller.Role.RoleStatus)     // 角色状态修改
-			role.POST("delete", controller.Role.RoleDelete)     // 角色删除
-			role.POST("dataAuth", controller.Role.RoleDataAuth) // 角色数据权限分配
-			role.GET("export", controller.Role.RoleExport)      // 角色导出
-			role.GET("user", controller.Role.UserRole)          // 获取用户角色
+			role.GET("all", controller.Role.RoleAll)                    // 所有角色
+			role.POST("page", controller.Role.Page)                     // 角色分页
+			role.POST("create", controller.Role.RoleCreate)             // 角色创建
+			role.POST("update", controller.Role.RoleUpdate)             // 角色修改
+			role.GET("info", controller.Role.RoleInfo)                  // 角色详情
+			role.POST("status", controller.Role.RoleStatus)             // 角色状态修改
+			role.POST("delete", controller.Role.RoleDelete)             // 角色删除
+			role.POST("dataAuth", controller.Role.RoleDataAuth)         // 角色数据权限分配
+			role.GET("export", controller.Role.RoleExport)              // 角色导出
+			role.GET("user", controller.Role.UserRole)                  // 获取用户角色
+			role.GET("getUser", controller.Role.RoleUser)               // 获取角色已经分配用户
+			role.POST("allocateUser", controller.Role.SaveAllocateUser) // 角色分配用户
 		}
 		menu := root.Group("menu") // 菜单模块
 		{
