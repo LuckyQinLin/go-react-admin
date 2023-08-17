@@ -104,6 +104,11 @@ func initRouter() {
 			notice.POST("delete", controller.Notice.NoticeDelete) // 通知删除
 			notice.GET("info", controller.Notice.NoticeInfo)      // 通知详情
 		}
+		logger := root.Group("logger") // 日志模块
+		{
+			logger.POST("visit", controller.Logger.VisitPage)     // 访问日志
+			logger.POST("operate", controller.Logger.OperatePage) // 操作日志
+		}
 	}
 }
 

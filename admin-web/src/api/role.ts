@@ -70,6 +70,15 @@ export const roleByUserId = (userId: number): Promise<number[]> => {
     })
 }
 
+// roleByUserId 获取用户的角色
+export const getRoleUser = (roleId: number): Promise<number[]> => {
+    return https.request({
+        url: '/role/getUser',
+        method: 'get',
+        params: {roleId: roleId}
+    })
+}
+
 // roleAllocateUser 角色分配用户
 export const roleAllocateUser = (roleId: number, userIds: number[]): Promise<boolean> => {
     return https.request({

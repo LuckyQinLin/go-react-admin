@@ -53,13 +53,14 @@ interface RoleUpdateFormProp extends RoleCreateFormProp{
 // RoleDrawerProp 角色抽屉属性
 interface RoleDrawerProp {
     createVisible: boolean;
+    userVisible: boolean;
     updateVisible: boolean;
     roleId?: number;
 }
 
 // AllocateUserDrawerProp 分配用户
 interface AllocateUserDrawerProp {
-    roleId: number;
+    roleId?: number;
     visible: boolean;
     close: () => void;
 }

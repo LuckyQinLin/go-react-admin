@@ -5,7 +5,7 @@ import {RoleDrawerProp, RolePageProp, RolePageQueryProp} from "@/pages/system/ro
 import {useRequest} from "ahooks";
 import {roleDelete, rolePage} from "@/api/role.ts";
 import {useEffect, useState} from "react";
-import {RoleCreateDrawer, RoleUpdateDrawer} from "@/pages/system/role/components";
+import {AllocateUserDrawer, RoleCreateDrawer, RoleUpdateDrawer} from "@/pages/system/role/components";
 
 const SystemRolePage = () => {
 
@@ -52,7 +52,7 @@ const SystemRolePage = () => {
             render: (_, record) => (
                 <Space size={'small'}>
                     <Button type="link" size='small' style={{padding: 4}}>数据权限</Button>
-                    <Button type="link" size='small' style={{padding: 4}}>分配用户</Button>
+                    <Button type="link" size='small' style={{padding: 4}} onClick={() => openDrawer('user', record.roleId)}>分配用户</Button>
                     <Button type="link" size='small' style={{padding: 4}} onClick={() => openDrawer('update', record.roleId)}>修改</Button>
                     <Button type="link" size='small' danger style={{padding: 4}} onClick={() => deleteRoleHandler(record.roleId)}>删除</Button>
                 </Space>
@@ -64,7 +64,7 @@ const SystemRolePage = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
     const [datasource, setDatasource] = useState<RolePageProp[]>([]);
     const [pageQuery] = useState<RolePageQueryProp>({page: 1, size: 10});
-    const [roleDrawer, setRoleDrawer] = useState<RoleDrawerProp>({createVisible: false, updateVisible: false});
+    const [roleDrawer, setRoleDrawer] = useState<RoleDrawerProp>({createVisible: false, updateVisible: false, userVisible: false});
 
     const {loading, run} = useRequest(rolePage, {
         manual: true,
@@ -92,24 +92,28 @@ const SystemRolePage = () => {
         });
     }
 
-    const openDrawer = (types: 'create' | 'update', roleId?: number) => {
+    const openDrawer = (types: 'create' | 'update' | 'user', roleId?: number) => {
         switch (types) {
             case 'create':
-                setRoleDrawer({createVisible: true, updateVisible: false});
+                setRoleDrawer({createVisible: true, updateVisible: false, userVisible: false});
                 break;
             case 'update':
-                setRoleDrawer({createVisible: false, updateVisible: true, roleId: roleId});
+                setRoleDrawer({createVisible: false, updateVisible: true, userVisible: false, roleId: roleId});
+                break;
+            case 'user':
+                setRoleDrawer({createVisible: false, updateVisible: false, userVisible: true, roleId: roleId});
                 break;
             default:
                 break
         }
     }
 
-    const closeDrawer = (types: 'create' | 'update', isLoad: boolean) => {
+    const closeDrawer = (types: 'create' | 'update' | 'user', isLoad: boolean) => {
         switch (types) {
             case 'create':
             case 'update':
-                setRoleDrawer({createVisible: false, updateVisible: false});
+            case 'user':
+                setRoleDrawer({createVisible: false, updateVisible: false, userVisible: false, roleId: undefined});
                 break;
             default:
                 break
@@ -167,6 +171,7 @@ const SystemRolePage = () => {
         />
         <RoleCreateDrawer visible={roleDrawer.createVisible} close={(isLoad) => closeDrawer('create', isLoad)} />
         <RoleUpdateDrawer visible={roleDrawer.updateVisible} close={isLoad => closeDrawer('update', isLoad)} roleId={roleDrawer.roleId} />
+        <AllocateUserDrawer visible={roleDrawer.userVisible} roleId={roleDrawer.roleId} close={() => closeDrawer('user', false)} />
     </>
 }
 

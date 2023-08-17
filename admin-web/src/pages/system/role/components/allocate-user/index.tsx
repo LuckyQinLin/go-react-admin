@@ -5,7 +5,7 @@ import {ColumnsType} from "antd/es/table";
 import {UserPageQueryProp, UserTableProp} from "@/pages/system/user/modules.ts";
 import {useRequest} from "ahooks";
 import {userPage} from "@/api/user.ts";
-import {roleAllocateUser} from "@/api/role.ts";
+import {getRoleUser, roleAllocateUser} from "@/api/role.ts";
 
 
 const AllocateUserDrawer: React.FC<AllocateUserDrawerProp> = ({visible, roleId, close}) => {
@@ -15,26 +15,29 @@ const AllocateUserDrawer: React.FC<AllocateUserDrawerProp> = ({visible, roleId, 
             title: '用户名称',
             key: 'userName',
             dataIndex: 'userName',
-            align: 'center'
+            align: 'center',
+            ellipsis: true,
         },
         {
             title: '用户昵称',
             key: 'nickName',
             dataIndex: 'nickName',
-            align: 'center'
+            align: 'center',
+            ellipsis: true,
         },
         {
             title: '手机',
             key: 'phone',
             dataIndex: 'phone',
-            align: 'center'
+            align: 'center',
+            width: 120,
         },
         {
             title: '状态',
             key: 'status',
             dataIndex: 'status',
             align: 'center',
-            width: 160,
+            width: 100,
             render: (_, record) => <Switch
                 checkedChildren="正常"
                 unCheckedChildren="停用"
@@ -64,6 +67,13 @@ const AllocateUserDrawer: React.FC<AllocateUserDrawerProp> = ({visible, roleId, 
         }
     });
 
+    const loadRoleUser = useRequest(getRoleUser, {
+        manual: true,
+        onSuccess: (data) => {
+            setSelectedRowKeys(data)
+        }
+    });
+
     const allocateUserLoad = useRequest(roleAllocateUser, {
         manual: true,
         onSuccess: () => {
@@ -72,16 +82,17 @@ const AllocateUserDrawer: React.FC<AllocateUserDrawerProp> = ({visible, roleId, 
         }
     })
 
-    const submitForm = () => allocateUserLoad.run(roleId, selectedRowKeys);
+    const submitForm = () => allocateUserLoad.run(roleId!, selectedRowKeys);
 
     useEffect(() => {
-        if (visible) {
+        if (visible && roleId) {
            loadUser.run(pageQuery)
+            loadRoleUser.run(roleId)
         }
     }, [visible]);
 
     return <Drawer
-        width={500}
+        width={800}
         title="分配用户"
         placement="right"
         onClose={close}
