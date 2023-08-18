@@ -18,7 +18,7 @@ func (s LoggerService) VisitPage(param *request.VisitLogRequest) (*response.Page
 		buildCondition = func(param *request.VisitLogRequest) func(db *gorm.DB) *gorm.DB {
 			return func(db *gorm.DB) *gorm.DB {
 				db.Model(&entity.Visit{})
-				if param.Status != 0 {
+				if param.Status != -1 {
 					db.Where("status = ?", param.Status)
 				}
 				if param.UserName != "" {

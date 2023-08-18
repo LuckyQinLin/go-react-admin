@@ -3,7 +3,7 @@ interface LoginLoggerQueryProp {
     page:       number;  //
     size:       number;  //
     userName?:  string;  // 用户名称
-    status?:    string;  // 访问结果
+    status?:    number;  // 访问结果
     startTime?: string;  // 开始时间
     endTime?:   string;  // 结束时间
     address?:   string;  // IP地址
