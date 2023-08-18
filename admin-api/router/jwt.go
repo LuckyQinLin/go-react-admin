@@ -81,7 +81,7 @@ func JwtMiddle() gin.HandlerFunc {
 			// 判断是否过期
 			if isExpired {
 				c.Abort()
-				core.Log.Info("当前请求路径[%s], 认证信息过期[%s]", path, err.Error())
+				core.Log.Info("当前请求路径[%s], 认证信息过期[%s]", path, auth)
 				c.JSON(http.StatusUnauthorized, response.Fail(response.TokenTimeOut))
 				return
 			}
