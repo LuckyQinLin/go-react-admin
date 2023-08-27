@@ -19,6 +19,7 @@ import {useNavigate} from "react-router-dom";
 import {captchaImage, sendCaptcha, userLogin, userRegister} from "@/api/user";
 import {LoginCaptchaProp, RegisterFormProp} from "@/pages/login/modules";
 import {useRequest} from "ahooks";
+import {HOME_PAGE} from "@/constant/setting.ts";
 
 
 export interface LoginFormProp {
@@ -171,7 +172,7 @@ const LoginPage: React.FC = () => {
         manual: true,
         onSuccess: (data)=> {
             dispatch(changeLoginStatusActionCreator({...data}));
-            navigate('/index');
+            navigate(HOME_PAGE);
         }
     })
 

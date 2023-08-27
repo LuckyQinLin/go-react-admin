@@ -60,6 +60,7 @@ func initRouter() {
 			menu.POST("update", controller.Menu.MenuUpdate) // 菜单修改
 			menu.GET("delete", controller.Menu.MenuDelete)  // 菜单删除
 			menu.GET("info", controller.Menu.MenuInfo)      // 菜单详情
+			menu.GET("router", controller.Menu.UserRouter)  // 获取当前用户路由
 		}
 		dept := root.Group("dept") // 部门模块
 		{

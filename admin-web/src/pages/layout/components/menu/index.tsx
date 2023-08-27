@@ -58,52 +58,52 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed, breadcrumb}) => {
 	const [menus, setMenus] = useState<MenuItem[]>([
 		{
 			label: '系统首页',
-			key: '/index',
+			key: '/home/index',
 			icon: <IconFont type="lucky-shouye1" />
 		},
 		{
 			label: '系统管理',
-			key: '/system',
+			key: '/setting',
 			icon: <IconFont type="lucky-shezhi1" />,
 			children: [
 				{
 					label: '用户管理',
-					key: '/system/user',
+					key: '/setting/user',
 					icon: <IconFont type="lucky-yonghu" />,
 				},
 				{
 					label: '角色管理',
-					key: '/system/role',
+					key: '/setting/role',
 					icon: <IconFont type="lucky-jiaose" />,
 				},
 				{
 					label: '菜单管理',
-					key: '/system/menu',
+					key: '/setting/menu',
 					icon: <IconFont type="lucky-caidan" />,
 				},
 				{
 					label: '部门管理',
-					key: '/system/dept',
+					key: '/setting/dept',
 					icon: <IconFont type="lucky-bumenguanli" />,
 				},
 				{
 					label: '岗位管理',
-					key: '/system/post',
+					key: '/setting/post',
 					icon: <IconFont type="lucky-gangwei" />,
 				},
 				{
 					label: '字典管理',
-					key: '/system/dict',
+					key: '/setting/dict',
 					icon: <IconFont type="lucky-zidianmuluguanli" />,
 				},
 				{
 					label: '参数管理',
-					key: '/system/param',
+					key: '/setting/param',
 					icon: <IconFont type="lucky-shujucanshu" />,
 				},
 				{
 					label: '通知公告',
-					key: '/system/inform',
+					key: '/setting/inform',
 					icon: <IconFont type="lucky-tongzhi" />,
 				},
 			]
@@ -159,7 +159,7 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed, breadcrumb}) => {
 		},
 		{
 			label: '个人中心',
-			key: '/user/setting',
+			key: '/person/index',
 			icon: <IconFont type="lucky-jiankong" />
 		}
 	]);
