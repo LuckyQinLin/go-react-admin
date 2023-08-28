@@ -1,24 +1,24 @@
-import {IRouteObject} from "@/router/modules.ts";
-import lazyLoad from "@/router/lazyLoad.tsx";
-import IconFont from "@/components/IconFont";
+import {IRouteObject, RouterMap} from "@/router/modules.ts";
 
 // 首页
 const HomeRouter: IRouteObject[] = [
     {
-        path: 'home',
+        path: '/home',
         redirect: '/home/index',
-        element: lazyLoad(() => import("@/pages/layout")),
+        element: RouterMap.get('Layout'),
         meta: {
-            icon: <IconFont type="lucky-shouye1" />,
+            icon: "lucky-shouye1",
             isRoot: true,
             sort: 1,
         },
         children: [
             {
-                path: 'index',
-                element: lazyLoad(() => import("@/pages/home")),
+                path: '/home/index',
+                element: RouterMap.get('HomePage'),
                 meta: {
                     title: '首页',
+                    icon: "lucky-shouye1",
+                    sort: 1,
                 },
             }
         ]

@@ -9,6 +9,7 @@ import (
 	"admin-api/core"
 	"admin-api/internal/gorm"
 	"admin-api/utils"
+	"sort"
 	"time"
 )
 
@@ -272,12 +273,16 @@ func (m *MenuService) UserRouter(userId int64, roleId int64) ([]response.UserRou
 				item.Children = buildTree(data, item.MenuId)
 				children = append(children, item)
 			}
-
 		}
+		// 排序
+		sort.Slice(children, func(i, j int) bool {
+			return children[i].MenuSort > children[j].MenuSort
+		})
 		return children
 	}
 	// 构建查询条件
 	condition := core.DB.Model(&entity.Menu{}).
+		//Debug().
 		Alias("sm").
 		Select("sm.menu_id,sm.menu_code as menu_name,sm.parent_id,sm.order_num as menu_sort,sm.path,sm.component,sm.perms,sm.icon").
 		Where("(sm.menu_type = 'M' or sm.menu_type = 'C')")

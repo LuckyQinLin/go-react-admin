@@ -1,11 +1,11 @@
-import {IRouteObject} from "@/router/modules.ts";
+import {IRouteObject, RouterMap} from "@/router/modules.ts";
 import lazyLoad from "@/router/lazyLoad.tsx";
 import IconFont from "@/components/IconFont";
 
 const SettingRouter: IRouteObject[] = [
     {
-        path: 'setting',
-        element: lazyLoad(() => import("@/pages/layout")),
+        path: '/setting',
+        element: RouterMap.get('Layout'),
         meta: {
             sort: 2,
             title: '系统设置',
@@ -14,7 +14,7 @@ const SettingRouter: IRouteObject[] = [
         },
         children: [
             {
-                path: 'user',
+                path: '/setting/user',
                 element: lazyLoad(() => import("@/pages/system/user")),
                 meta: {
                     sort: 1,
@@ -24,7 +24,7 @@ const SettingRouter: IRouteObject[] = [
                 },
             },
             {
-                path: 'role',
+                path: '/setting/role',
                 element: lazyLoad(() => import("@/pages/system/role")),
                 meta: {
                     sort: 2,
@@ -34,7 +34,7 @@ const SettingRouter: IRouteObject[] = [
                 },
             },
             {
-                path: 'menu',
+                path: '/setting/menu',
                 element: lazyLoad(() => import("@/pages/system/menu")),
                 meta: {
                     sort: 3,
@@ -44,7 +44,7 @@ const SettingRouter: IRouteObject[] = [
                 },
             },
             {
-                path: 'dept',
+                path: '/setting/dept',
                 element: lazyLoad(() => import("@/pages/system/dept")),
                 meta: {
                     sort: 4,
@@ -54,7 +54,7 @@ const SettingRouter: IRouteObject[] = [
                 },
             },
             {
-                path: 'post',
+                path: '/setting/post',
                 element: lazyLoad(() => import("@/pages/system/post")),
                 meta: {
                     sort: 5,
@@ -64,7 +64,7 @@ const SettingRouter: IRouteObject[] = [
                 },
             },
             {
-                path: 'dict',
+                path: '/setting/dict',
                 element: lazyLoad(() => import("@/pages/system/dict")),
                 meta: {
                     sort: 6,
@@ -74,7 +74,7 @@ const SettingRouter: IRouteObject[] = [
                 },
             },
             {
-                path: 'param',
+                path: '/setting/param',
                 element: lazyLoad(() => import("@/pages/system/param")),
                 meta: {
                     sort: 7,
@@ -84,7 +84,7 @@ const SettingRouter: IRouteObject[] = [
                 },
             },
             {
-                path: 'inform',
+                path: '/setting/inform',
                 element: lazyLoad(() => import("@/pages/system/inform")),
                 meta: {
                     sort: 8,

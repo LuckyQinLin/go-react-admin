@@ -1,24 +1,24 @@
-import {IRouteObject} from "@/router/modules.ts";
-import lazyLoad from "@/router/lazyLoad.tsx";
-import IconFont from "@/components/IconFont";
+import {IRouteObject, RouterMap} from "@/router/modules.ts";
 
 // 首页
 const PersonRouter: IRouteObject[] = [
     {
-        path: 'person',
+        path: '/person',
         redirect: '/person/index',
-        element: lazyLoad(() => import("@/pages/layout")),
+        element: RouterMap.get('Layout'),
         meta: {
             sort: 5,
             isRoot: true,
-            icon: <IconFont type="lucky-jiankong" />,
+            icon: "lucky-jiankong",
         },
         children: [
             {
-                path: 'index',
-                element: lazyLoad(() => import("@/pages/user")),
+                path: '/person/index',
+                element: RouterMap.get('PersonUserPage'),
                 meta: {
+                    sort: 1,
                     title: '个人中心',
+                    icon: "lucky-jiankong",
                 },
             }
         ]

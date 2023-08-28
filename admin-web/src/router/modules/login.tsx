@@ -1,11 +1,10 @@
-import {IRouteObject} from "@/router/modules.ts";
-import lazyLoad from "@/router/lazyLoad.tsx";
+import {IRouteObject, RouterMap} from "@/router/modules.ts";
 
 // 首页
 const LoginRouter: IRouteObject[] = [
     {
-        path: 'login',
-        element: lazyLoad(() => import("@/pages/login")),
+        path: '/login',
+        element: RouterMap.get('Layout'),
     }
 ]
 

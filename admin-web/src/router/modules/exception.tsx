@@ -1,10 +1,10 @@
-import {IRouteObject} from "@/router/modules.ts";
+import {IRouteObject, RouterMap} from "@/router/modules.ts";
 import lazyLoad from "@/router/lazyLoad.tsx";
 
 const ExceptionRouter: IRouteObject[] = [
     {
         path: 'exception',
-        element: lazyLoad(() => import("@/pages/layout")),
+        element: RouterMap.get('Layout'),
         children: [
             {
                 path: '403',

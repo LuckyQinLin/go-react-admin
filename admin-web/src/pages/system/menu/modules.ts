@@ -80,6 +80,7 @@ interface UserRouterProp {
     sort: number;               // 显示顺序
     path: string;               // 路由地址
     component: string;          // 组件路由
+    isRoot: boolean;            //
     children: UserRouterProp[]; // 子路由
 }
 

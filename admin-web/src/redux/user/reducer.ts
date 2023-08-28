@@ -1,4 +1,7 @@
-import {CHANGE_LONGIN_STATUS, CLEAN_USER_STORE, UserTypes} from "./action";
+import {CHANGE_LONGIN_STATUS, CHANGE_MENU_STATUS, CLEAN_USER_STORE, UserTypes} from "./action";
+import {MenuProps} from "antd";
+
+type MenuItem = Required<MenuProps>['items'][number];
 
 export interface UserState {
 	token?: string;
@@ -6,6 +9,7 @@ export interface UserState {
 	user?: UserProp; // 用户信息
 	roles?: string[]; // 角色
 	permissions?: string[]; // 资源
+	menus?: MenuItem[]; // 菜单
 }
 
 export interface PermInfo {
@@ -68,9 +72,11 @@ export default function userReducer(state = defaultUserState, action: UserTypes)
 				...action.payload
 			};
 		case CLEAN_USER_STORE:
+			return defaultUserState;
+		case CHANGE_MENU_STATUS:
 			return {
 				...state,
-				...action.payload,
+				...action.payload
 			}
 		default:
 			return state;

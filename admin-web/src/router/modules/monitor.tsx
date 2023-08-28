@@ -1,16 +1,15 @@
-import {IRouteObject} from "@/router/modules.ts";
+import {IRouteObject, RouterMap} from "@/router/modules.ts";
 import lazyLoad from "@/router/lazyLoad.tsx";
-import IconFont from "@/components/IconFont";
 
 const MonitorRouter: IRouteObject[] = [
     {
-        path: 'monitor',
-        element: lazyLoad(() => import("@/pages/layout")),
+        path: '/monitor',
+        element: RouterMap.get('Layout'),
         meta: {
             sort: 4,
             title: '系统监控',
             permission: ['monitor'],
-            icon: <IconFont type="lucky-jiankong" />,
+            icon: "lucky-jiankong",
         },
         children: [
             {
@@ -20,7 +19,7 @@ const MonitorRouter: IRouteObject[] = [
                     sort: 1,
                     title: '在线用户',
                     permission: ['monitor:onlineUser'],
-                    icon: <IconFont type="lucky-zaixianyonghuguanli1" />,
+                    icon: "lucky-zaixianyonghuguanli1",
                 },
             },
             {
@@ -30,7 +29,7 @@ const MonitorRouter: IRouteObject[] = [
                     sort: 2,
                     title: '定时任务',
                     permission: ['monitor:timeTask'],
-                    icon: <IconFont type="lucky-dingshirenwuguanli" />,
+                    icon: "lucky-dingshirenwuguanli",
                 },
             },
             {
@@ -40,7 +39,7 @@ const MonitorRouter: IRouteObject[] = [
                     sort: 3,
                     title: '服务器监控',
                     permission: ['monitor:server'],
-                    icon: <IconFont type="lucky-fuwuqijiankong" />,
+                    icon: "lucky-fuwuqijiankong",
                 },
             },
             {
@@ -50,7 +49,7 @@ const MonitorRouter: IRouteObject[] = [
                     sort: 4,
                     title: '缓冲监控',
                     permission: ['monitor:cache'],
-                    icon: <IconFont type="lucky-huanchongfenxi" />,
+                    icon: "lucky-huanchongfenxi",
                 },
             },
             {
@@ -60,7 +59,7 @@ const MonitorRouter: IRouteObject[] = [
                     sort: 5,
                     title: '缓冲列表',
                     permission: ['monitor:cacheList'],
-                    icon: <IconFont type="lucky-cityworksjichugongnengtubiao-" />,
+                    icon: "lucky-cityworksjichugongnengtubiao-",
                 },
             }
         ]

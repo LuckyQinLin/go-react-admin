@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react"
 import {IRouteObject} from "@/router/modules.ts";
-import {asyncRoutes} from "@/router/index.tsx";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useSelector} from "@/redux/hooks.ts";
 import {useRequest} from "ahooks";
 import {userLoginInfo} from "@/api/user.ts";
-import {changeLoginStatusActionCreator} from "@/redux/user/action.ts";
+import {changeLoginStatusActionCreator, changeMenuStatusActionCreator} from "@/redux/user/action.ts";
 import {useDispatch} from "react-redux";
 import {userRouter} from "@/api/menu.ts";
+import {existRouter, routerBuild, routerBuildMenu} from "@/router/routerFilter.tsx";
+import PersonRouter from "@/router/modules/person.tsx";
+import HomeRouter from "@/router/modules/home.tsx";
+import {constantRouter} from "@/router/index.tsx";
+import {LOGIN_PAGE, NOT_FOUND_PAGE} from "@/constant/setting.ts";
 
 const useLoadRoutes = (): [
     router: IRouteObject[],
-    setCurrRoute: (data: IRouteObject | undefined | string) => void,
     getUserInfo: () => void,
 ] => {
 
@@ -19,8 +22,8 @@ const useLoadRoutes = (): [
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const {token } = useSelector((state) => state.user);
-    const [routes, setRoutes] = useState<IRouteObject[]>([]);
-    const [currRoute, setCurrRoute] = useState<IRouteObject | undefined | string>(undefined);
+    const [routes, setRoutes] = useState<IRouteObject[]>(constantRouter);
+
     // 加载用户信息
     const loadInfo = useRequest(userLoginInfo, {
         manual: true,
@@ -34,7 +37,14 @@ const useLoadRoutes = (): [
         manual: true,
         onSuccess: (data) => {
             // 生成路由和菜单信息
-            console.log("菜单：", data);
+            console.log("菜单-data：", data);
+            const router = routerBuild(data);
+            console.log("菜单-router：", router);
+            const menus = routerBuildMenu([...HomeRouter, ...router, ...PersonRouter]);
+            console.log("菜单-menu：", menus);
+            setRoutes([...routes, ...router]); // 生成路由
+            // setRoutes([...routes]); // 生成路由
+            dispatch(changeMenuStatusActionCreator({menus: menus}));
         }
     })
 
@@ -48,31 +58,27 @@ const useLoadRoutes = (): [
         console.log("location", location.pathname, location.state, location.search, location.key)
         if (!token && location.pathname != '/login') {
             console.log('不存在登录信息')
-            navigate('/login');
+            navigate(LOGIN_PAGE);
+            return;
         }
+        debugger;
+        if (!existRouter(routes, location.pathname)) {
+            navigate(NOT_FOUND_PAGE);
+            return;
+        }
+
     }, [location.pathname]);
 
-    useEffect(() => {
-        console.log("当前的路由 => ", currRoute)
-        if (currRoute === undefined) {
-            // navigate(LOGIN_PAGE);
-        } else if (currRoute instanceof String) {
-            // 返回string,将在页面404时进行处理
-            navigate(currRoute as string);
-        } else {
-            // 设置tab和面包屑
-
-        }
-
-    }, [currRoute]);
 
     // 用来获取用户权限信息
     useEffect(() => {
         console.log('获取用户路由信息......')
-        setRoutes([...asyncRoutes])
+        if (token) {
+            getUserInfo();
+        }
     }, []);
 
-    return [routes, setCurrRoute, getUserInfo]
+    return [routes, getUserInfo]
 
 }
 

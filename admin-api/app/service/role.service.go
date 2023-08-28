@@ -120,7 +120,6 @@ func (r *RoleService) Update(param *request.RoleUpdateRequest) *response.Busines
 	var (
 		err       error
 		isNeed    bool
-		role      entity.Role
 		maps      []*entity.RoleMenu
 		now       time.Time
 		old       entity.Role
@@ -170,14 +169,14 @@ func (r *RoleService) Update(param *request.RoleUpdateRequest) *response.Busines
 		return response.CustomBusinessError(response.Failed, "当前角色不存在")
 	}
 	// 判断是否需要修改数据
-	if isNeed, customErr = contrast(&old, param); customErr != nil || !isNeed {
-		core.Log.Error("修改角色失败：%s", customErr.Error())
+	if isNeed, customErr = contrast(&old, param); customErr != nil {
+		core.Log.Error("修改角色失败: %s", customErr.Error())
 		return customErr
 	}
 	// 判断是否需要更新角色和菜单的授权信息
 	if len(param.MenuIds) > 0 {
 		for _, id := range param.MenuIds {
-			maps = append(maps, &entity.RoleMenu{RoleId: role.RoleId, MenuId: id})
+			maps = append(maps, &entity.RoleMenu{RoleId: old.RoleId, MenuId: id})
 		}
 	}
 	// 执行更新
