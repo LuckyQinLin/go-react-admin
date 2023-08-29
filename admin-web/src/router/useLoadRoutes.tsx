@@ -39,7 +39,8 @@ const useLoadRoutes = (): [
             // 生成路由和菜单信息
             console.log("菜单-data：", data);
             const router = routerBuild(data);
-            console.log("菜单-router：", router);
+            console.log("菜单-router-1：", router);
+            console.log("菜单-router-2：", [...HomeRouter, ...router, ...PersonRouter]);
             const menus = routerBuildMenu([...HomeRouter, ...router, ...PersonRouter]);
             console.log("菜单-menu：", menus);
             setRoutes([...routes, ...router]); // 生成路由

@@ -72,7 +72,11 @@ export default function userReducer(state = defaultUserState, action: UserTypes)
 				...action.payload
 			};
 		case CLEAN_USER_STORE:
-			return defaultUserState;
+			// return {
+			// 	...state,
+			// 	token: undefined
+			// };
+			return defaultUserState
 		case CHANGE_MENU_STATUS:
 			return {
 				...state,

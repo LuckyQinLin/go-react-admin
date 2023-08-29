@@ -20,6 +20,8 @@ const MonitorServerPage = lazyLoad(() => import("@/pages/monitor/server"));
 const MonitorCachePage = lazyLoad(() => import("@/pages/monitor/cache"));
 const MonitorCacheListPage = lazyLoad(() => import("@/pages/monitor/cacheList"));
 
+const LoginPage = lazyLoad(() => import("@/pages/login"));
+
 const PersonUserPage = lazyLoad(() => import("@/pages/user"));
 
 export interface IRouteObject {
@@ -57,4 +59,5 @@ export const RouterMap = new Map<String, React.ReactNode>([
     ["MonitorCachePage", MonitorCachePage],
     ["MonitorCacheListPage", MonitorCacheListPage],
     ["PersonUserPage", PersonUserPage],
+    ["LoginPage", LoginPage],
 ])

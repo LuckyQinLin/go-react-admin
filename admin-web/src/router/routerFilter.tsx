@@ -11,10 +11,10 @@ export const routerBuild = (data: UserRouterProp[]): IRouteObject[] => {
     return data.map((item) => {
         const currentRouter: IRouteObject = {
             path: `${item.path}`,
-            isRoot: item.isRoot,
             element: RouterMap.get(item.component),
             meta: {
-                key: item.component,
+                isRoot: item.isRoot ? item.isRoot : false,
+                key: item.perms,
                 sort: item.sort,
                 title: item.title,
                 icon: item.icon,
@@ -36,8 +36,8 @@ const isRootRouter = (item: IRouteObject): boolean => item.meta?.isRoot || (item
 
 const existChildren = (item: IRouteObject): boolean => item.children ? item.children.length > 0 : false;
 
-const buildMenuItem = (label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[], type?: 'group'): MenuItem => {
-    return { key, icon, children, label, type } as MenuItem;
+const buildMenuItem = (label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[]): MenuItem => {
+    return { key, icon, children, label } as MenuItem;
 }
 
 export const routerBuildMenu = (data: IRouteObject[]): MenuItem[] => {
@@ -62,8 +62,7 @@ export const routerBuildMenu = (data: IRouteObject[]): MenuItem[] => {
                 label,
                 key,
                 icon,
-                children,
-                'group'
+                children
             )
         }
     });

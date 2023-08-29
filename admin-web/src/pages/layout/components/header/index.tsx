@@ -12,8 +12,7 @@ import {ItemType as BreadcrumbType} from "antd/es/breadcrumb/Breadcrumb";
 import './index.less';
 import {AdminIcon} from "@/components";
 import {useDispatch} from "react-redux";
-import {changeLoginStatusActionCreator} from "@/redux/user/action";
-import {defaultUserState} from "@/redux/user/reducer";
+import {cleanUserStoreActionCreator} from "@/redux/user/action";
 import {useNavigate} from "react-router-dom";
 import {useSelector} from "@/redux/hooks";
 
@@ -55,7 +54,7 @@ const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapse
     const onClick: MenuProps['onClick'] = (e) => {
         if (e.key === '2') {
             messageApi.success('退出成功');
-            dispatch(changeLoginStatusActionCreator({...defaultUserState}));
+            dispatch(cleanUserStoreActionCreator());
             navigate('/login');
         }
     };

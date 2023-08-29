@@ -4,7 +4,7 @@ import {IRouteObject, RouterMap} from "@/router/modules.ts";
 const LoginRouter: IRouteObject[] = [
     {
         path: '/login',
-        element: RouterMap.get('Layout'),
+        element: RouterMap.get('LoginPage'),
     }
 ]
 

@@ -10,6 +10,7 @@ const PersonRouter: IRouteObject[] = [
             sort: 5,
             isRoot: true,
             icon: "lucky-jiankong",
+            key: 'person',
         },
         children: [
             {
@@ -18,6 +19,7 @@ const PersonRouter: IRouteObject[] = [
                 meta: {
                     sort: 1,
                     title: '个人中心',
+                    key: 'person:index',
                     icon: "lucky-jiankong",
                 },
             }
