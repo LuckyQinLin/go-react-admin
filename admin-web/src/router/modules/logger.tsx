@@ -6,6 +6,7 @@ const LoggerRouter: IRouteObject[] = [
         path: '/logger',
         element: RouterMap.get('Layout'),
         meta: {
+            title: '日志管理',
             icon: "lucky-nav_icon_rzgl_spe",
             sort: 3,
         },

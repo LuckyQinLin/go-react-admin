@@ -10,7 +10,7 @@ import {userRouter} from "@/api/menu.ts";
 import {existRouter, routerBuild, routerBuildMenu} from "@/router/routerFilter.tsx";
 import PersonRouter from "@/router/modules/person.tsx";
 import HomeRouter from "@/router/modules/home.tsx";
-import {constantRouter} from "@/router/index.tsx";
+import {asyncRoutes, constantRouter} from "@/router/index.tsx";
 import {LOGIN_PAGE, NOT_FOUND_PAGE} from "@/constant/setting.ts";
 
 const useLoadRoutes = (): [
@@ -21,7 +21,7 @@ const useLoadRoutes = (): [
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const {token } = useSelector((state) => state.user);
+    const {token, permissions } = useSelector((state) => state.user);
     const [routes, setRoutes] = useState<IRouteObject[]>(constantRouter);
 
     // 加载用户信息
@@ -36,15 +36,9 @@ const useLoadRoutes = (): [
     const loadRouter = useRequest(userRouter, {
         manual: true,
         onSuccess: (data) => {
-            // 生成路由和菜单信息
-            console.log("菜单-data：", data);
-            const router = routerBuild(data);
-            console.log("菜单-router-1：", router);
-            console.log("菜单-router-2：", [...HomeRouter, ...router, ...PersonRouter]);
+            let router: IRouteObject[] = permissions?.length === 1 && permissions[0] === '*:*:*' ? asyncRoutes : routerBuild(data);
             const menus = routerBuildMenu([...HomeRouter, ...router, ...PersonRouter]);
-            console.log("菜单-menu：", menus);
             setRoutes([...routes, ...router]); // 生成路由
-            // setRoutes([...routes]); // 生成路由
             dispatch(changeMenuStatusActionCreator({menus: menus}));
         }
     })
