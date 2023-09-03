@@ -54,3 +54,9 @@ func (d *DeptDao) UpdateById(tx *gorm.DB, dept *entity.Dept) error {
 func (d *DeptDao) Delete(tx *gorm.DB, deptId ...int64) error {
 	return tx.Where("dept_id in ?", deptId).Delete(&entity.Dept{}).Error
 }
+
+// Select 模版
+func (d *DeptDao) Select(param any) (depts []entity.Dept, err error) {
+	err = core.DB.Template("", param).Find(&depts).Error
+	return
+}

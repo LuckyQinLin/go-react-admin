@@ -500,3 +500,14 @@ func (db *DB) ToSQL(queryFn func(tx *DB) *DB) string {
 
 	return db.Dialector.Explain(stmt.SQL.String(), stmt.Vars...)
 }
+
+// Template 执行模版查询
+// @param template 模版内容
+// @param param 参数
+// @param result 返回
+// @return error 错误
+func (db *DB) Template(template string, param any) (tx *DB) {
+	tx = db.getInstance()
+
+	return tx
+}

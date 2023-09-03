@@ -13,15 +13,12 @@ import HomeRouter from "@/router/modules/home.tsx";
 import {asyncRoutes, constantRouter} from "@/router/index.tsx";
 import {LOGIN_PAGE, NOT_FOUND_PAGE} from "@/constant/setting.ts";
 
-const useLoadRoutes = (): [
-    router: IRouteObject[],
-    getUserInfo: () => void,
-] => {
+const useLoadRoutes = (): [router: IRouteObject[], getUserInfo: () => void] => {
 
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const {token, permissions } = useSelector((state) => state.user);
+    const {token, permissions} = useSelector((state) => state.user);
     const [routes, setRoutes] = useState<IRouteObject[]>(constantRouter);
 
     // 加载用户信息
@@ -37,8 +34,12 @@ const useLoadRoutes = (): [
         manual: true,
         onSuccess: (data) => {
             let router: IRouteObject[] = permissions?.length === 1 && permissions[0] === '*:*:*' ? asyncRoutes : routerBuild(data);
+            console.log("router-1", router);
+            // let router = routerBuild(data);
             const menus = routerBuildMenu([...HomeRouter, ...router, ...PersonRouter]);
+            console.log("menus-1", menus);
             setRoutes([...routes, ...router]); // 生成路由
+            console.log('routes', routes);
             dispatch(changeMenuStatusActionCreator({menus: menus}));
         }
     })
@@ -56,7 +57,7 @@ const useLoadRoutes = (): [
             navigate(LOGIN_PAGE);
             return;
         }
-        debugger;
+        // debugger;
         if (!existRouter(routes, location.pathname)) {
             navigate(NOT_FOUND_PAGE);
             return;

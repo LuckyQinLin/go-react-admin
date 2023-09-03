@@ -13,7 +13,7 @@ const MonitorRouter: IRouteObject[] = [
         },
         children: [
             {
-                path: 'onlineUser',
+                path: '/monitor/onlineUser',
                 element: lazyLoad(() => import("@/pages/monitor/online")),
                 meta: {
                     sort: 1,
@@ -23,7 +23,7 @@ const MonitorRouter: IRouteObject[] = [
                 },
             },
             {
-                path: 'timeTask',
+                path: '/monitor/timeTask',
                 element: lazyLoad(() => import("@/pages/monitor/task")),
                 meta: {
                     sort: 2,
@@ -33,7 +33,7 @@ const MonitorRouter: IRouteObject[] = [
                 },
             },
             {
-                path: 'server',
+                path: '/monitor/server',
                 element: lazyLoad(() => import("@/pages/monitor/server")),
                 meta: {
                     sort: 3,
@@ -43,7 +43,7 @@ const MonitorRouter: IRouteObject[] = [
                 },
             },
             {
-                path: 'cache',
+                path: '/monitor/cache',
                 element: lazyLoad(() => import("@/pages/monitor/cache")),
                 meta: {
                     sort: 4,
@@ -53,7 +53,7 @@ const MonitorRouter: IRouteObject[] = [
                 },
             },
             {
-                path: 'cacheList',
+                path: '/monitor/cacheList',
                 element: lazyLoad(() => import("@/pages/monitor/cacheList")),
                 meta: {
                     sort: 5,
