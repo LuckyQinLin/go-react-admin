@@ -5,7 +5,11 @@ import (
 	"admin-api/app/models/response"
 	"admin-api/core"
 	"admin-api/internal/gorm"
+	_ "embed"
 )
+
+//go:embed mapper/role.xml
+var RoleMapper string
 
 var Role = NewRoleDao()
 

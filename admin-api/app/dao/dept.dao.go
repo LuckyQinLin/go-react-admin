@@ -12,7 +12,8 @@ type DeptDao struct{}
 
 // All 获取全部部门
 func (d *DeptDao) All() (depts []entity.Dept, err error) {
-	err = core.DB.Model(&entity.Dept{}).Where("del_flag = 1").Find(&depts).Error
+	//err = core.DB.Model(&entity.Dept{}).Where("del_flag = 1").Find(&depts).Error
+	err = core.DB.Template(`del_flag = {{id}}`, map[string]any{"id": 1}).Find(&depts).Error
 	return
 }
 
@@ -53,10 +54,4 @@ func (d *DeptDao) UpdateById(tx *gorm.DB, dept *entity.Dept) error {
 // Delete 删除数据
 func (d *DeptDao) Delete(tx *gorm.DB, deptId ...int64) error {
 	return tx.Where("dept_id in ?", deptId).Delete(&entity.Dept{}).Error
-}
-
-// Select 模版
-func (d *DeptDao) Select(param any) (depts []entity.Dept, err error) {
-	err = core.DB.Template("", param).Find(&depts).Error
-	return
 }

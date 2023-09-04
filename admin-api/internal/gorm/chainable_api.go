@@ -2,6 +2,7 @@ package gorm
 
 import (
 	"fmt"
+	"github.com/flosch/pongo2/v6"
 	"regexp"
 	"strings"
 
@@ -206,6 +207,19 @@ func (db *DB) Omit(columns ...string) (tx *DB) {
 func (db *DB) Where(query interface{}, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	if conds := tx.Statement.BuildCondition(query, args...); len(conds) > 0 {
+		tx.Statement.AddClause(clause.Where{Exprs: conds})
+	}
+	return
+}
+
+// Template 执行模版查询
+// @param template 模版内容
+// @param param 参数
+// @param result 返回
+// @return error 错误
+func (db *DB) Template(template string, param pongo2.Context) (tx *DB) {
+	tx = db.getInstance()
+	if conds := tx.Statement.BuildTemplate(template, param); len(conds) > 0 {
 		tx.Statement.AddClause(clause.Where{Exprs: conds})
 	}
 	return

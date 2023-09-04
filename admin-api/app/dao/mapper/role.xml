@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper namespace="RoleMapper">
+    <select id="selectRoleList">
+        select
+            *
+        from sys_role
+        where del_flag = 1
+            {% if param.Status != 0 %}
+                and status = {{param.Status}}
+            {% endif %}
+            {% if param.Name != "" %}
+                and (
+                    role_name like concat('%', {{param.Name}}, '%')
+                    or
+                    role_key like concat('%', {{param.Name}}, '%')
+                )
+            {% endif %}
+            {% if param.StartTime == nil and param.EndTime != nil %}
+                and create_time <![CDATA[<]]> {{param.EndTime}}
+            {% endif %}
+            {% if param.StartTime != nil and param.EndTime == nil %}
+                and create_time <![CDATA[>]]> {{param.StartTime}}
+            {% endif %}
+            {% if param.StartTime != nil and param.EndTime != nil %}
+                and create_time between {{param.StartTime}} and {{param.EndTime}}
+            {% endif %}
+    </select>
+</mapper>

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
+	"github.com/flosch/pongo2/v6"
 	"reflect"
 	"regexp"
 	"sort"
@@ -279,6 +280,15 @@ func (stmt *Statement) AddClause(v clause.Interface) {
 func (stmt *Statement) AddClauseIfNotExists(v clause.Interface) {
 	if c, ok := stmt.Clauses[v.Name()]; !ok || c.Expression == nil {
 		stmt.AddClause(v)
+	}
+}
+
+// BuildTemplate 构建模版
+func (stmt *Statement) BuildTemplate(query string, param pongo2.Context) []clause.Expression {
+	if len(param) <= 0 {
+		return []clause.Expression{clause.Template{SQL: query, Vars: nil}}
+	} else {
+		return []clause.Expression{clause.Template{SQL: query, Vars: param}}
 	}
 }
 
