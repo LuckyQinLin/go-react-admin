@@ -25,4 +25,10 @@
                 and create_time between {{param.StartTime}} and {{param.EndTime}}
             {% endif %}
     </select>
+    <select id="selectRoleAll">
+        select
+            *
+        from sys_role
+        where del_flag = 1
+    </select>
 </mapper>

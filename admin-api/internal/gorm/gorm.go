@@ -1,6 +1,7 @@
 package gorm
 
 import (
+	"admin-api/internal/gorm/template"
 	"context"
 	"database/sql"
 	"fmt"
@@ -61,6 +62,7 @@ type Config struct {
 
 	callbacks  *callbacks
 	cacheStore *sync.Map
+	Mapper     map[string]*template.MapperModel
 }
 
 // Apply update config to new config
@@ -95,6 +97,7 @@ type DB struct {
 	Error        error
 	RowsAffected int64
 	Statement    *Statement
+	Mapper       map[string]*template.MapperModel
 	clone        int
 }
 
@@ -404,6 +407,31 @@ func (db *DB) getInstance() *DB {
 				Context:  db.Statement.Context,
 				Clauses:  map[string]clause.Clause{},
 				Vars:     make([]interface{}, 0, 8),
+			}
+		} else {
+			// with clone statement
+			tx.Statement = db.Statement.clone()
+			tx.Statement.DB = tx
+		}
+
+		return tx
+	}
+
+	return db
+}
+
+func (db *DB) getInstanceTemplate(name string) *DB {
+	if db.clone > 0 {
+		tx := &DB{Config: db.Config, Error: db.Error, Mapper: db.Config.Mapper}
+		if db.clone == 1 {
+			// clone with new statement
+			tx.Statement = &Statement{
+				DB:       tx,
+				ConnPool: db.Statement.ConnPool,
+				Context:  db.Statement.Context,
+				Clauses:  map[string]clause.Clause{},
+				Vars:     make([]interface{}, 0, 8),
+				Mapper:   tx.Mapper[name],
 			}
 		} else {
 			// with clone statement

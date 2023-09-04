@@ -8,9 +8,6 @@ import (
 	_ "embed"
 )
 
-//go:embed mapper/role.xml
-var RoleMapper string
-
 var Role = NewRoleDao()
 
 type RoleDao struct {

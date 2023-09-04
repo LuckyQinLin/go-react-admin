@@ -2,38 +2,32 @@ package template
 
 import (
 	"encoding/xml"
-	"errors"
-	"fmt"
 	"io"
-	"strings"
+)
+
+type TType int
+
+const (
+	Query TType = iota
+	Update
+	Delete
+	Insert
 )
 
 // ParseMapper 解析Mapper
 type ParseMapper struct {
-	TableName string         // 表名
-	ParamMap  map[string]any // 参数类型映射
-	ResultMap map[string]any // 返回类型映射
+	mapper *MapperItemModel
 }
 
-func New(paramMap map[string]any, resultMap map[string]any) *ParseMapper {
-	return &ParseMapper{
-		ParamMap:  paramMap,
-		ResultMap: resultMap,
+func New(file io.Reader) *ParseMapper {
+	var mapper MapperItemModel
+	decoder := xml.NewDecoder(file)
+	if err := decoder.Decode(&mapper); err != nil {
+		return &ParseMapper{mapper: nil}
 	}
+	return &ParseMapper{mapper: &mapper}
 }
 
-func (p ParseMapper) Parse(content string) (*MapperModel, error) {
-	var (
-		mapper  MapperItemModel
-		decoder *xml.Decoder
-		reader  io.Reader
-		err     error
-	)
-	reader = strings.NewReader(content)
-	decoder = xml.NewDecoder(reader)
-	if err = decoder.Decode(&mapper); err != nil {
-		return nil, errors.New("解析XML文件失败: " + err.Error())
-	}
-	fmt.Printf("读取结果：%v", mapper)
-	return NewMapperModel(p.ParamMap, p.ResultMap, &mapper), nil
+func (p ParseMapper) Parse() (*MapperModel, error) {
+	return NewMapperModel(p.mapper), nil
 }

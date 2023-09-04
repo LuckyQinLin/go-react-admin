@@ -22,6 +22,7 @@ func (db *DB) Model(value interface{}) (tx *DB) {
 	return
 }
 
+// Alias 设置别名
 func (db *DB) Alias(value string) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.Alias = value

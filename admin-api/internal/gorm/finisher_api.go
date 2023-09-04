@@ -1,6 +1,7 @@
 package gorm
 
 import (
+	"admin-api/internal/gorm/template"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -763,4 +764,15 @@ func (db *DB) Exec(sql string, values ...interface{}) (tx *DB) {
 	}
 
 	return tx.callbacks.Raw().Execute(tx)
+}
+
+// TemplateQuery 模板查询
+// @param templateName 模板名称   role.selectRole
+// @param param 参数
+// @param result 返回数据
+func (db *DB) TemplateQuery(templateName string, param ...any) (tx *DB) {
+	temp := strings.Split(templateName, ".")
+	tx = db.getInstanceTemplate(temp[0])
+	tx.Statement.BuildSQL(template.Query, temp[1], param...)
+	return db
 }

@@ -3,8 +3,6 @@ package template
 // MapperModel mapper模型
 type MapperModel struct {
 	TableName string                // 表名
-	ParamMap  map[string]any        // 参数类型映射
-	ResultMap map[string]any        // 返回类型映射
 	Select    map[string]MapperItem // 查询
 	Update    map[string]MapperItem // 更新
 	Delete    map[string]MapperItem // 删除
@@ -56,13 +54,9 @@ func Transform[T ElementType](list []T) map[string]MapperItem {
 }
 
 // NewMapperModel 创建
-func NewMapperModel(paramMap map[string]any,
-	resultMap map[string]any,
-	data *MapperItemModel) *MapperModel {
+func NewMapperModel(data *MapperItemModel) *MapperModel {
 	return &MapperModel{
 		TableName: data.Namespace,
-		ParamMap:  paramMap,
-		ResultMap: resultMap,
 		Select:    Transform[SelectElement](data.Selects),
 		Update:    Transform[UpdateElement](data.Updates),
 		Delete:    Transform[DeleteElement](data.Deletes),
