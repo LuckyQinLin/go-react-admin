@@ -50,7 +50,7 @@ func InitDb() {
 			TablePrefix:   tablePrefix,
 			SingularTable: true,
 		},
-		Mapper: utils2.ReadTemplate(tpl, "role"),
+		Mapper: utils2.ReadTemplate(tpl, "role", "config"),
 	}); err != nil {
 		Log.Error("连接数据库失败: %s", err.Error())
 		panic(err.Error())

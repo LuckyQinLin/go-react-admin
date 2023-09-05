@@ -5,21 +5,31 @@ import "github.com/flosch/pongo2/v6"
 // Template raw expression
 type Template struct {
 	SQL                string
+	IsPage             bool
 	Vars               pongo2.Context
 	WithoutParentheses bool
 }
 
-// Build build raw expression
-func (expr Template) Build(builder Builder) {
+func (t Template) Name() string {
+	return "TEMPLATE"
+}
+
+func (t Template) MergeClause(clause *Clause) {
+	clause.Name = ""
+	clause.Expression = t
+}
+
+// Build raw expression
+func (t Template) Build(builder Builder) {
 	var (
 		tp     *pongo2.Template
 		result string
 		err    error
 	)
-	if tp, err = pongo2.FromString(expr.SQL); err != nil {
+	if tp, err = pongo2.FromString(t.SQL); err != nil {
 
 	}
-	if result, err = tp.Execute(expr.Vars); err != nil {
+	if result, err = tp.Execute(t.Vars); err != nil {
 
 	}
 	builder.WriteString(result)

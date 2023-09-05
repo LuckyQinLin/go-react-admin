@@ -1,7 +1,6 @@
 package gorm
 
 import (
-	"admin-api/internal/gorm/template"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -169,6 +168,21 @@ func (db *DB) Find(dest interface{}, conds ...interface{}) (tx *DB) {
 	}
 	tx.Statement.Dest = dest
 	return tx.callbacks.Query().Execute(tx)
+}
+
+// Page 分页
+func (db *DB) Page(dest any, total *int64) (tx *DB) {
+	tx = db.getInstance()
+	// 查询总条数
+	tx.Statement.Dest = total
+
+	tx.callbacks.Query().Execute(tx)
+	if *total >= 0 {
+		// 查询数据
+		tx.Statement.Dest = dest
+		tx.callbacks.Query().Execute(tx)
+	}
+	return tx
 }
 
 // FindInBatches finds all records in batches of batchSize
@@ -764,15 +778,4 @@ func (db *DB) Exec(sql string, values ...interface{}) (tx *DB) {
 	}
 
 	return tx.callbacks.Raw().Execute(tx)
-}
-
-// TemplateQuery 模板查询
-// @param templateName 模板名称   role.selectRole
-// @param param 参数
-// @param result 返回数据
-func (db *DB) TemplateQuery(templateName string, param ...any) (tx *DB) {
-	temp := strings.Split(templateName, ".")
-	tx = db.getInstanceTemplate(temp[0])
-	tx.Statement.BuildSQL(template.Query, temp[1], param...)
-	return tx
 }

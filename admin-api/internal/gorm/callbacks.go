@@ -73,7 +73,8 @@ func (cs *callbacks) Raw() *processor {
 }
 
 // ExecuteTemplate 执行模版
-func (p *processor) ExecuteTemplate() *DB {
+func (p *processor) ExecuteTemplate(db *DB) *DB {
+
 	return nil
 }
 

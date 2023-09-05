@@ -61,9 +61,6 @@ func (r *RoleService) RoleAll() (list []response.RoleKeyValueResponse, customErr
 	if err := core.DB.TemplateQuery("role.selectRoleAll").Find(&list).Error; err != nil {
 		customErr = response.CustomBusinessError(response.Failed, "获取角色数据失败")
 	}
-	//if err := core.DB.Model(&entity.Role{}).Where("del_flag = 1").Find(&list).Error; err != nil {
-	//	customErr = response.CustomBusinessError(response.Failed, "获取角色数据失败")
-	//}
 	return
 }
 

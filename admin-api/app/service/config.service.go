@@ -150,6 +150,9 @@ func (d *ConfigService) Page(param *request.ConfigPageRequest) (*response.PageDa
 		total int64
 		err   error
 	)
+	if err = core.DB.TemplateQuery("config.selectConfigPage", param).Page(&list, &total).Error; err != nil {
+
+	}
 	if err = core.DB.Scopes(buildCondition(param)).Debug().Count(&total).Error; err != nil {
 		core.Log.Error("统计参数数据失败, 异常信息如下：%s", err.Error())
 		return nil, response.CustomBusinessError(response.Failed, "获取参数数据失败")

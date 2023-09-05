@@ -66,6 +66,23 @@ type StatementModifier interface {
 	ModifyStatement(*Statement)
 }
 
+func (stmt *Statement) GetSQL(types template.TType, templateId string) template.MapperItem {
+	var (
+		tpl template.MapperItem
+	)
+	switch types {
+	case template.Query:
+		tpl = stmt.Mapper.Select[templateId]
+	case template.Delete:
+		tpl = stmt.Mapper.Delete[templateId]
+	case template.Update:
+		tpl = stmt.Mapper.Update[templateId]
+	case template.Insert:
+		tpl = stmt.Mapper.Insert[templateId]
+	}
+	return tpl
+}
+
 func (stmt *Statement) BuildSQL(types template.TType, templateId string, param ...any) {
 	var (
 		t       *pongo2.Template
