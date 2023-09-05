@@ -5,7 +5,6 @@ import "github.com/flosch/pongo2/v6"
 // Template raw expression
 type Template struct {
 	SQL                string
-	IsPage             bool
 	Vars               pongo2.Context
 	WithoutParentheses bool
 }

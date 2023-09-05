@@ -119,6 +119,13 @@ type Session struct {
 	CreateBatchSize          int
 }
 
+type IPage struct {
+	Page  int
+	Size  int
+	Total int64
+	Data  any
+}
+
 // Open initialize db session based on dialector
 func Open(dialector Dialector, opts ...Option) (db *DB, err error) {
 	config := &Config{}

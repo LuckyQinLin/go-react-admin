@@ -235,9 +235,27 @@ func (db *DB) TemplateQuery(templateName string, param ...any) (tx *DB) {
 // @param param 参数
 // @param result 返回数据
 func (db *DB) TemplatePageQuery(templateName string, param ...any) (tx *DB) {
+	// 构建统计查询
+	var transformCount = func(sql string) string {
+		start := strings.Index(sql, "from")
+		return "select count(*) " + sql[start:]
+	}
+
+	var transformPage = func(sql string) string {
+		return sql + " limit {{size}}, {{offset}}"
+	}
+
 	temp := strings.Split(templateName, ".")
 	tx = db.getInstanceTemplate(temp[0])
-	tx.Statement.BuildSQL(template.Query, temp[1], param...)
+	mapper := tx.Statement.GetSQL(template.Query, temp[1])
+	tx.Statement.AddClause(clause.PageCount{CountSQL: transformCount(mapper.Content), CountVars: map[string]any{
+		mapper.ParamName: param[2],
+	}})
+	tx.Statement.AddClause(clause.PageQuery{SQL: transformPage(mapper.Content), Vars: map[string]any{
+		"size":           param[0],
+		"offset":         param[1],
+		mapper.ParamName: param[2],
+	}})
 	return tx
 }
 

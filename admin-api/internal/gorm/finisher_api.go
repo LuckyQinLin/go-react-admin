@@ -175,8 +175,8 @@ func (db *DB) Page(dest any, total *int64) (tx *DB) {
 	tx = db.getInstance()
 	// 查询总条数
 	tx.Statement.Dest = total
-
 	tx.callbacks.Query().Execute(tx)
+
 	if *total >= 0 {
 		// 查询数据
 		tx.Statement.Dest = dest

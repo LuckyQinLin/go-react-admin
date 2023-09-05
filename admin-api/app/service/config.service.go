@@ -150,7 +150,7 @@ func (d *ConfigService) Page(param *request.ConfigPageRequest) (*response.PageDa
 		total int64
 		err   error
 	)
-	if err = core.DB.TemplateQuery("config.selectConfigPage", param).Page(&list, &total).Error; err != nil {
+	if err = core.DB.TemplatePageQuery("config.selectConfigPage", param.Size, param.Offset(), param).Page(&list, &total).Error; err != nil {
 
 	}
 	if err = core.DB.Scopes(buildCondition(param)).Debug().Count(&total).Error; err != nil {
