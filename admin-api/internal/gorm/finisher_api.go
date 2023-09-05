@@ -774,5 +774,5 @@ func (db *DB) TemplateQuery(templateName string, param ...any) (tx *DB) {
 	temp := strings.Split(templateName, ".")
 	tx = db.getInstanceTemplate(temp[0])
 	tx.Statement.BuildSQL(template.Query, temp[1], param...)
-	return db
+	return tx
 }
