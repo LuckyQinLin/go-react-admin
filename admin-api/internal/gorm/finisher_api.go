@@ -172,16 +172,25 @@ func (db *DB) Find(dest interface{}, conds ...interface{}) (tx *DB) {
 
 // Page 分页
 func (db *DB) Page(dest any, total *int64) (tx *DB) {
+	tx = db.pageCount(total)
+	if *total > 0 {
+		tx = db.pageQuery(dest)
+	}
+	return tx
+}
+
+func (db *DB) pageCount(total *int64) (tx *DB) {
 	tx = db.getInstance()
-	// 查询总条数
 	tx.Statement.Dest = total
 	tx.callbacks.Query().Execute(tx)
+	delete(tx.Statement.Clauses, clause.PageCount{}.Name())
+	return tx
+}
 
-	if *total >= 0 {
-		// 查询数据
-		tx.Statement.Dest = dest
-		tx.callbacks.Query().Execute(tx)
-	}
+func (db *DB) pageQuery(dest any) (tx *DB) {
+	tx = db.getInstance()
+	tx.Statement.Dest = dest
+	tx.callbacks.Query().Execute(tx)
 	return tx
 }
 

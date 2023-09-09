@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mapper namespace="RoleMapper">
+<mapper namespace="SettingMapper">
     <select id="selectConfigPage" param="param">
         select
-            {% if isCount == 1 %}
-                *
-            {% else  %}
-                count(*)
-            {% endif %}
-        from sys_config
+            *
+        from sys_setting
         where 1 = 1
             {% if param.ConfigType != -1 %}
                 and config_type = {{param.ConfigType}}
@@ -18,9 +14,6 @@
             {% if param.ConfigKey != "" %}
                 and config_key like concat('%', {{param.ConfigKey}}, '%')
             {% endif %}
-            order by create_time
-            {% if isCount == 1 %}
-                limit {{param.Page}}, {{param.Offset}}
-            {% endif %}
+                order by create_time
     </select>
 </mapper>

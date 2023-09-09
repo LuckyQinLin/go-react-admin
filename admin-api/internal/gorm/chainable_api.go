@@ -238,15 +238,19 @@ func (db *DB) TemplatePageQuery(templateName string, param ...any) (tx *DB) {
 	// 构建统计查询
 	var transformCount = func(sql string) string {
 		start := strings.Index(sql, "from")
-		return "select count(*) " + sql[start:]
+		end := strings.LastIndex(sql, "order by")
+		return "select count(*) " + sql[start:end]
 	}
 
 	var transformPage = func(sql string) string {
-		return sql + " limit {{size}}, {{offset}}"
+		return sql + " limit {{size}} offset {{offset}}"
 	}
 
 	temp := strings.Split(templateName, ".")
 	tx = db.getInstanceTemplate(temp[0])
+	if tx.Statement.Mapper == nil {
+		tx.Statement.Statement.Mapper = tx.Mapper[temp[0]]
+	}
 	mapper := tx.Statement.GetSQL(template.Query, temp[1])
 	tx.Statement.AddClause(clause.PageCount{CountSQL: transformCount(mapper.Content), CountVars: map[string]any{
 		mapper.ParamName: param[2],
