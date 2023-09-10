@@ -4,6 +4,7 @@ import (
 	"admin-api/app/models/entity"
 	"admin-api/internal/gorm"
 	"admin-api/internal/gorm/driver/postgres"
+	"admin-api/internal/gorm/logger"
 	"admin-api/internal/gorm/schema"
 	utils2 "admin-api/internal/gorm/utils"
 	"admin-api/utils"
@@ -50,7 +51,9 @@ func InitDb() {
 			TablePrefix:   tablePrefix,
 			SingularTable: true,
 		},
-		Mapper: utils2.ReadTemplate(tpl, "role", "config"),
+		// 配置日志输出级别
+		Logger: logger.Default.LogMode(logger.Info),
+		Mapper: utils2.ReadTemplate(tpl, "role", "config", "menu"),
 	}); err != nil {
 		Log.Error("连接数据库失败: %s", err.Error())
 		panic(err.Error())

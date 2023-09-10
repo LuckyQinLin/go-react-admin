@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper namespace="MenuMapper">
+
+    <select id="selectMenuByRoles" param="param">
+        select
+            sm.menu_id,
+            sm.menu_code as menu_name,
+            sm.parent_id,
+            sm.order_num as menu_sort,
+            sm.path,
+            sm.component,
+            sm.perms,
+            sm.icon
+        from sys_menu sm
+        where 1 = 1
+            and (sm.menu_type = 'M' or sm.menu_type = 'C')
+            {% if param.IsAll != 0 %}
+                {# 单独角色 #}
+                {% if param.RoleId != 0 %}
+                    and exists(select 1 from sys_role_menu srm
+                        where srm.role_id = {{param.RoleId}}
+                            and srm.menu_id = sm.menu_id)
+                {% else %}
+                    {# 全部角色 #}
+                    and exists(select 1 from sys_role_menu srm
+                        where exists(select 1 from sys_user_role sur
+                                    where sur.user_id = {{param.UserId}}
+                                        and sur.role_id = srm.role_id)
+                            and srm.menu_id = sm.menu_id)
+                {% endif %}
+            {% endif %}
+    </select>
+
+</mapper>

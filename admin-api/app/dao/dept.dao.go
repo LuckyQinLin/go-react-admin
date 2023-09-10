@@ -12,7 +12,6 @@ type DeptDao struct{}
 
 // All 获取全部部门
 func (d *DeptDao) All() (depts []entity.Dept, err error) {
-	//err = core.DB.Model(&entity.Dept{}).Where("del_flag = 1").Find(&depts).Error
 	err = core.DB.Template(`del_flag = {{id}}`, map[string]any{"id": 1}).Find(&depts).Error
 	return
 }

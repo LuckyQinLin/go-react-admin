@@ -8,7 +8,6 @@ import (
 	"admin-api/app/models/vo"
 	"admin-api/core"
 	"admin-api/internal/gorm"
-	"admin-api/utils"
 	"sort"
 	"time"
 )
@@ -262,7 +261,6 @@ func (m *MenuService) UserRouter(userId int64, roleId int64) ([]response.UserRou
 	var (
 		buildTree func(data []response.UserRouterResponse, parentId int64) []response.UserRouterResponse
 		result    []response.UserRouterResponse
-		roleIds   []int64
 		err       error
 	)
 	// 构建Tree
@@ -281,35 +279,21 @@ func (m *MenuService) UserRouter(userId int64, roleId int64) ([]response.UserRou
 		return children
 	}
 	// 构建查询条件
-	condition := core.DB.Model(&entity.Menu{}).
-		//Debug().
-		Alias("sm").
-		Select("sm.menu_id,sm.menu_code as menu_name,sm.parent_id,sm.order_num as menu_sort,sm.path,sm.component,sm.perms,sm.icon").
-		Where("(sm.menu_type = 'M' or sm.menu_type = 'C')")
-	// 获取当前用户的角色信息
-	if roleIds, err = dao.User.UserRoleId(userId); err != nil {
-		core.Log.Error("当前用户不存在角色信息")
-		return nil, response.CustomBusinessError(response.Failed, "获取用户路由失败")
-	}
-	if len(roleIds) == 0 {
-		if userId != vo.SUPER_USER_ID {
-			core.Log.Error("当前用户不存在角色信息")
-			return nil, response.CustomBusinessError(response.Failed, "获取用户路由失败")
-		}
-	} else {
-		if roleId != 0 {
-			if utils.Contain(roleId, roleIds) {
-				condition.Where("exists(select 1 from sys_role_menu srm where srm.role_id = ? and srm.menu_id = sm.menu_id)", roleId)
+	if err = core.DB.Mappers("menu").
+		Query("selectMenuByRoles", func() any {
+			condition := make(map[string]any)
+			if userId == vo.SUPER_USER_ID {
+				condition["IsAll"] = 0
 			} else {
-				core.Log.Error("当前用户不存在该角色信息")
-				return nil, response.CustomBusinessError(response.Failed, "获取用户路由失败")
+				condition["RoleId"] = roleId
+				if roleId == 0 {
+					condition["UserId"] = userId
+				}
 			}
-		} else {
-			condition.Where("exists(select 1 from sys_role_menu srm where srm.role_id in ? and srm.menu_id = sm.menu_id)", roleIds)
-		}
-	}
-	// 查询数据
-	if err = condition.Find(&result).Error; err != nil {
+			return condition
+		}).
+		Find(&result).
+		Error; err != nil {
 		core.Log.Error("查询用户的路由信息发生异常：%s", err.Error())
 		return nil, response.CustomBusinessError(response.Failed, "获取用户路由失败")
 	}

@@ -214,6 +214,27 @@ func (db *DB) Where(query interface{}, args ...interface{}) (tx *DB) {
 	return
 }
 
+func (db *DB) Mappers(name string) (tx *DB) {
+	return db.getInstanceTemplate(name)
+}
+
+func (db *DB) Query(tId string, param func() any) (tx *DB) {
+	tx = db.getInstance()
+	mapper := tx.Statement.GetSQL(template.Query, tId)
+	if param() == nil {
+		tx.Statement.AddClause(clause.Template{
+			SQL:  mapper.Content,
+			Vars: nil,
+		})
+	} else {
+		tx.Statement.AddClause(clause.Template{
+			SQL:  mapper.Content,
+			Vars: map[string]any{mapper.ParamName: param()},
+		})
+	}
+	return tx
+}
+
 // TemplateQuery 模板查询
 // @param templateName 模板名称   role.selectRole
 // @param param 参数

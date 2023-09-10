@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper namespace="DeptMapper">
+
+    <!-- 创建 -->
+    <insert id="insertDept" param="param">
+        insert into sys_dept (
+            {% if param.DeptId is not nil %} dept_id, {% endif %}
+            {% if param.ParentId is not nil %} parent_id, {% endif %}
+            {% if param.Ancestors != "" %} ancestors, {% endif %}
+            {% if param.DeptName != "" %} dept_name, {% endif %}
+            {% if param.OrderNum is not nil %} order_num, {% endif %}
+            {% if param.Leader != ""l %} leader, {% endif %}
+            {% if param.Phone != "" %} phone, {% endif %}
+            {% if param.Email != "" %} email, {% endif %}
+            {% if param.Status is not nil %} status, {% endif %}
+            {% if param.CreateBy is not nil %} create_by, {% endif %}
+            del_flag,
+            create_time
+        ) values (
+            {% if param.DeptId is not nil %} {{param.DeptId}}, {% endif %}
+            {% if param.ParentId is not nil %} {{param.ParentId}}, {% endif %}
+            {% if param.Ancestors != "" %} {{param.Ancestors}}, {% endif %}
+            {% if param.DeptName != "" %} {{param.DeptName}}, {% endif %}
+            {% if param.OrderNum is not nil %} {{param.OrderNum}}, {% endif %}
+            {% if param.Leader != ""l %} {{param.Leader}}, {% endif %}
+            {% if param.Phone != "" %} {{param.Phone}}, {% endif %}
+            {% if param.Email != "" %} {{param.Email}}, {% endif %}
+            {% if param.Status is not nil %} {{param.Status}}, {% endif %}
+            {% if param.CreateBy is not nil %} {{param.CreateBy}}, {% endif %}
+            1,
+            current_timestamp
+        )
+    </insert>
+
+    <!-- 更新 -->
+    <update id="updateDept" param="param">
+
+    </update>
+
+    <!--根据ID删除部门 -->
+    <delete id="deleteDeptById" param="param">
+
+    </delete>
+
+    <!-- 根据ID获取部门信息 -->
+    <select id="selectOneById" param="param">
+        select * from sys_dept where dept_id = {{param.id}}
+    </select>
+
+</mapper>
