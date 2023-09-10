@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -10,11 +9,11 @@ import (
 )
 
 // buildPath 构建路径
-func buildPath(logFile string, index int) string {
+func buildPath(logFile string) string {
 	return path.Join(
 		logFile,
 		time.Now().Format("2006-01-02"),
-		fmt.Sprintf("access_log_%03d.log", index),
+		"out.log",
 	)
 }
 

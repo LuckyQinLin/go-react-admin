@@ -3,6 +3,7 @@ package logger
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"sync"
@@ -31,10 +32,11 @@ type ToolLogger struct {
 	filePath    string         // 日志文件路径
 	logLevel    LogLevel       // 默认日志等级
 	logChannel  chan *LogEntry // 写入日志的实体
-	file        *os.File       // 对应的日志文件
+	isWriteFile bool           // 是否写文件
 	wg          sync.WaitGroup // 并发分组
+	out         io.Writer
+	fileSize    int64
 	maxFileSize int64
-	fileIndex   int
 }
 
 func DefaultLogger(logFile string) *ToolLogger {
@@ -44,15 +46,17 @@ func DefaultLogger(logFile string) *ToolLogger {
 		logChannel:  make(chan *LogEntry, 10),
 		Prefix:      "Admin",
 		TimeFormat:  "2006-01-02 15:04:05",
-		maxFileSize: 1 * 1024 * 1024,
-		fileIndex:   1,
+		maxFileSize: 10 * 1024 * 1024,
+		isWriteFile: true,
 	}
-	filePath := buildPath(logFile, logger.fileIndex)
-	file, err := openFile(filePath)
+	file, err := openFile(buildPath(logFile))
 	if err != nil {
+		logger.isWriteFile = false
 		PrintLogger(Error, "创建文件失败: %s", err.Error())
 	}
-	logger.file = file
+	info, _ := file.Stat()
+	logger.fileSize = info.Size()
+	logger.out = io.MultiWriter(file, os.Stdout)
 	logger.wg.Add(1)
 	go logger.processLog()
 	return logger
@@ -77,30 +81,32 @@ func (l *ToolLogger) processLog() {
 		l.wg.Done()
 	}()
 	for entry := range l.logChannel {
-		Blue(buff, l.Prefix, true)
-		NotColor(fileBuff, l.Prefix, true)
-		// 写入日志日期
-		times := entry.Timestamp.Format(l.TimeFormat)
-		NotColor(fileBuff, times, true)
-		White(buff, times, true)
-		// 写入日志类型
-		l.changeLevel(buff, entry.Level)
-		l.changeLevelNotColor(fileBuff, entry.Level)
-		// 写入日志内容
-		fileBuff.WriteString(entry.Message)
-		buff.WriteString(entry.Message)
-		fileBuff.WriteByte('\n')
 		// 写入文件
-		l.writeFile(fileBuff, entry.Timestamp)
+		l.writeFile(entry, func() []byte {
+			defer fileBuff.Reset()
+			NotColor(fileBuff, l.Prefix, true)
+			NotColor(fileBuff, entry.Timestamp.Format(l.TimeFormat), true)
+			l.changeLevelNotColor(fileBuff, entry.Level)
+			fileBuff.WriteString(entry.Message)
+			fileBuff.WriteByte('\n')
+			return fileBuff.Bytes()
+		})
 		// 写入控制台
-		l.console(true, buff)
+		l.console(true, func() []byte {
+			defer buff.Reset()
+			Blue(buff, l.Prefix, true)
+			White(buff, entry.Timestamp.Format(l.TimeFormat), true)
+			l.changeLevel(buff, entry.Level)
+			buff.WriteString(entry.Message)
+			return buff.Bytes()
+		})
 	}
 }
 
 // writeFile 写文件
-func (l *ToolLogger) writeFile(buff *bytes.Buffer, times time.Time) {
+func (l *ToolLogger) writeFile(entry *LogEntry, handler func() []byte) {
 	stat, _ := l.file.Stat()
-	if times.Day() != time.Now().Day() {
+	if entry.Timestamp.Day() != time.Now().Day() {
 		_ = l.file.Close()
 		file, _ := openFile(path.Join(l.filePath, time.Now().Format("2006-01-02"), fmt.Sprintf("access_log_%03d.log", 1)))
 		l.fileIndex++
@@ -125,19 +131,18 @@ func (l *ToolLogger) writeFile(buff *bytes.Buffer, times time.Time) {
 		l.fileIndex++
 		l.file = file
 	}
-	if _, err := l.file.Write(buff.Bytes()); err != nil {
+	buffer := handler()
+	if _, err := l.file.Write(buffer); err != nil {
 		PrintLogger(Error, "写入文件失败: %s", err.Error())
 	}
-	defer buff.Reset()
 }
 
 // console 写入控制台
-func (l *ToolLogger) console(isConsole bool, buff *bytes.Buffer) {
+func (l *ToolLogger) console(isConsole bool, handler func() []byte) {
 	if !isConsole {
 		return
 	}
-	fmt.Println(buff.String())
-	defer buff.Reset()
+	l.out.Write(handler())
 }
 
 func (l *ToolLogger) changeLevel(buffer *bytes.Buffer, level LogLevel) {
