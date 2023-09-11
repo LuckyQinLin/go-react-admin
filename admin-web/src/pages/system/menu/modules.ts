@@ -52,7 +52,7 @@ interface MenuUpdateDrawerProp {
 interface MenuCreateFormProp {
     parentId:  number;  // 上级菜单
     menuType:  string;  // 菜单类型 (M目录 C菜单 F按钮)
-    perms: string; // 权限字符
+    perms: string;      // 权限字符
     icon:      string;  // 图标
     menuName:  string;  // 菜单名称
     menuSort:  number;  // 菜单排序
@@ -70,6 +70,20 @@ interface MenuUpdateFormProp extends MenuCreateFormProp{
     menuId: number; // 菜单ID
 }
 
+// UserRouterProp 用户路由
+interface UserRouterProp {
+    id: number;                 // 菜单主键
+    pId: number;                // 上级菜单
+    icon: string;               // 图标
+    title: string;              // 菜单名称
+    perms: string;              // 权限字符
+    sort: number;               // 显示顺序
+    path: string;               // 路由地址
+    component: string;          // 组件路由
+    isRoot: boolean;            //
+    children: UserRouterProp[]; // 子路由
+}
+
 export type {
     MenuTreeProp,
     DrawerProp,
@@ -78,5 +92,6 @@ export type {
     MenuCreateDrawerProp,
     MenuUpdateDrawerProp,
     MenuCreateFormProp,
-    MenuUpdateFormProp
+    MenuUpdateFormProp,
+    UserRouterProp
 }

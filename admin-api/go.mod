@@ -5,11 +5,11 @@ go 1.20
 require (
 	github.com/bytedance/sonic v1.9.1
 	github.com/cpuguy83/go-md2man/v2 v2.0.2
+	github.com/flosch/pongo2/v6 v6.0.0
 	github.com/gin-contrib/sse v0.1.0
 	github.com/go-playground/validator/v10 v10.14.0
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/goccy/go-json v0.10.2
-	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/inconshreveable/mousetrap v1.1.0
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/jinzhu/inflection v1.0.0
@@ -21,7 +21,7 @@ require (
 	github.com/mssola/useragent v1.0.0
 	github.com/pelletier/go-toml/v2 v2.0.8
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	github.com/ugorji/go/codec v1.2.11
 	github.com/xuri/excelize/v2 v2.7.1
 	golang.org/x/crypto v0.11.0

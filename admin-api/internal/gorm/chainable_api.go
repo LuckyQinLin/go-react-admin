@@ -1,7 +1,9 @@
 package gorm
 
 import (
+	"admin-api/internal/gorm/template"
 	"fmt"
+	"github.com/flosch/pongo2/v6"
 	"regexp"
 	"strings"
 
@@ -18,6 +20,13 @@ import (
 func (db *DB) Model(value interface{}) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.Model = value
+	return
+}
+
+// Alias 设置别名
+func (db *DB) Alias(value string) (tx *DB) {
+	tx = db.getInstance()
+	tx.Statement.Alias = value
 	return
 }
 
@@ -200,6 +209,89 @@ func (db *DB) Omit(columns ...string) (tx *DB) {
 func (db *DB) Where(query interface{}, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	if conds := tx.Statement.BuildCondition(query, args...); len(conds) > 0 {
+		tx.Statement.AddClause(clause.Where{Exprs: conds})
+	}
+	return
+}
+
+func (db *DB) Mappers(name string) (tx *DB) {
+	return db.getInstanceTemplate(name)
+}
+
+func (db *DB) Query(tId string, param func() any) (tx *DB) {
+	tx = db.getInstance()
+	mapper := tx.Statement.GetSQL(template.Query, tId)
+	if param() == nil {
+		tx.Statement.AddClause(clause.Template{
+			SQL:  mapper.Content,
+			Vars: nil,
+		})
+	} else {
+		tx.Statement.AddClause(clause.Template{
+			SQL:  mapper.Content,
+			Vars: map[string]any{mapper.ParamName: param()},
+		})
+	}
+	return tx
+}
+
+// TemplateQuery 模板查询
+// @param templateName 模板名称   role.selectRole
+// @param param 参数
+// @param result 返回数据
+func (db *DB) TemplateQuery(templateName string, param ...any) (tx *DB) {
+	temp := strings.Split(templateName, ".")
+	tx = db.getInstanceTemplate(temp[0])
+	mapper := tx.Statement.GetSQL(template.Query, temp[1])
+	if len(param) <= 0 {
+		tx.Statement.AddClause(clause.Template{SQL: mapper.Content, Vars: nil})
+	} else {
+		tx.Statement.AddClause(clause.Template{SQL: mapper.Content, Vars: map[string]any{mapper.ParamName: param[0]}})
+	}
+	return tx
+}
+
+// TemplatePageQuery 模板分页查询
+// @param templateName 模板名称   role.selectRole
+// @param param 参数
+// @param result 返回数据
+func (db *DB) TemplatePageQuery(templateName string, param ...any) (tx *DB) {
+	// 构建统计查询
+	var transformCount = func(sql string) string {
+		start := strings.Index(sql, "from")
+		end := strings.LastIndex(sql, "order by")
+		return "select count(*) " + sql[start:end]
+	}
+
+	var transformPage = func(sql string) string {
+		return sql + " limit {{size}} offset {{offset}}"
+	}
+
+	temp := strings.Split(templateName, ".")
+	tx = db.getInstanceTemplate(temp[0])
+	if tx.Statement.Mapper == nil {
+		tx.Statement.Statement.Mapper = tx.Mapper[temp[0]]
+	}
+	mapper := tx.Statement.GetSQL(template.Query, temp[1])
+	tx.Statement.AddClause(clause.PageCount{CountSQL: transformCount(mapper.Content), CountVars: map[string]any{
+		mapper.ParamName: param[2],
+	}})
+	tx.Statement.AddClause(clause.PageQuery{SQL: transformPage(mapper.Content), Vars: map[string]any{
+		"size":           param[0],
+		"offset":         param[1],
+		mapper.ParamName: param[2],
+	}})
+	return tx
+}
+
+// Template 执行模版查询
+// @param template 模版内容
+// @param param 参数
+// @param result 返回
+// @return error 错误
+func (db *DB) Template(template string, param pongo2.Context) (tx *DB) {
+	tx = db.getInstance()
+	if conds := tx.Statement.BuildTemplate(template, param); len(conds) > 0 {
 		tx.Statement.AddClause(clause.Where{Exprs: conds})
 	}
 	return

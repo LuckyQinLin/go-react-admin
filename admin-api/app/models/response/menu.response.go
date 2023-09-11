@@ -56,3 +56,16 @@ type MenuInfoResponse struct {
 	Status    int    `json:"status"`                       // 菜单状态
 	UserName  string `json:"userName"`                     // 用户名称
 }
+
+// UserRouterResponse 用户路由信息
+type UserRouterResponse struct {
+	MenuId    int64                `json:"id"`                // 菜单ID
+	ParentId  int64                `json:"pId"`               // 上级菜单
+	Icon      string               `json:"icon"`              // 图标
+	MenuName  string               `json:"title"`             // 菜单名称
+	Perms     string               `json:"perms"`             // 权限字符
+	MenuSort  int                  `json:"sort"`              // 显示顺序
+	Path      string               `json:"path"`              // 路由地址
+	Component string               `json:"component"`         // 组件路由
+	Children  []UserRouterResponse `json:"children" gorm:"-"` // 下级路由
+}

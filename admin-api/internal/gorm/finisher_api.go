@@ -170,6 +170,30 @@ func (db *DB) Find(dest interface{}, conds ...interface{}) (tx *DB) {
 	return tx.callbacks.Query().Execute(tx)
 }
 
+// Page 分页
+func (db *DB) Page(dest any, total *int64) (tx *DB) {
+	tx = db.pageCount(total)
+	if *total > 0 {
+		tx = db.pageQuery(dest)
+	}
+	return tx
+}
+
+func (db *DB) pageCount(total *int64) (tx *DB) {
+	tx = db.getInstance()
+	tx.Statement.Dest = total
+	tx.callbacks.Query().Execute(tx)
+	delete(tx.Statement.Clauses, clause.PageCount{}.Name())
+	return tx
+}
+
+func (db *DB) pageQuery(dest any) (tx *DB) {
+	tx = db.getInstance()
+	tx.Statement.Dest = dest
+	tx.callbacks.Query().Execute(tx)
+	return tx
+}
+
 // FindInBatches finds all records in batches of batchSize
 func (db *DB) FindInBatches(dest interface{}, batchSize int, fc func(tx *DB, batch int) error) *DB {
 	var (

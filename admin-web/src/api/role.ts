@@ -1,6 +1,20 @@
-import {RoleCreateFormProp, RolePageProp, RolePageQueryProp, RoleUpdateFormProp} from "@/pages/system/role/modules.ts";
+import {
+    RoleCreateFormProp,
+    RoleInfoProp,
+    RolePageProp,
+    RolePageQueryProp,
+    RoleUpdateFormProp
+} from "@/pages/system/role/modules.ts";
 import {PageData} from "@/utils/request.ts";
 import {https} from "@/utils/request.ts";
+
+// postList 全部岗位
+export const roleList = (): Promise<RoleInfoProp[]> => {
+    return https.request({
+        url: '/role/all',
+        method: 'get'
+    })
+}
 
 // rolePage 角色分页查询
 export const rolePage = (data: RolePageQueryProp): Promise<PageData<RolePageProp>> => {
@@ -44,5 +58,32 @@ export const roleDelete = (ids: number[]): Promise<boolean> => {
         url: '/role/delete',
         method: 'post',
         data: {ids: ids}
+    })
+}
+
+// roleByUserId 获取用户的角色
+export const roleByUserId = (userId: number): Promise<number[]> => {
+    return https.request({
+        url: '/role/user',
+        method: 'get',
+        params: {userId: userId}
+    })
+}
+
+// roleByUserId 获取用户的角色
+export const getRoleUser = (roleId: number): Promise<number[]> => {
+    return https.request({
+        url: '/role/getUser',
+        method: 'get',
+        params: {roleId: roleId}
+    })
+}
+
+// roleAllocateUser 角色分配用户
+export const roleAllocateUser = (roleId: number, userIds: number[]): Promise<boolean> => {
+    return https.request({
+        url: '/role/allocateUser',
+        method: 'post',
+        params: {roleId: roleId, userIds: userIds}
     })
 }

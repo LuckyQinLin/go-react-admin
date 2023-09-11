@@ -7,6 +7,11 @@ interface RolePageQueryProp {
     endTime?: number;
 }
 
+interface RoleInfoProp {
+    value: number;
+    label: string;
+}
+
 // RolePageProp 角色分页查询返回属性
 interface RolePageProp {
     roleId: number;
@@ -48,16 +53,35 @@ interface RoleUpdateFormProp extends RoleCreateFormProp{
 // RoleDrawerProp 角色抽屉属性
 interface RoleDrawerProp {
     createVisible: boolean;
+    userVisible: boolean;
     updateVisible: boolean;
     roleId?: number;
 }
 
+// AllocateUserDrawerProp 分配用户
+interface AllocateUserDrawerProp {
+    roleId?: number;
+    visible: boolean;
+    close: () => void;
+}
+
+// AllocatePermDrawerProp 分配资源
+interface AllocatePermDrawerProp {
+    visible: boolean;
+    roleId: number;
+    close: () => void;
+}
+
+
 export type {
+    RoleInfoProp,
     RolePageQueryProp,
     RolePageProp,
     RoleCreateDrawerProp,
     RoleUpdateDrawerProp,
     RoleCreateFormProp,
     RoleUpdateFormProp,
-    RoleDrawerProp
+    RoleDrawerProp,
+    AllocateUserDrawerProp,
+    AllocatePermDrawerProp
 }

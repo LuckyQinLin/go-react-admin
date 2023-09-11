@@ -41,6 +41,11 @@ func (c *CacheRedis) IsExpire(key string) float64 {
 	return c.client.TTL(key).Val().Seconds()
 }
 
+// KeyExpired 续期
+func (c *CacheRedis) KeyExpired(key string, duration time.Duration) (bool, error) {
+	return c.client.Expire(key, duration).Result()
+}
+
 func InitRedis() {
 	config := Config.Redis
 	addr := fmt.Sprintf("%s:%d", config.Host, config.Port)

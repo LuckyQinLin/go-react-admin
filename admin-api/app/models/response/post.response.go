@@ -36,3 +36,9 @@ type PostInfoResponse struct {
 	Status   int    `json:"status"`   // 状态
 	Remark   string `json:"remark"`   // 备注
 }
+
+// PostListResponse 岗位信息
+type PostListResponse struct {
+	PostId   int64  `json:"value"`
+	PostName string `json:"label"`
+}

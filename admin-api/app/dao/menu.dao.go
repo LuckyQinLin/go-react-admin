@@ -54,3 +54,13 @@ func (m *MenuDao) UpdateById(tx *gorm.DB, menu *entity.Menu) error {
 func (m *MenuDao) Delete(tx *gorm.DB, menuId ...int64) error {
 	return tx.Where("menu_id in ?", menuId).Delete(&entity.Menu{}).Error
 }
+
+// GetMenuByUserId 获取用户拥有的权限信息
+func (m *MenuDao) GetMenuByUserId(userId int64) (menus []entity.Menu, err error) {
+	err = core.DB.Model(entity.Menu{}).
+		Alias("sm").
+		Where("exists(select 1 from sys_role_menu srm where srm.menu_id = sm.menu_id and exists(select 1 from sys_user_role sur where sur.role_id = srm.role_id and sur.user_id = ?))", userId).
+		First(&menus).
+		Error
+	return
+}

@@ -28,6 +28,7 @@ const (
 	LogoutFail          HttpCode = 100520
 	DateUpdateError     HttpCode = 100521
 	CaptchaImageError   HttpCode = 100522
+	UserNotAllowDelete  HttpCode = 100523
 )
 
 var Menus = map[HttpCode]string{
@@ -56,6 +57,7 @@ var Menus = map[HttpCode]string{
 	LogoutFail:          "退出登录失败",
 	DateUpdateError:     "数据更新失败",
 	CaptchaImageError:   "验证码生成失败",
+	UserNotAllowDelete:  "当前用户不允许删除",
 }
 
 // Message 消息

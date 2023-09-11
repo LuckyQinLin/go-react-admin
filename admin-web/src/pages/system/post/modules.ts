@@ -8,6 +8,11 @@ interface PostPageQueryProp {
     status?: number;
 }
 
+// PostInfoProp 岗位信息
+interface PostInfoProp {
+    value: number;
+    label: string;
+}
 
 // PostPageProp 岗位表属性
 interface PostPageProp {
@@ -55,6 +60,7 @@ interface PostUpdateFormProp extends PostCreateFormProp {
 
 
 export type {
+    PostInfoProp,
     PostPageProp,
     PostPageQueryProp,
     PostDrawerProp,

@@ -72,6 +72,12 @@ func (cs *callbacks) Raw() *processor {
 	return cs.processors["raw"]
 }
 
+// ExecuteTemplate 执行模版
+func (p *processor) ExecuteTemplate(db *DB) *DB {
+
+	return nil
+}
+
 func (p *processor) Execute(db *DB) *DB {
 	// call scopes
 	for len(db.Statement.scopes) > 0 {

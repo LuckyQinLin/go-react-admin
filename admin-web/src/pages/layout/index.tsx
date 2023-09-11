@@ -5,24 +5,8 @@ import {LayoutHeader, LayoutSider} from "@/pages/layout/components";
 import {BreadcrumbProp} from "@/pages/layout/components/header";
 import {PermInfo} from "@/redux/user/reducer";
 import "./index.less";
-import {useSelector} from "@/redux/hooks.ts";
+import useLoadRoutes from "@/router/useLoadRoutes.tsx";
 
-export const paths = (perms: PermInfo[]): Set<string> => {
-    let path = new Set<string>()
-    perms.forEach(item => {
-        if (item.path) {
-            path.add(item.path)
-        }
-        if (item.children) {
-            item.children.forEach(inner => {
-                if (inner.path) {
-                    path.add(inner.path)
-                }
-            })
-        }
-    })
-    return path
-}
 
 export const permsKeys = (perms: PermInfo[]): string[] => {
     let result: string[] = [];
@@ -42,15 +26,14 @@ export const permsKeys = (perms: PermInfo[]): string[] => {
 
 const LayoutPage: React.FC = () => {
 
+    const [, getUserInfo] = useLoadRoutes();
     const {token: { colorBgContainer }} = theme.useToken();
     const [collapsed, setCollapsed] = useState(false);
     const [breadcrumb, setBreadcrumb] = useState<BreadcrumbProp[]>([]);
-    const user = useSelector((state) => state.user)
 
     useEffect(() => {
-        console.log("user", user);
-    }, [user])
-
+        getUserInfo()
+    }, []);
 
     const contentCss: React.CSSProperties = {
         margin: '16px 16px',

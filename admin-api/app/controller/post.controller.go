@@ -14,8 +14,21 @@ var Post = new(PostController)
 
 type PostController struct{ BaseController }
 
+// PostList 获取全部岗位信息
+func (p *PostController) PostList(ctx *gin.Context) {
+	var (
+		list      []*response.PostListResponse
+		customErr *response.BusinessError
+	)
+	if list, customErr = service.Post.All(); customErr != nil {
+		ctx.JSON(http.StatusOK, response.ResultCustom(customErr))
+		return
+	}
+	ctx.JSON(http.StatusOK, response.Ok(list))
+}
+
 // PostCreate 岗位创建
-func (d *PostController) PostCreate(ctx *gin.Context) {
+func (p *PostController) PostCreate(ctx *gin.Context) {
 	var (
 		claims    *vo.UserClaims
 		operate   *entity.Operate
@@ -23,22 +36,22 @@ func (d *PostController) PostCreate(ctx *gin.Context) {
 		customErr *response.BusinessError
 		err       error
 	)
-	claims, operate = d.Parse(ctx, "岗位创建", vo.Add, nil)
+	claims, operate = p.Parse(ctx, "岗位创建", vo.Add, nil)
 	if err = ctx.ShouldBind(&param); err != nil {
-		d.Failed(ctx, operate, response.Fail(response.RequestParamError))
+		p.Failed(ctx, operate, response.Fail(response.RequestParamError))
 		return
 	}
 	param.UserName = claims.Username
 	operate.ParamToJson(param)
 	if customErr = service.Post.Create(&param); customErr != nil {
-		d.Failed(ctx, operate, response.ResultCustom(customErr))
+		p.Failed(ctx, operate, response.ResultCustom(customErr))
 		return
 	}
-	d.Success(ctx, operate, response.Ok("岗位创建成功"))
+	p.Success(ctx, operate, response.Ok("岗位创建成功"))
 }
 
 // PostUpdate 岗位更新
-func (d *PostController) PostUpdate(ctx *gin.Context) {
+func (p *PostController) PostUpdate(ctx *gin.Context) {
 	var (
 		claims    *vo.UserClaims
 		operate   *entity.Operate
@@ -46,22 +59,22 @@ func (d *PostController) PostUpdate(ctx *gin.Context) {
 		customErr *response.BusinessError
 		err       error
 	)
-	claims, operate = d.Parse(ctx, "岗位修改", vo.Update, nil)
+	claims, operate = p.Parse(ctx, "岗位修改", vo.Update, nil)
 	if err = ctx.ShouldBind(&param); err != nil {
-		d.Failed(ctx, operate, response.Fail(response.RequestParamError))
+		p.Failed(ctx, operate, response.Fail(response.RequestParamError))
 		return
 	}
 	param.UserName = claims.Username
 	operate.ParamToJson(param)
 	if customErr = service.Post.Update(&param); customErr != nil {
-		d.Failed(ctx, operate, response.ResultCustom(customErr))
+		p.Failed(ctx, operate, response.ResultCustom(customErr))
 		return
 	}
-	d.Success(ctx, operate, response.Ok("岗位修改成功"))
+	p.Success(ctx, operate, response.Ok("岗位修改成功"))
 }
 
 // PostDelete 岗位删除
-func (d *PostController) PostDelete(ctx *gin.Context) {
+func (p *PostController) PostDelete(ctx *gin.Context) {
 	var (
 		err       error
 		claims    *vo.UserClaims
@@ -69,21 +82,21 @@ func (d *PostController) PostDelete(ctx *gin.Context) {
 		param     request.PostDeleteRequest
 		customErr *response.BusinessError
 	)
-	claims, operate = d.Parse(ctx, "岗位删除", vo.Delete, nil)
+	claims, operate = p.Parse(ctx, "岗位删除", vo.Delete, nil)
 	if err = ctx.ShouldBind(&param); err != nil {
-		d.Failed(ctx, operate, response.Fail(response.RequestParamError))
+		p.Failed(ctx, operate, response.Fail(response.RequestParamError))
 		return
 	}
 	operate.ParamToJson(param)
 	if customErr = service.Post.Delete(&param, claims.Username); customErr != nil {
-		d.Failed(ctx, operate, response.ResultCustom(customErr))
+		p.Failed(ctx, operate, response.ResultCustom(customErr))
 		return
 	}
-	d.Success(ctx, operate, response.Ok("删除岗位数据成功"))
+	p.Success(ctx, operate, response.Ok("删除岗位数据成功"))
 }
 
 // PostPage 岗位分页
-func (d *PostController) PostPage(ctx *gin.Context) {
+func (p *PostController) PostPage(ctx *gin.Context) {
 	var (
 		param     request.PostPageRequest
 		result    *response.PageData
@@ -102,7 +115,7 @@ func (d *PostController) PostPage(ctx *gin.Context) {
 }
 
 // PostInfo 岗位详情
-func (d *PostController) PostInfo(ctx *gin.Context) {
+func (p *PostController) PostInfo(ctx *gin.Context) {
 	var (
 		err       error
 		postId    int64
@@ -121,6 +134,6 @@ func (d *PostController) PostInfo(ctx *gin.Context) {
 }
 
 // PostExport 岗位导出
-func (d *PostController) PostExport(ctx *gin.Context) {
+func (p *PostController) PostExport(ctx *gin.Context) {
 
 }

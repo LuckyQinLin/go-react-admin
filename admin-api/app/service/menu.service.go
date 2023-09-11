@@ -5,8 +5,10 @@ import (
 	"admin-api/app/models/entity"
 	"admin-api/app/models/request"
 	"admin-api/app/models/response"
+	"admin-api/app/models/vo"
 	"admin-api/core"
 	"admin-api/internal/gorm"
+	"sort"
 	"time"
 )
 
@@ -252,4 +254,49 @@ func (m *MenuService) Info(menuId int64) (*response.MenuInfoResponse, *response.
 		IsShow:   menu.Visible,
 		Status:   menu.Status,
 	}, nil
+}
+
+// UserRouter 用户路由
+func (m *MenuService) UserRouter(userId int64, roleId int64) ([]response.UserRouterResponse, *response.BusinessError) {
+	var (
+		buildTree func(data []response.UserRouterResponse, parentId int64) []response.UserRouterResponse
+		result    []response.UserRouterResponse
+		err       error
+	)
+	// 构建Tree
+	buildTree = func(data []response.UserRouterResponse, parentId int64) []response.UserRouterResponse {
+		var children []response.UserRouterResponse
+		for _, item := range data {
+			if parentId == item.ParentId {
+				item.Children = buildTree(data, item.MenuId)
+				children = append(children, item)
+			}
+		}
+		// 排序
+		sort.Slice(children, func(i, j int) bool {
+			return children[i].MenuSort > children[j].MenuSort
+		})
+		return children
+	}
+	// 构建查询条件
+	if err = core.DB.Mappers("menu").
+		Query("selectMenuByRoles", func() any {
+			condition := make(map[string]any)
+			if userId == vo.SUPER_USER_ID {
+				condition["IsAll"] = 0
+			} else {
+				condition["RoleId"] = roleId
+				if roleId == 0 {
+					condition["UserId"] = userId
+				}
+			}
+			return condition
+		}).
+		Find(&result).
+		Error; err != nil {
+		core.Log.Error("查询用户的路由信息发生异常：%s", err.Error())
+		return nil, response.CustomBusinessError(response.Failed, "获取用户路由失败")
+	}
+	return buildTree(result, 0), nil
+
 }

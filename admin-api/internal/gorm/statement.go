@@ -1,10 +1,12 @@
 package gorm
 
 import (
+	"admin-api/internal/gorm/template"
 	"context"
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
+	"github.com/flosch/pongo2/v6"
 	"reflect"
 	"regexp"
 	"sort"
@@ -23,6 +25,8 @@ type Statement struct {
 	*DB
 	TableExpr            *clause.Expr
 	Table                string
+	Alias                string                // 表的别名
+	Mapper               *template.MapperModel // 模版映射
 	Model                interface{}
 	Unscoped             bool
 	Dest                 interface{}
@@ -62,6 +66,58 @@ type StatementModifier interface {
 	ModifyStatement(*Statement)
 }
 
+func (stmt *Statement) GetSQL(types template.TType, templateId string) template.MapperItem {
+	var (
+		tpl template.MapperItem
+	)
+	switch types {
+	case template.Query:
+		tpl = stmt.Mapper.Select[templateId]
+	case template.Delete:
+		tpl = stmt.Mapper.Delete[templateId]
+	case template.Update:
+		tpl = stmt.Mapper.Update[templateId]
+	case template.Insert:
+		tpl = stmt.Mapper.Insert[templateId]
+	}
+	return tpl
+}
+
+func (stmt *Statement) BuildSQL(types template.TType, templateId string, param ...any) {
+	var (
+		t       *pongo2.Template
+		tpl     template.MapperItem
+		content string
+		err     error
+	)
+	switch types {
+	case template.Query:
+		tpl = stmt.Mapper.Select[templateId]
+	case template.Delete:
+		tpl = stmt.Mapper.Delete[templateId]
+	case template.Update:
+		tpl = stmt.Mapper.Update[templateId]
+	case template.Insert:
+		tpl = stmt.Mapper.Insert[templateId]
+	}
+	if t, err = pongo2.FromString(tpl.Content); err != nil {
+		stmt.Error = err
+		return
+	}
+	if len(param) <= 0 {
+		if content, err = t.Execute(nil); err != nil {
+			stmt.Error = err
+			return
+		}
+	} else {
+		if content, err = t.Execute(pongo2.Context{"param": param[0]}); err != nil {
+			stmt.Error = err
+			return
+		}
+	}
+	stmt.SQL.WriteString(content)
+}
+
 // WriteString write string
 func (stmt *Statement) WriteString(str string) (int, error) {
 	return stmt.SQL.WriteString(str)
@@ -90,6 +146,7 @@ func (stmt *Statement) QuoteTo(writer clause.Writer, field interface{}) {
 	switch v := field.(type) {
 	case clause.Table:
 		if v.Name == clause.CurrentTable {
+			v.Alias = stmt.Alias
 			if stmt.TableExpr != nil {
 				stmt.TableExpr.Build(stmt)
 			} else {
@@ -277,6 +334,15 @@ func (stmt *Statement) AddClause(v clause.Interface) {
 func (stmt *Statement) AddClauseIfNotExists(v clause.Interface) {
 	if c, ok := stmt.Clauses[v.Name()]; !ok || c.Expression == nil {
 		stmt.AddClause(v)
+	}
+}
+
+// BuildTemplate 构建模版
+func (stmt *Statement) BuildTemplate(query string, param pongo2.Context) []clause.Expression {
+	if len(param) <= 0 {
+		return []clause.Expression{clause.Template{SQL: query, Vars: nil}}
+	} else {
+		return []clause.Expression{clause.Template{SQL: query, Vars: param}}
 	}
 }
 
@@ -519,6 +585,7 @@ func (stmt *Statement) clone() *Statement {
 		Context:              stmt.Context,
 		RaiseErrorOnNotFound: stmt.RaiseErrorOnNotFound,
 		SkipHooks:            stmt.SkipHooks,
+		Mapper:               stmt.Mapper,
 	}
 
 	if stmt.SQL.Len() > 0 {

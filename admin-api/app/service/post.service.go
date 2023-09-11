@@ -181,3 +181,21 @@ func (p *PostService) Update(param *request.PostUpdateRequest) *response.Busines
 	}
 	return nil
 }
+
+// All 获取全部岗位
+func (p *PostService) All() (list []*response.PostListResponse, customErr *response.BusinessError) {
+	var (
+		posts []entity.Post
+		err   error
+	)
+	if posts, err = dao.Post.List(core.DB); err != nil {
+		return nil, response.CustomBusinessError(response.Failed, "获取岗位失败")
+	}
+	for _, post := range posts {
+		list = append(list, &response.PostListResponse{
+			PostId:   post.PostId,
+			PostName: post.PostName,
+		})
+	}
+	return
+}

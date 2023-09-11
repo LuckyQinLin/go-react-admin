@@ -28,19 +28,29 @@ func initRouter() {
 			user.GET("captchaImage", controller.User.CaptchaImage) // 获取验证码
 			user.POST("login", controller.User.Login)              // 登陆
 			user.GET("info", controller.User.GetUserInfo)          // 获取用户信息
-			user.POST("userAllot", controller.User.AllotRole)      // 用户分配角色
+			user.POST("page", controller.User.Page)                // 用户分页
+			user.POST("create", controller.User.UserCreate)        // 用户创建
+			user.POST("update", controller.User.UserUpdate)        // 用户更新
+			user.POST("status", controller.User.ChangeStatus)      // 修改用户状态
+			user.POST("role", controller.User.UserRole)            // 用户分配角色
+			user.GET("loginInfo", controller.User.UserLoginInfo)   // 用户登录信息
+			user.GET("routes", controller.User.UserRoutes)         // 用户菜单信息
+
 		}
 		role := root.Group("role") // 角色模块
 		{
-			role.GET("all", controller.Role.RoleAll)            // 所有角色
-			role.POST("page", controller.Role.Page)             // 角色分页
-			role.POST("create", controller.Role.RoleCreate)     // 角色创建
-			role.POST("update", controller.Role.RoleUpdate)     // 角色修改
-			role.GET("info", controller.Role.RoleInfo)          // 角色详情
-			role.POST("status", controller.Role.RoleStatus)     // 角色状态修改
-			role.POST("delete", controller.Role.RoleDelete)     // 角色删除
-			role.POST("dataAuth", controller.Role.RoleDataAuth) // 角色数据权限分配
-			role.GET("export", controller.Role.RoleExport)      // 角色导出
+			role.GET("all", controller.Role.RoleAll)                    // 所有角色
+			role.POST("page", controller.Role.Page)                     // 角色分页
+			role.POST("create", controller.Role.RoleCreate)             // 角色创建
+			role.POST("update", controller.Role.RoleUpdate)             // 角色修改
+			role.GET("info", controller.Role.RoleInfo)                  // 角色详情
+			role.POST("status", controller.Role.RoleStatus)             // 角色状态修改
+			role.POST("delete", controller.Role.RoleDelete)             // 角色删除
+			role.POST("dataAuth", controller.Role.RoleDataAuth)         // 角色数据权限分配
+			role.GET("export", controller.Role.RoleExport)              // 角色导出
+			role.GET("user", controller.Role.UserRole)                  // 获取用户角色
+			role.GET("getUser", controller.Role.RoleUser)               // 获取角色已经分配用户
+			role.POST("allocateUser", controller.Role.SaveAllocateUser) // 角色分配用户
 		}
 		menu := root.Group("menu") // 菜单模块
 		{
@@ -50,6 +60,7 @@ func initRouter() {
 			menu.POST("update", controller.Menu.MenuUpdate) // 菜单修改
 			menu.GET("delete", controller.Menu.MenuDelete)  // 菜单删除
 			menu.GET("info", controller.Menu.MenuInfo)      // 菜单详情
+			menu.GET("router", controller.Menu.UserRouter)  // 获取当前用户路由
 		}
 		dept := root.Group("dept") // 部门模块
 		{
@@ -62,6 +73,7 @@ func initRouter() {
 		}
 		post := root.Group("post") // 岗位模块
 		{
+			post.GET("all", controller.Post.PostList)       // 全部岗位
 			post.POST("page", controller.Post.PostPage)     // 岗位分页
 			post.POST("create", controller.Post.PostCreate) // 岗位创建
 			post.POST("update", controller.Post.PostUpdate) // 岗位修改
@@ -92,6 +104,11 @@ func initRouter() {
 			notice.POST("update", controller.Notice.NoticeUpdate) // 通知修改
 			notice.POST("delete", controller.Notice.NoticeDelete) // 通知删除
 			notice.GET("info", controller.Notice.NoticeInfo)      // 通知详情
+		}
+		logger := root.Group("logger") // 日志模块
+		{
+			logger.POST("visit", controller.Logger.VisitPage)     // 访问日志
+			logger.POST("operate", controller.Logger.OperatePage) // 操作日志
 		}
 	}
 }

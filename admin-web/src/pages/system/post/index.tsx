@@ -51,8 +51,8 @@ const SystemPostPage = () => {
             width: 160,
             render: (_, record) => (
                 <Space size={'small'}>
-                    <Button type="link" style={{padding: 4}} onClick={() => openDrawer('update', record.postId)}>修改</Button>
-                    <Button type="link" danger style={{padding: 4}} onClick={() => deleteRoleHandler(record.postId)}>删除</Button>
+                    <Button type="link" size='small' style={{padding: 4}} onClick={() => openDrawer('update', record.postId)}>修改</Button>
+                    <Button type="link" size='small' danger style={{padding: 4}} onClick={() => deleteRoleHandler(record.postId)}>删除</Button>
                 </Space>
             ),
         },

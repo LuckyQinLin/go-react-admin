@@ -132,3 +132,20 @@ func (m *MenuController) MenuInfo(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, response.Ok(info))
 }
+
+// UserRouter 用户路由信息
+func (m *MenuController) UserRouter(ctx *gin.Context) {
+	var (
+		claims    *vo.UserClaims
+		tree      []response.UserRouterResponse
+		customErr *response.BusinessError
+		roleId    int64
+	)
+	roleId = ctx.GetInt64("roleId")
+	claims = m.GetCurrentUser(ctx)
+	if tree, customErr = service.Menu.UserRouter(claims.UserId, roleId); customErr != nil {
+		ctx.JSON(http.StatusOK, response.ResultCustom(customErr))
+		return
+	}
+	ctx.JSON(http.StatusOK, response.Ok(tree))
+}

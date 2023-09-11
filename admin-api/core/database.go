@@ -4,14 +4,20 @@ import (
 	"admin-api/app/models/entity"
 	"admin-api/internal/gorm"
 	"admin-api/internal/gorm/driver/postgres"
+	"admin-api/internal/gorm/logger"
 	"admin-api/internal/gorm/schema"
+	utils2 "admin-api/internal/gorm/utils"
 	"admin-api/utils"
+	"embed"
 )
 
 // GetTable 获取模式下的表名
 const GetTable = "SELECT table_name FROM information_schema.tables WHERE table_schema = ?"
 
 var DB *gorm.DB
+
+//go:embed mapper
+var tpl embed.FS
 
 func InitDb() {
 
@@ -45,6 +51,9 @@ func InitDb() {
 			TablePrefix:   tablePrefix,
 			SingularTable: true,
 		},
+		// 配置日志输出级别
+		Logger: logger.Default.LogMode(logger.Info),
+		Mapper: utils2.ReadTemplate(tpl, "role", "config", "menu"),
 	}); err != nil {
 		Log.Error("连接数据库失败: %s", err.Error())
 		panic(err.Error())

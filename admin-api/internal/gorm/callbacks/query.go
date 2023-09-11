@@ -38,6 +38,22 @@ func BuildQuerySQL(db *gorm.DB) {
 	}
 
 	if db.Statement.SQL.Len() == 0 {
+		// 判断如果存在模板，则直接解析模板
+		if _, ok := db.Statement.Clauses[clause.Template{}.Name()]; ok {
+			db.Statement.Build(db.Statement.BuildClauses...)
+			return
+		}
+		// 分页统计
+		if _, ok := db.Statement.Clauses[clause.PageCount{}.Name()]; ok {
+			db.Statement.Build(clause.PageCount{}.Name())
+			return
+		}
+		// 分页查询
+		if _, ok := db.Statement.Clauses[clause.PageQuery{}.Name()]; ok {
+			db.Statement.Build(clause.PageQuery{}.Name())
+			return
+		}
+
 		db.Statement.SQL.Grow(100)
 		clauseSelect := clause.Select{Distinct: db.Statement.Distinct}
 

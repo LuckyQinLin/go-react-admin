@@ -1,7 +1,5 @@
 package vo
 
-import "github.com/golang-jwt/jwt/v5"
-
 // UserClaims 自定义jwt数据体
 type UserClaims struct {
 	UserId   int64
@@ -10,5 +8,5 @@ type UserClaims struct {
 	Username string
 	Email    string
 	Phone    string
-	jwt.RegisteredClaims
+	IsSuper  bool // 是否为超级用户
 }

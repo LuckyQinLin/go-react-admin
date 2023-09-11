@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"admin-api/internal/gorm/template"
 	"database/sql/driver"
+	"embed"
 	"fmt"
 	"path/filepath"
 	"reflect"
@@ -147,4 +149,14 @@ func SplitNestedRelationName(name string) []string {
 // JoinNestedRelationNames nested relationships like `Manager__Company`
 func JoinNestedRelationNames(relationNames []string) string {
 	return strings.Join(relationNames, nestedRelationSplit)
+}
+
+func ReadTemplate(file embed.FS, names ...string) map[string]*template.MapperModel {
+	var result = make(map[string]*template.MapperModel)
+	for _, name := range names {
+		open, _ := file.Open(fmt.Sprintf("mapper/%s.xml", name))
+		mapperModel, _ := template.New(open).Parse()
+		result[name] = mapperModel
+	}
+	return result
 }

@@ -5,11 +5,22 @@ import (
 	"admin-api/app/models/response"
 	"admin-api/core"
 	"admin-api/internal/gorm"
+	_ "embed"
 )
 
-var Role = new(RoleDao)
+var Role = NewRoleDao()
 
-type RoleDao struct{}
+type RoleDao struct {
+	role     BaseDao[entity.Role]
+	userRole BaseDao[entity.UserRole]
+}
+
+func NewRoleDao() *RoleDao {
+	return &RoleDao{
+		role:     BaseDao[entity.Role]{},
+		userRole: BaseDao[entity.UserRole]{},
+	}
+}
 
 // Total 查询获取总条数
 func (r *RoleDao) Total(condition *gorm.DB) (total int64, err error) {
@@ -72,4 +83,46 @@ func (r *RoleDao) UpdateById(tx *gorm.DB, update map[string]any, roleId ...int64
 func (r *RoleDao) List(condition *gorm.DB) (roles []entity.Role, err error) {
 	err = condition.Model(&entity.Role{}).Find(&roles).Error
 	return
+}
+
+// UserRole 获取用户角色
+func (r *RoleDao) UserRole(userId int64) ([]int64, error) {
+	var (
+		result []int64
+		data   []entity.UserRole
+		err    error
+	)
+	if err = r.userRole.FindByMap(map[string]any{"user_id": userId}, &data); err != nil {
+		return nil, err
+	}
+	for _, userRole := range data {
+		result = append(result, userRole.RoleId)
+	}
+	return result, nil
+}
+
+// GetRoleByUserId 获取用户角色
+func (r *RoleDao) GetRoleByUserId(userId int64) (roles []entity.Role, err error) {
+	err = core.DB.Model(entity.Role{}).
+		Alias("sr").
+		Where("sr.del_flag = 1 and exists(select 1 from sys_user_role sur where sur.user_id = ? and sur.role_id = sr.role_id)", userId).
+		Find(&roles).
+		Error
+	return
+}
+
+// RoleUser 获取角色用户
+func (r *RoleDao) RoleUser(roleId int64) ([]int64, error) {
+	var (
+		result []int64
+		data   []entity.UserRole
+		err    error
+	)
+	if err = r.userRole.FindByMap(map[string]any{"role_id": roleId}, &data); err != nil {
+		return nil, err
+	}
+	for _, userRole := range data {
+		result = append(result, userRole.UserId)
+	}
+	return result, nil
 }

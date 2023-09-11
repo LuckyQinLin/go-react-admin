@@ -14,3 +14,13 @@ func In[T Types](target T, arr []T) (bool, int) {
 	}
 	return false, 0
 }
+
+// Contain 包含
+func Contain[T Types](target T, arr []T) bool {
+	for _, item := range arr {
+		if target == item {
+			return true
+		}
+	}
+	return false
+}

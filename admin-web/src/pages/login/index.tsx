@@ -19,6 +19,7 @@ import {useNavigate} from "react-router-dom";
 import {captchaImage, sendCaptcha, userLogin, userRegister} from "@/api/user";
 import {LoginCaptchaProp, RegisterFormProp} from "@/pages/login/modules";
 import {useRequest} from "ahooks";
+import {HOME_PAGE} from "@/constant/setting.ts";
 
 
 export interface LoginFormProp {
@@ -165,13 +166,15 @@ const LoginPage: React.FC = () => {
 
     const dispatch = useDispatch();
 
+
+
     const navigate = useNavigate();
 
     const {run} = useRequest(userLogin, {
         manual: true,
         onSuccess: (data)=> {
-            dispatch(changeLoginStatusActionCreator({...data, status: true}));
-            navigate('/index');
+            dispatch(changeLoginStatusActionCreator({...data}));
+            navigate(HOME_PAGE);
         }
     })
 

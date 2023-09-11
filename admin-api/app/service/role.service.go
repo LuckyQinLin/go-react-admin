@@ -58,7 +58,7 @@ func (r *RoleService) Page(param *request.RolePageRequest) (*response.PageData, 
 
 // RoleAll 获取所有角色
 func (r *RoleService) RoleAll() (list []response.RoleKeyValueResponse, customErr *response.BusinessError) {
-	if err := core.DB.Model(&entity.Role{}).Where("del_flag = 1").Find(&list).Error; err != nil {
+	if err := core.DB.TemplateQuery("role.selectRoleAll").Find(&list).Error; err != nil {
 		customErr = response.CustomBusinessError(response.Failed, "获取角色数据失败")
 	}
 	return
@@ -120,7 +120,6 @@ func (r *RoleService) Update(param *request.RoleUpdateRequest) *response.Busines
 	var (
 		err       error
 		isNeed    bool
-		role      entity.Role
 		maps      []*entity.RoleMenu
 		now       time.Time
 		old       entity.Role
@@ -170,14 +169,14 @@ func (r *RoleService) Update(param *request.RoleUpdateRequest) *response.Busines
 		return response.CustomBusinessError(response.Failed, "当前角色不存在")
 	}
 	// 判断是否需要修改数据
-	if isNeed, customErr = contrast(&old, param); customErr != nil || !isNeed {
-		core.Log.Error("修改角色失败：%s", customErr.Error())
+	if isNeed, customErr = contrast(&old, param); customErr != nil {
+		core.Log.Error("修改角色失败: %s", customErr.Error())
 		return customErr
 	}
 	// 判断是否需要更新角色和菜单的授权信息
 	if len(param.MenuIds) > 0 {
 		for _, id := range param.MenuIds {
-			maps = append(maps, &entity.RoleMenu{RoleId: role.RoleId, MenuId: id})
+			maps = append(maps, &entity.RoleMenu{RoleId: old.RoleId, MenuId: id})
 		}
 	}
 	// 执行更新
@@ -307,4 +306,53 @@ func (r *RoleService) DataExport(ids []int64) (file *excelize.File, customErr *r
 	}
 	file.SetActiveSheet(sheet)
 	return file, nil
+}
+
+// UserRole 获取用户拥有的角色
+func (r *RoleService) UserRole(userId int64) ([]int64, *response.BusinessError) {
+	var (
+		ids []int64
+		err error
+	)
+	if ids, err = dao.Role.UserRole(userId); err != nil {
+		return nil, response.CustomBusinessError(response.Failed, "获取用户角色数据失败")
+	}
+	return ids, nil
+}
+
+// RoleUser 获取角色拥有的用户信息
+func (r *RoleService) RoleUser(roleId int64) ([]int64, *response.BusinessError) {
+	var (
+		ids []int64
+		err error
+	)
+	if ids, err = dao.Role.RoleUser(roleId); err != nil {
+		return nil, response.CustomBusinessError(response.Failed, "获取角色用户数据失败")
+	}
+	return ids, nil
+}
+
+// RoleAllocateUser 角色分配用户
+func (r *RoleService) RoleAllocateUser(param *request.RoleUserRequest) *response.BusinessError {
+	if err := core.DB.Transaction(func(tx *gorm.DB) error {
+		if err := dao.UserRole.DeleteByRoleId(tx, param.RoleId); err != nil {
+			core.Log.Error("删除角色已有用户映射关系失败:%s", err.Error())
+			return err
+		}
+		list := make([]*entity.UserRole, 0)
+		for _, userId := range param.UserIds {
+			list = append(list, &entity.UserRole{
+				UserId: userId,
+				RoleId: param.RoleId,
+			})
+		}
+		if err := dao.UserRole.InsertBatch(tx, list); err != nil {
+			core.Log.Error("保存角色已有用户映射关系失败:%s", err.Error())
+			return err
+		}
+		return nil
+	}); err != nil {
+		return response.CustomBusinessError(response.Failed, "给角色分配用户失败")
+	}
+	return nil
 }

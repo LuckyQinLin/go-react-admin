@@ -6,9 +6,9 @@ import (
 
 var (
 	createClauses = []string{"INSERT", "VALUES", "ON CONFLICT"}
-	queryClauses  = []string{"SELECT", "FROM", "WHERE", "GROUP BY", "ORDER BY", "LIMIT", "FOR"}
-	updateClauses = []string{"UPDATE", "SET", "WHERE"}
-	deleteClauses = []string{"DELETE", "FROM", "WHERE"}
+	queryClauses  = []string{"SELECT", "FROM", "WHERE", "GROUP BY", "ORDER BY", "LIMIT", "FOR", "TEMPLATE", "PAGE COUNT", "PAGE QUERY"}
+	updateClauses = []string{"UPDATE", "SET", "WHERE", "TEMPLATE"}
+	deleteClauses = []string{"DELETE", "FROM", "WHERE", "TEMPLATE"}
 )
 
 type Config struct {

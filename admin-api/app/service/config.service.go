@@ -120,35 +120,41 @@ func (d *ConfigService) Info(configId int64) (*response.ConfigInfoResponse, *res
 // Page 参数分页
 func (d *ConfigService) Page(param *request.ConfigPageRequest) (*response.PageData, *response.BusinessError) {
 	var (
-		buildCondition = func(param *request.ConfigPageRequest) func(db *gorm.DB) *gorm.DB {
-			return func(db *gorm.DB) *gorm.DB {
-				db.Model(&entity.Setting{})
-				if param.ConfigType != -1 {
-					db.Where("config_type = ?", param.ConfigType)
-				}
-				if param.ConfigName != "" {
-					db.Where("config_name like concat('%', ?, '%')", param.ConfigName)
-				}
-				if param.ConfigKey != "" {
-					db.Where("config_key like concat('%', ?, '%')", param.ConfigKey)
-				}
-				return db
-			}
-		}
+		//buildCondition = func(param *request.ConfigPageRequest) func(db *gorm.DB) *gorm.DB {
+		//	return func(db *gorm.DB) *gorm.DB {
+		//		db.Model(&entity.Setting{}).Template(`
+		//			1 = 1
+		//			{% if param.ConfigType != -1 %}
+		//				and config_type = {{param.ConfigType}}
+		//			{% endif %}
+		//			{% if param.ConfigName != "" %}
+		//				and config_name like concat('%', {{param.ConfigName}}, '%')
+		//			{% endif %}
+		//			{% if param.ConfigKey != "" %}
+		//				and config_key like concat('%', {{param.ConfigKey}}, '%')
+		//			{% endif %}
+		//		`, map[string]any{"param": param})
+		//		return db
+		//	}
+		//}
 		list  []response.ConfigTableResponse
 		total int64
 		err   error
 	)
-	if err = core.DB.Scopes(buildCondition(param)).Debug().Count(&total).Error; err != nil {
+	if err = core.DB.Model(&entity.Setting{}).TemplatePageQuery("config.selectConfigPage", param.Size, param.Offset(), param).Page(&list, &total).Error; err != nil {
 		core.Log.Error("统计参数数据失败, 异常信息如下：%s", err.Error())
 		return nil, response.CustomBusinessError(response.Failed, "获取参数数据失败")
 	}
-	if err = core.DB.Scopes(buildCondition(param)).
-		Find(&list).
-		Error; err != nil {
-		core.Log.Error("查询参数数据失败, 异常信息如下：%s", err.Error())
-		return nil, response.CustomBusinessError(response.Failed, "获取参数数据失败")
-	}
+	//if err = core.DB.Scopes(buildCondition(param)).Debug().Count(&total).Error; err != nil {
+	//	core.Log.Error("统计参数数据失败, 异常信息如下：%s", err.Error())
+	//	return nil, response.CustomBusinessError(response.Failed, "获取参数数据失败")
+	//}
+	//if err = core.DB.Scopes(buildCondition(param)).
+	//	Find(&list).
+	//	Error; err != nil {
+	//	core.Log.Error("查询参数数据失败, 异常信息如下：%s", err.Error())
+	//	return nil, response.CustomBusinessError(response.Failed, "获取参数数据失败")
+	//}
 	return &response.PageData{
 		Total: total,
 		Page:  param.Page,
