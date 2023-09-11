@@ -23,6 +23,11 @@ const (
 type ILogger interface {
 	GetPrefix() string                    // 获取前缀
 	PrintLogger(LogLevel, string, ...any) // 输出日志
+	Info(string, ...any)                  //
+	Debug(string, ...any)                 //
+	Warn(string, ...any)                  // 警告
+	Fail(string, ...any)                  // 失败
+	Error(string, ...any)                 // 错误
 }
 
 type ToolLogger struct {
