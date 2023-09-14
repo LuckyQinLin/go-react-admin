@@ -2,11 +2,10 @@ package utils
 
 import (
 	"crypto/md5"
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/hex"
 	"golang.org/x/crypto/bcrypt"
-	"math/rand"
-	"strings"
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*=+"
@@ -17,15 +16,6 @@ func TransformMd5(target string) string {
 	m := md5.New()
 	m.Write(d)
 	return hex.EncodeToString(m.Sum(nil))
-}
-
-func RandomString(n int) string {
-	sb := strings.Builder{}
-	sb.Grow(n)
-	for i := 0; i < n; i++ {
-		sb.WriteByte(charset[rand.Intn(len(charset))])
-	}
-	return sb.String()
 }
 
 // BcryptEncode Bcrypt加密密码

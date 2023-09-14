@@ -142,7 +142,7 @@ func (u *UserService) UserLogin(param *request.UserLoginRequest, ctx *gin.Contex
 				LoginTime:     &now,
 				Status:        status,
 			})
-		}
+		} // 登录日志
 		cacheUserInfo = func(user *vo.UserClaims, token string) (err error) {
 			bytes, _ := json.Marshal(user)
 			if _, err = core.Cache.SetKeyValue(

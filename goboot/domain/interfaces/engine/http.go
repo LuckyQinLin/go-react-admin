@@ -43,6 +43,10 @@ type IRouter interface {
 type IContext interface {
 }
 
+type IParams interface {
+	Get(string) (string, error)
+}
+
 // IMethodTree 方法树
 type IMethodTree interface {
 }
