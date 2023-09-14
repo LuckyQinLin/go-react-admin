@@ -2,92 +2,106 @@ package web
 
 import (
 	"goboot/domain/interfaces/engine"
+	"goboot/domain/model"
 	"net/http"
 )
 
-// EngineRouter 路由
-type EngineRouter struct {
-	path    string               // 路径
-	engine  *HttpEngine          // 引擎
-	handler engine.HandlersChain // 中间件
+type (
+	// Routers 路由
+	Routers struct {
+		engine        *HttpEngine          // 引擎
+		basePath      string               // 根路径
+		globalHandler engine.HandlersChain // 全局处理器
+		router        []engine.IRouter     // 路由
+	}
+
+	// Router 路由
+	Router struct {
+		path        string                                     // 路径
+		handlers    engine.HandlersChain                       // 中间件
+		controllers map[model.HttpMethod]engine.ControllerFunc // 控制器
+		children    []engine.IRouter                           // 下级路由节点
+	}
+)
+
+// =====================================================================================================================
+
+// NewRouters 构建路由根节点
+func NewRouters(basePath string, handler ...engine.HandlerFunc) engine.IRoutes {
+	return &Routers{
+		basePath:      basePath,
+		globalHandler: handler,
+		router:        make([]engine.IRouter, 0),
+	}
 }
 
-func (e EngineRouter) Children(s string, handlerFunc ...engine.HandlerFunc) engine.IRoutes {
+func (r *Routers) Push(router ...engine.IRouter) engine.IRoutes {
+	r.router = append(r.router, router...)
+	return r
+}
+
+func (r *Routers) Use(handler ...engine.HandlerFunc) engine.IRoutes {
+	r.globalHandler = append(r.globalHandler, handler...)
+	return r
+}
+
+// =====================================================================================================================
+
+// NewRouter 构建路由子节点
+func NewRouter(path string) engine.IRouter {
+	return &Router{
+		path:        path,
+		controllers: make(map[model.HttpMethod]engine.ControllerFunc),
+		children:    make([]engine.IRouter, 0),
+		handlers:    make(engine.HandlersChain, 0),
+	}
+}
+
+// request 请求
+func (r *Router) request(method model.HttpMethod, handler engine.ControllerFunc) engine.IRouter {
+	r.controllers[method] = handler
+	return r
+}
+
+// Push 添加下级节点
+func (r *Router) Push(nodes ...engine.IRouter) engine.IRouter {
+	r.children = append(r.children, nodes...)
+	return r
+}
+
+// Handler 处理器
+func (r *Router) Handler(handler ...engine.HandlerFunc) engine.IRouter {
+	r.handlers = append(r.handlers, handler...)
+	return r
+}
+
+// Get 请求
+func (r *Router) Get(handler engine.ControllerFunc) engine.IRouter {
+	return r.request(model.MethodGet, handler)
+}
+
+// Post 请求
+func (r *Router) Post(handler engine.ControllerFunc) engine.IRouter {
+	return r.request(model.MethodPost, handler)
+}
+
+// StaticFile 静态文件
+func (r *Router) StaticFile(s string, s2 string) engine.IRouter {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (e EngineRouter) Use(handlerFunc ...engine.HandlerFunc) engine.IRoutes {
+func (r *Router) StaticFileFS(s string, s2 string, system http.FileSystem) engine.IRouter {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (e EngineRouter) Handle(s string, s2 string, handlerFunc ...engine.HandlerFunc) engine.IRoutes {
+func (r *Router) Static(s string, s2 string) engine.IRouter {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (e EngineRouter) Any(s string, handlerFunc ...engine.HandlerFunc) engine.IRoutes {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (e EngineRouter) Get(s string, handlerFunc ...engine.HandlerFunc) engine.IRoutes {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (e EngineRouter) Post(s string, handlerFunc ...engine.HandlerFunc) engine.IRoutes {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (e EngineRouter) Delete(s string, handlerFunc ...engine.HandlerFunc) engine.IRoutes {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (e EngineRouter) Patch(s string, handlerFunc ...engine.HandlerFunc) engine.IRoutes {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (e EngineRouter) Put(s string, handlerFunc ...engine.HandlerFunc) engine.IRoutes {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (e EngineRouter) Options(s string, handlerFunc ...engine.HandlerFunc) engine.IRoutes {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (e EngineRouter) Head(s string, handlerFunc ...engine.HandlerFunc) engine.IRoutes {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (e EngineRouter) Match(strings []string, s string, handlerFunc ...engine.HandlerFunc) engine.IRoutes {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (e EngineRouter) StaticFile(s string, s2 string) engine.IRoutes {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (e EngineRouter) StaticFileFS(s string, s2 string, system http.FileSystem) engine.IRoutes {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (e EngineRouter) Static(s string, s2 string) engine.IRoutes {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (e EngineRouter) StaticFS(s string, system http.FileSystem) engine.IRoutes {
+func (r *Router) StaticFS(s string, system http.FileSystem) engine.IRouter {
 	//TODO implement me
 	panic("implement me")
 }
