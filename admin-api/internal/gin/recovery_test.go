@@ -5,6 +5,7 @@
 package gin
 
 import (
+	"admin-api/internal/logger"
 	"fmt"
 	"net"
 	"net/http"
@@ -18,7 +19,7 @@ import (
 
 func TestPanicClean(t *testing.T) {
 	buffer := new(strings.Builder)
-	router := New()
+	router := New(logger.Default())
 	password := "my-super-secret-password"
 	router.Use(RecoveryWithWriter(buffer))
 	router.GET("/recovery", func(c *Context) {
@@ -50,7 +51,7 @@ func TestPanicClean(t *testing.T) {
 // TestPanicInHandler assert that panic has been recovered.
 func TestPanicInHandler(t *testing.T) {
 	buffer := new(strings.Builder)
-	router := New()
+	router := New(logger.Default())
 	router.Use(RecoveryWithWriter(buffer))
 	router.GET("/recovery", func(_ *Context) {
 		panic("Oupps, Houston, we have a problem")
@@ -77,7 +78,7 @@ func TestPanicInHandler(t *testing.T) {
 
 // TestPanicWithAbort assert that panic has been recovered even if context.Abort was used.
 func TestPanicWithAbort(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	router.Use(RecoveryWithWriter(nil))
 	router.GET("/recovery", func(c *Context) {
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -123,7 +124,7 @@ func TestPanicWithBrokenPipe(t *testing.T) {
 		t.Run(expectMsg, func(t *testing.T) {
 			var buf strings.Builder
 
-			router := New()
+			router := New(logger.Default())
 			router.Use(RecoveryWithWriter(&buf))
 			router.GET("/recovery", func(c *Context) {
 				// Start writing response
@@ -146,7 +147,7 @@ func TestPanicWithBrokenPipe(t *testing.T) {
 func TestCustomRecoveryWithWriter(t *testing.T) {
 	errBuffer := new(strings.Builder)
 	buffer := new(strings.Builder)
-	router := New()
+	router := New(logger.Default())
 	handleRecovery := func(c *Context, err any) {
 		errBuffer.WriteString(err.(string))
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -180,7 +181,7 @@ func TestCustomRecoveryWithWriter(t *testing.T) {
 func TestCustomRecovery(t *testing.T) {
 	errBuffer := new(strings.Builder)
 	buffer := new(strings.Builder)
-	router := New()
+	router := New(logger.Default())
 	DefaultErrorWriter = buffer
 	handleRecovery := func(c *Context, err any) {
 		errBuffer.WriteString(err.(string))
@@ -215,7 +216,7 @@ func TestCustomRecovery(t *testing.T) {
 func TestRecoveryWithWriterWithCustomRecovery(t *testing.T) {
 	errBuffer := new(strings.Builder)
 	buffer := new(strings.Builder)
-	router := New()
+	router := New(logger.Default())
 	DefaultErrorWriter = buffer
 	handleRecovery := func(c *Context, err any) {
 		errBuffer.WriteString(err.(string))

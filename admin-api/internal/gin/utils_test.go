@@ -5,6 +5,7 @@
 package gin
 
 import (
+	"admin-api/internal/logger"
 	"bytes"
 	"encoding/xml"
 	"fmt"
@@ -36,7 +37,7 @@ func (t *testStruct) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func TestWrap(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	router.POST("/path", WrapH(&testStruct{t}))
 	router.GET("/path2", WrapF(func(w http.ResponseWriter, req *http.Request) {
 		assert.Equal(t, "GET", req.Method)
@@ -114,7 +115,7 @@ type bindTestStruct struct {
 func TestBindMiddleware(t *testing.T) {
 	var value *bindTestStruct
 	var called bool
-	router := New()
+	router := New(logger.Default())
 	router.GET("/", Bind(bindTestStruct{}), func(c *Context) {
 		called = true
 		value = c.MustGet(BindKey).(*bindTestStruct)

@@ -47,6 +47,27 @@ type ToolLogger struct {
 	wg           sync.WaitGroup // 并发分组
 }
 
+func Default() *ToolLogger {
+	var (
+		logger *ToolLogger
+	)
+	logger = &ToolLogger{
+		logLevel:     Info,
+		logChannel:   make(chan *LogEntry, 10),
+		Prefix:       "Admin",
+		TimeFormat:   "2006-01-02 15:04:05",
+		maxFileSize:  1 * 1024 * 1024,
+		isWriteFile:  false,
+		consoleAsync: false,
+		consoleBuff:  new(bytes.Buffer),
+		consoleOut:   os.Stdout,
+	}
+	logger.wg.Add(1)
+	// 启动日志监听写入
+	go logger.processLog()
+	return logger
+}
+
 func DefaultLogger(logFile string) *ToolLogger {
 	var (
 		logger *ToolLogger

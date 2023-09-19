@@ -5,6 +5,7 @@
 package gin
 
 import (
+	"admin-api/internal/logger"
 	"bytes"
 	"context"
 	"errors"
@@ -147,7 +148,7 @@ func TestSaveUploadedCreateFailed(t *testing.T) {
 }
 
 func TestContextReset(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	c := router.allocateContext(0)
 	assert.Equal(t, c.engine, router)
 
@@ -998,7 +999,7 @@ func TestContextRenderFile(t *testing.T) {
 	c.File("./gin.go")
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Contains(t, w.Body.String(), "func New() *Engine {")
+	assert.Contains(t, w.Body.String(), "func New(logger.Default()) *Engine {")
 	// Content-Type='text/plain; charset=utf-8' when go version <= 1.16,
 	// else, Content-Type='text/x-go; charset=utf-8'
 	assert.NotEqual(t, "", w.Header().Get("Content-Type"))
@@ -1012,7 +1013,7 @@ func TestContextRenderFileFromFS(t *testing.T) {
 	c.FileFromFS("./gin.go", Dir(".", false))
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Contains(t, w.Body.String(), "func New() *Engine {")
+	assert.Contains(t, w.Body.String(), "func New(logger.Default()) *Engine {")
 	// Content-Type='text/plain; charset=utf-8' when go version <= 1.16,
 	// else, Content-Type='text/x-go; charset=utf-8'
 	assert.NotEqual(t, "", w.Header().Get("Content-Type"))
@@ -1028,7 +1029,7 @@ func TestContextRenderAttachment(t *testing.T) {
 	c.FileAttachment("./gin.go", newFilename)
 
 	assert.Equal(t, 200, w.Code)
-	assert.Contains(t, w.Body.String(), "func New() *Engine {")
+	assert.Contains(t, w.Body.String(), "func New(logger.Default()) *Engine {")
 	assert.Equal(t, fmt.Sprintf("attachment; filename=\"%s\"", newFilename), w.Header().Get("Content-Disposition"))
 }
 
@@ -1042,7 +1043,7 @@ func TestContextRenderAndEscapeAttachment(t *testing.T) {
 	c.FileAttachment("./gin.go", maliciousFilename)
 
 	assert.Equal(t, 200, w.Code)
-	assert.Contains(t, w.Body.String(), "func New() *Engine {")
+	assert.Contains(t, w.Body.String(), "func New(logger.Default()) *Engine {")
 	assert.Equal(t, fmt.Sprintf("attachment; filename=\"%s\"", actualEscapedResponseFilename), w.Header().Get("Content-Disposition"))
 }
 
@@ -1055,7 +1056,7 @@ func TestContextRenderUTF8Attachment(t *testing.T) {
 	c.FileAttachment("./gin.go", newFilename)
 
 	assert.Equal(t, 200, w.Code)
-	assert.Contains(t, w.Body.String(), "func New() *Engine {")
+	assert.Contains(t, w.Body.String(), "func New(logger.Default()) *Engine {")
 	assert.Equal(t, `attachment; filename*=UTF-8''`+url.QueryEscape(newFilename), w.Header().Get("Content-Disposition"))
 }
 
@@ -2134,7 +2135,7 @@ func TestContextResetInHandler(t *testing.T) {
 
 func TestRaceParamsContextCopy(t *testing.T) {
 	DefaultWriter = os.Stdout
-	router := Default()
+	router := Default(logger.Default())
 	nameGroup := router.Group("/:name")
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -2328,7 +2329,7 @@ func TestContextCopyShouldNotCancel(t *testing.T) {
 
 	wg := &sync.WaitGroup{}
 
-	r := New()
+	r := New(logger.Default())
 	r.GET("/", func(ginctx *Context) {
 		wg.Add(1)
 
@@ -2395,7 +2396,7 @@ func TestContextAddParam(t *testing.T) {
 
 func TestCreateTestContextWithRouteParams(t *testing.T) {
 	w := httptest.NewRecorder()
-	engine := New()
+	engine := New(logger.Default())
 	engine.GET("/:action/:name", func(ctx *Context) {
 		ctx.String(http.StatusOK, "%s %s", ctx.Param("action"), ctx.Param("name"))
 	})
