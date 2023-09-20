@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper namespace="UserMapper">
+    <select id="selectUserPage" param="param">
+        select
+            *
+        from sys_setting
+        where 1 = 1
+        {% if param.ConfigType != -1 %}
+        and config_type = {{param.ConfigType}}
+        {% endif %}
+        {% if param.ConfigName != "" %}
+        and config_name like concat('%', {{param.ConfigName}}, '%')
+        {% endif %}
+        {% if param.ConfigKey != "" %}
+        and config_key like concat('%', {{param.ConfigKey}}, '%')
+        {% endif %}
+        order by create_time
+    </select>
+</mapper>

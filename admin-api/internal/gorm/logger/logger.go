@@ -85,21 +85,21 @@ var (
 
 func NewLogger(log logger2.ILogger, config Config) Interface {
 	var (
-		infoStr      = "%s\n[info] "
-		warnStr      = "%s\n[warn] "
-		errStr       = "%s\n[error] "
-		traceStr     = "%s\n[%.3fms] [rows:%v] %s"
-		traceWarnStr = "%s %s\n[%.3fms] [rows:%v] %s"
-		traceErrStr  = "%s %s\n[%.3fms] [rows:%v] %s"
+		infoStr      = "%s [info] "
+		warnStr      = "%s [warn] "
+		errStr       = "%s [error] "
+		traceStr     = "%s [%.3fms] [rows:%v] %s"
+		traceWarnStr = "%s %s [%.3fms] [rows:%v] %s"
+		traceErrStr  = "%s %s [%.3fms] [rows:%v] %s"
 	)
 
 	if config.Colorful {
-		infoStr = Green + "%s\n" + Reset + Green + "[info] " + Reset
-		warnStr = BlueBold + "%s\n" + Reset + Magenta + "[warn] " + Reset
-		errStr = Magenta + "%s\n" + Reset + Red + "[error] " + Reset
-		traceStr = Green + "%s\n" + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
-		traceWarnStr = Green + "%s " + Yellow + "%s\n" + Reset + RedBold + "[%.3fms] " + Yellow + "[rows:%v]" + Magenta + " %s" + Reset
-		traceErrStr = RedBold + "%s " + MagentaBold + "%s\n" + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
+		infoStr = Green + "%s " + Reset + Green + "[info] " + Reset
+		warnStr = BlueBold + "%s " + Reset + Magenta + "[warn] " + Reset
+		errStr = Magenta + "%s " + Reset + Red + "[error] " + Reset
+		traceStr = Green + "%s " + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
+		traceWarnStr = Green + "%s " + Yellow + "%s " + Reset + RedBold + "[%.3fms] " + Yellow + "[rows:%v]" + Magenta + " %s" + Reset
+		traceErrStr = RedBold + "%s " + MagentaBold + "%s " + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
 	}
 
 	return &newLogger{
@@ -126,12 +126,12 @@ func New(writer Writer, config Config) Interface {
 	)
 
 	if config.Colorful {
-		infoStr = Green + "%s\n" + Reset + Green + "[info] " + Reset
-		warnStr = BlueBold + "%s\n" + Reset + Magenta + "[warn] " + Reset
-		errStr = Magenta + "%s\n" + Reset + Red + "[error] " + Reset
-		traceStr = Green + "%s\n" + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
-		traceWarnStr = Green + "%s " + Yellow + "%s\n" + Reset + RedBold + "[%.3fms] " + Yellow + "[rows:%v]" + Magenta + " %s" + Reset
-		traceErrStr = RedBold + "%s " + MagentaBold + "%s\n" + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
+		infoStr = Green + "%s " + Reset + Green + "[info] " + Reset
+		warnStr = BlueBold + "%s " + Reset + Magenta + "[warn] " + Reset
+		errStr = Magenta + "%s " + Reset + Red + "[error] " + Reset
+		traceStr = Green + "%s " + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
+		traceWarnStr = Green + "%s " + Yellow + "%s " + Reset + RedBold + "[%.3fms] " + Yellow + "[rows:%v]" + Magenta + " %s" + Reset
+		traceErrStr = RedBold + "%s " + MagentaBold + "%s " + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
 	}
 
 	return &logger{
@@ -193,7 +193,7 @@ func (n newLogger) Trace(ctx context.Context, begin time.Time, fc func() (sql st
 		}
 	case elapsed > n.SlowThreshold && n.SlowThreshold != 0 && n.LogLevel >= Warn:
 		sql, rows := fc()
-		slowLog := fmt.Sprintf("SLOW SQL >= %v", n.SlowThreshold)
+		slowLog := fmt.Sprintf("[Slow SQL >= %v]", n.SlowThreshold)
 		if rows == -1 {
 			n.inner.Warn(n.traceWarnStr, utils.FileWithLineNum(), slowLog, float64(elapsed.Nanoseconds())/1e6, "-", sql)
 		} else {
