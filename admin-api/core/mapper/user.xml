@@ -2,18 +2,35 @@
 <mapper namespace="UserMapper">
     <select id="selectUserPage" param="param">
         select
-            *
-        from sys_setting
-        where 1 = 1
-        {% if param.ConfigType != -1 %}
-        and config_type = {{param.ConfigType}}
-        {% endif %}
-        {% if param.ConfigName != "" %}
-        and config_name like concat('%', {{param.ConfigName}}, '%')
-        {% endif %}
-        {% if param.ConfigKey != "" %}
-        and config_key like concat('%', {{param.ConfigKey}}, '%')
-        {% endif %}
-        order by create_time
+            su.user_id,
+            su.dept_id,
+            su.nick_name,
+            su.user_name,
+            su.email,
+            su.avatar,
+            su.phone,
+            su.status,
+            su.create_time,
+            sd.dept_name
+        from sys_user su
+            left join sys_dept sd on sd.dept_id = su.dept_id
+        where su.del_flag = 1
+        {%- if param.Status %}
+            and su.status = {{param.Status}}
+        {%- endif %}
+        {%- if param.UserName != "" %}
+            and su.user_name like concat('%', {{param.UserName}}, '%')
+        {%- endif %}
+        {%- if param.Phone != "" %}
+            and su.phone like concat('%', {{param.Phone}}, '%')
+        {%- endif %}
+        {%- if param.DeptId and param.DeptId != 0 %}
+            and (su.dept_id = {{param.DeptId}}
+                or su.dept_id in (select t.dept_id from sys_dept t
+                                    where {{param.DeptId}} = any (string_to_array(t.ancestors, ',')::integer[])
+                   )
+            )
+        {%- endif %}
+        order by su.create_time desc
     </select>
 </mapper>

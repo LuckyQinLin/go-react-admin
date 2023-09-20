@@ -10,7 +10,6 @@ import (
 	"admin-api/internal/gin"
 	"admin-api/internal/gorm"
 	"admin-api/utils"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -303,42 +302,54 @@ func (u *UserService) UserLoginInfo(userId int64) (*response.UserLoginInfoRespon
 // Page 用户分页
 func (u *UserService) Page(param *request.UserPageRequest) (*response.PageData, *response.BusinessError) {
 	var (
-		buildCondition = func(param *request.UserPageRequest) func(db *gorm.DB) *gorm.DB {
-			return func(db *gorm.DB) *gorm.DB {
-				db.Model(&entity.User{}).
-					Alias("u").
-					Where("u.del_flag = 1")
-				if param.Status != nil {
-					db.Where("u.status = @status", sql.Named("status", param.Status))
-				}
-				if param.UserName != "" {
-					db.Where("u.user_name like concat('%', @userName, '%')", sql.Named("userName", param.UserName))
-				}
-				if param.Phone != "" {
-					db.Where("u.phone like concat('%', @phone, '%')", sql.Named("phone", param.Phone))
-				}
-				if param.DeptId != nil && *param.DeptId != 0 {
-					db.Where("(u.dept_id = @deptId or u.dept_id in (select t.dept_id from sys_dept t where @deptId = any (string_to_array(t.ancestors, ',')::integer[])))", sql.Named("deptId", param.DeptId))
-				}
-				return db
-			}
-		}
+		//buildCondition = func(param *request.UserPageRequest) func(db *gorm.DB) *gorm.DB {
+		//	return func(db *gorm.DB) *gorm.DB {
+		//		db.Model(&entity.User{}).
+		//			Alias("u").
+		//			Where("u.del_flag = 1")
+		//		if param.Status != nil {
+		//			db.Where("u.status = @status", sql.Named("status", param.Status))
+		//		}
+		//		if param.UserName != "" {
+		//			db.Where("u.user_name like concat('%', @userName, '%')", sql.Named("userName", param.UserName))
+		//		}
+		//		if param.Phone != "" {
+		//			db.Where("u.phone like concat('%', @phone, '%')", sql.Named("phone", param.Phone))
+		//		}
+		//		if param.DeptId != nil && *param.DeptId != 0 {
+		//			db.Where("(u.dept_id = @deptId or u.dept_id in (select t.dept_id from sys_dept t where @deptId = any (string_to_array(t.ancestors, ',')::integer[])))", sql.Named("deptId", param.DeptId))
+		//		}
+		//		return db
+		//	}
+		//}
 		list  []response.UserPageResponse
 		total int64
 		err   error
 	)
-	if err = core.DB.Scopes(buildCondition(param)).Count(&total).Debug().Error; err != nil {
-		core.Log.Error("统计用户数据失败, 异常信息如下：%s", err.Error())
+
+	if err = core.DB.Model(&entity.User{}).
+		TemplatePageQuery(
+			"user.selectUserPage",
+			param.Size,
+			param.Offset(),
+			param).
+		Page(&list, &total).Error; err != nil {
+		core.Log.Error("查询用户信息失败, 异常信息如下：%s", err.Error())
 		return nil, response.CustomBusinessError(response.Failed, "获取用户数据失败")
 	}
-	if err = core.DB.Scopes(buildCondition(param)).
-		Select("u.user_id,u.dept_id,u.nick_name,u.user_name,u.email,u.avatar,u.phone,u.status,u.create_time,d.dept_name").
-		Joins("left join sys_dept d on u.dept_id = d.dept_id").
-		Find(&list).
-		Error; err != nil {
-		core.Log.Error("查询用户数据失败, 异常信息如下：%s", err.Error())
-		return nil, response.CustomBusinessError(response.Failed, "获取用户数据失败")
-	}
+
+	//if err = core.DB.Scopes(buildCondition(param)).Count(&total).Debug().Error; err != nil {
+	//	core.Log.Error("统计用户数据失败, 异常信息如下：%s", err.Error())
+	//	return nil, response.CustomBusinessError(response.Failed, "获取用户数据失败")
+	//}
+	//if err = core.DB.Scopes(buildCondition(param)).
+	//	Select("u.user_id,u.dept_id,u.nick_name,u.user_name,u.email,u.avatar,u.phone,u.status,u.create_time,d.dept_name").
+	//	Joins("left join sys_dept d on u.dept_id = d.dept_id").
+	//	Find(&list).
+	//	Error; err != nil {
+	//	core.Log.Error("查询用户数据失败, 异常信息如下：%s", err.Error())
+	//	return nil, response.CustomBusinessError(response.Failed, "获取用户数据失败")
+	//}
 	return &response.PageData{
 		Total: total,
 		Page:  param.Page,
