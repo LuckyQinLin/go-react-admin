@@ -19,7 +19,6 @@ type (
 	// Router 路由
 	Router struct {
 		path        string                                  // 路径
-		handlers    []engine.FilterHandler                  // 中间件
 		controllers map[model.HttpMethod]engine.HandlerFunc // 控制器
 		children    []engine.IRouter                        // 下级路由节点
 	}
@@ -50,8 +49,12 @@ func (r *Routers) Use(handler ...engine.FilterHandler) engine.IRoutes {
 	return r
 }
 
-func (r *Routers) Match(path string) engine.IRouter {
+func (r *Routers) Match(path string, method string) engine.IRouter {
 	return nil
+}
+
+func (r *Routers) Filter() engine.FilterChains {
+	return r.globalHandler
 }
 
 // =====================================================================================================================
@@ -62,7 +65,6 @@ func NewRouter(path string) engine.IRouter {
 		path:        path,
 		controllers: make(map[model.HttpMethod]engine.HandlerFunc),
 		children:    make([]engine.IRouter, 0),
-		handlers:    make(engine.FilterChains, 0),
 	}
 }
 
@@ -70,6 +72,13 @@ func NewRouter(path string) engine.IRouter {
 func (r *Router) request(method model.HttpMethod, handler engine.HandlerFunc) engine.IRouter {
 	r.controllers[method] = handler
 	return r
+}
+
+func (r *Router) Handler(method model.HttpMethod, ctx engine.IContext) engine.HandlerFunc {
+	if h, ok := r.controllers[method]; ok {
+		h(ctx)
+	}
+	return r.controllers[method]
 }
 
 // Push 添加下级节点
