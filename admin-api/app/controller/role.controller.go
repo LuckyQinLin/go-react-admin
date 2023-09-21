@@ -6,6 +6,7 @@ import (
 	"admin-api/app/models/response"
 	"admin-api/app/models/vo"
 	"admin-api/app/service"
+	"admin-api/core"
 	"admin-api/internal/gin"
 	"admin-api/utils"
 	"github.com/xuri/excelize/v2"
@@ -82,6 +83,7 @@ func (r *RoleController) RoleUpdate(ctx *gin.Context) {
 	)
 	claims, operate = r.Parse(ctx, "角色修改", vo.Update, nil)
 	if err = ctx.ShouldBind(&param); err != nil {
+		core.Log.Warn("请求参数错误：%s", err.Error())
 		r.Failed(ctx, operate, response.Fail(response.RequestParamError))
 		return
 	}

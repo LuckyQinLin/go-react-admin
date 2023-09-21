@@ -131,3 +131,4 @@ SELECT setval('sys_dict_type_dict_id_seq', (SELECT max(dict_id) FROM sys_dict_ty
 SELECT setval('sys_dict_data_data_id_seq', (SELECT max(data_id) FROM sys_dict_data));
 SELECT setval('sys_setting_config_id_seq', (SELECT max(config_id) FROM sys_setting));
 SELECT setval('sys_notice_notice_id_seq', (SELECT max(notice_id) FROM sys_notice));
+SELECT setval('sys_operate_oper_id_seq', (SELECT max(oper_id) FROM sys_operate));
