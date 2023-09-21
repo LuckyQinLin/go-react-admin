@@ -1,7 +1,7 @@
 // DeptTreeProp 部门树
 interface DeptTreeProp {
     key: number;
-    title: string;
+    title: string | React.ReactElement;
     children: DeptTreeProp[];
 }
 

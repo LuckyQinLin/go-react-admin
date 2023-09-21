@@ -11,10 +11,9 @@ type UserLoginRequest struct {
 // UserPageRequest 用户分页查询
 type UserPageRequest struct {
 	CommonPage
-	DeptId   *int64 `json:"deptId"`   // 部门
-	Status   *int   `json:"status"`   // 状态
-	UserName string `json:"userName"` // 用户名称
-	Phone    string `json:"phone"`    // 手机号
+	DeptId *int64 `json:"deptId"` // 部门
+	Status *int   `json:"status"` // 状态
+	Name   string `json:"name"`   // 用户名称/手机号
 }
 
 // UserCreateRequest 用户创建

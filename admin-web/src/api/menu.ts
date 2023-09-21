@@ -60,7 +60,7 @@ export const menuDelete = (menuId: number): Promise<string> => {
 }
 
 // menuDelete 菜单删除
-export const userRouter = (roleId?: number): Promise<UserRouterProp[]> => {
+export const userPageRouter = (roleId?: number): Promise<UserRouterProp[]> => {
     return https.request({
         url: '/menu/router',
         method: 'get',

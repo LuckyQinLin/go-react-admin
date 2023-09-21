@@ -1,7 +1,9 @@
 import {CHANGE_LONGIN_STATUS, CHANGE_MENU_STATUS, CLEAN_USER_STORE, UserTypes} from "./action";
-import {MenuProps} from "antd";
+// import {MenuProps} from "antd";
+// import {IRouteObject} from "@/router/modules.ts";
+import {UserRouterProp} from "@/pages/system/menu/modules.ts";
 
-type MenuItem = Required<MenuProps>['items'][number];
+// type MenuItem = Required<MenuProps>['items'][number];
 
 export interface UserState {
 	token?: string;
@@ -9,7 +11,7 @@ export interface UserState {
 	user?: UserProp; // 用户信息
 	roles?: string[]; // 角色
 	permissions?: string[]; // 资源
-	menus?: MenuItem[]; // 菜单
+	userRouter?: UserRouterProp[]; // 菜单
 }
 
 export interface PermInfo {

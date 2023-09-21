@@ -18,11 +18,9 @@
         {%- if param.Status %}
             and su.status = {{param.Status}}
         {%- endif %}
-        {%- if param.UserName != "" %}
-            and su.user_name like concat('%', {{param.UserName}}, '%')
-        {%- endif %}
-        {%- if param.Phone != "" %}
-            and su.phone like concat('%', {{param.Phone}}, '%')
+        {%- if param.Name != "" %}
+            and (su.user_name like concat('%', '{{param.Name}}', '%')
+                or su.phone like concat('%', '{{param.Name}}', '%'))
         {%- endif %}
         {%- if param.DeptId and param.DeptId != 0 %}
             and (su.dept_id = {{param.DeptId}}

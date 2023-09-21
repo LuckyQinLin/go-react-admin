@@ -26,7 +26,7 @@ export const routerBuild = (data: UserRouterProp[]): IRouteObject[] => {
             currentRouter.children = routerBuild(item.children);
         }
         return currentRouter;
-    }).sort((a, b) => (a.meta?.sort ? a.meta.sort : 0) - (b.meta?.sort ? b.meta.sort : 0));
+    }).sort((a, b) => (a.meta?.sort ?? 0) - (b.meta?.sort ?? 0));
 }
 
 /**
@@ -45,7 +45,7 @@ export const routerBuildMenu = (data: IRouteObject[]): MenuItem[] => {
         const isRoot = isRootRouter(item);
         if (isRoot) {
             const info = isRoot && item.children ? item.children[0] : item;
-            const key = info.meta?.key ? info.meta?.key : info.path;
+            const key = info.meta?.key ?? info.path;
             const title = <Link to={`${info.path}`}>{info.meta?.title}</Link>;
             const icon = info.meta?.icon ? <IconFont type={info.meta.icon} /> : undefined;
             return buildMenuItem(
@@ -55,7 +55,7 @@ export const routerBuildMenu = (data: IRouteObject[]): MenuItem[] => {
             )
         } else {
             const label = existChildren(item) ? item.meta?.title! : <Link to={`${item.path}`}>{item.meta?.title}</Link>
-            const key = item.meta?.key ? item.meta?.key : item.path;
+            const key = item.meta?.key ?? item.path;
             const icon = item.meta?.icon ? <IconFont type={item.meta.icon} /> : undefined;
             const children = existChildren(item) ? routerBuildMenu(item.children!) : undefined;
             return buildMenuItem(
