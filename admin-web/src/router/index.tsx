@@ -55,13 +55,11 @@ const Router: React.FC = () => {
     }
 
     const routes = useMemo(() => {
-        debugger;
         let router: IRouteObject[] = permissions?.length === 1 && permissions[0] === '*:*:*' ? asyncRoutes : (userRouter ? routerBuild(userRouter) : constantRouter);
         return [...constantRouter, ...router, {path: '*', element: <Navigate to="/exception/404" />}]
     }, [userRouter])
 
     useEffect(() => {
-        console.log("getUserInfo !!!")
         if (token) {
             getUserInfo();
         }
