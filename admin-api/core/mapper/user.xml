@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper namespace="UserMapper">
+    <select id="selectUserPage" param="param">
+        select
+            su.user_id,
+            su.dept_id,
+            su.nick_name,
+            su.user_name,
+            su.email,
+            su.avatar,
+            su.phone,
+            su.status,
+            su.create_time,
+            sd.dept_name
+        from sys_user su
+            left join sys_dept sd on sd.dept_id = su.dept_id
+        where su.del_flag = 1
+        {%- if param.Status %}
+            and su.status = {{param.Status}}
+        {%- endif %}
+        {%- if param.Name != "" %}
+            and (su.user_name like concat('%', '{{param.Name}}', '%')
+                or su.phone like concat('%', '{{param.Name}}', '%'))
+        {%- endif %}
+        {%- if param.DeptId and param.DeptId != 0 %}
+            and (su.dept_id = {{param.DeptId}}
+                or su.dept_id in (select t.dept_id from sys_dept t
+                                    where {{param.DeptId}} = any (string_to_array(t.ancestors, ',')::integer[])
+                   )
+            )
+        {%- endif %}
+        order by su.create_time desc
+    </select>
+</mapper>

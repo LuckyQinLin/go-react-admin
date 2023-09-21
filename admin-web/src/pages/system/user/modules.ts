@@ -6,8 +6,7 @@ interface UserPageQueryProp {
     size:      number;
     deptId?:   number; // 部门
     status?:   number; // 用户状态
-    userName?: string; // 用户名称
-    phone?:    string; // 手机号
+    name?:     string; // 用户名称/手机号
 }
 
 // UserTableProp 用户表属性

@@ -5,6 +5,7 @@
 package gin
 
 import (
+	"admin-api/internal/logger"
 	"html/template"
 	"net/http"
 	"os"
@@ -12,27 +13,27 @@ import (
 )
 
 func BenchmarkOneRoute(B *testing.B) {
-	router := New()
+	router := New(logger.Default())
 	router.GET("/ping", func(c *Context) {})
 	runRequest(B, router, "GET", "/ping")
 }
 
 func BenchmarkRecoveryMiddleware(B *testing.B) {
-	router := New()
+	router := New(logger.Default())
 	router.Use(Recovery())
 	router.GET("/", func(c *Context) {})
 	runRequest(B, router, "GET", "/")
 }
 
 func BenchmarkLoggerMiddleware(B *testing.B) {
-	router := New()
+	router := New(logger.Default())
 	router.Use(LoggerWithWriter(newMockWriter()))
 	router.GET("/", func(c *Context) {})
 	runRequest(B, router, "GET", "/")
 }
 
 func BenchmarkManyHandlers(B *testing.B) {
-	router := New()
+	router := New(logger.Default())
 	router.Use(Recovery(), LoggerWithWriter(newMockWriter()))
 	router.Use(func(c *Context) {})
 	router.Use(func(c *Context) {})
@@ -42,14 +43,14 @@ func BenchmarkManyHandlers(B *testing.B) {
 
 func Benchmark5Params(B *testing.B) {
 	DefaultWriter = os.Stdout
-	router := New()
+	router := New(logger.Default())
 	router.Use(func(c *Context) {})
 	router.GET("/param/:param1/:params2/:param3/:param4/:param5", func(c *Context) {})
 	runRequest(B, router, "GET", "/param/path/to/parameter/john/12345")
 }
 
 func BenchmarkOneRouteJSON(B *testing.B) {
-	router := New()
+	router := New(logger.Default())
 	data := struct {
 		Status string `json:"status"`
 	}{"ok"}
@@ -60,7 +61,7 @@ func BenchmarkOneRouteJSON(B *testing.B) {
 }
 
 func BenchmarkOneRouteHTML(B *testing.B) {
-	router := New()
+	router := New(logger.Default())
 	t := template.Must(template.New("index").Parse(`
 		<html><body><h1>{{.}}</h1></body></html>`))
 	router.SetHTMLTemplate(t)
@@ -72,7 +73,7 @@ func BenchmarkOneRouteHTML(B *testing.B) {
 }
 
 func BenchmarkOneRouteSet(B *testing.B) {
-	router := New()
+	router := New(logger.Default())
 	router.GET("/ping", func(c *Context) {
 		c.Set("key", "value")
 	})
@@ -80,7 +81,7 @@ func BenchmarkOneRouteSet(B *testing.B) {
 }
 
 func BenchmarkOneRouteString(B *testing.B) {
-	router := New()
+	router := New(logger.Default())
 	router.GET("/text", func(c *Context) {
 		c.String(http.StatusOK, "this is a plain text")
 	})
@@ -88,26 +89,26 @@ func BenchmarkOneRouteString(B *testing.B) {
 }
 
 func BenchmarkManyRoutesFist(B *testing.B) {
-	router := New()
+	router := New(logger.Default())
 	router.Any("/ping", func(c *Context) {})
 	runRequest(B, router, "GET", "/ping")
 }
 
 func BenchmarkManyRoutesLast(B *testing.B) {
-	router := New()
+	router := New(logger.Default())
 	router.Any("/ping", func(c *Context) {})
 	runRequest(B, router, "OPTIONS", "/ping")
 }
 
 func Benchmark404(B *testing.B) {
-	router := New()
+	router := New(logger.Default())
 	router.Any("/something", func(c *Context) {})
 	router.NoRoute(func(c *Context) {})
 	runRequest(B, router, "GET", "/ping")
 }
 
 func Benchmark404Many(B *testing.B) {
-	router := New()
+	router := New(logger.Default())
 	router.GET("/", func(c *Context) {})
 	router.GET("/path/to/something", func(c *Context) {})
 	router.GET("/post/:id", func(c *Context) {})

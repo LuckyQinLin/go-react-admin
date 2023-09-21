@@ -1,7 +1,7 @@
-import {Button, Col, Input, message, Modal, Row, Space, Switch, Table, Tree} from "antd";
+import {Button, Col, Divider, Input, message, Modal, Row, Select, Space, Switch, Table, Tree} from "antd";
 import {useRequest} from "ahooks";
 import {deptTree} from "@/api/dept.ts";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {DeptTreeProp} from "@/pages/system/dept/modules.ts";
 import {UserDrawerProp, UserPageQueryProp, UserTableProp} from "@/pages/system/user/modules.ts";
 import {userDelete, userPage, userStatus} from "@/api/user.ts";
@@ -74,7 +74,7 @@ const SystemUserPage = () => {
     ]
 
 
-    const [searchValue] = useState('');
+    const [searchValue, setSearchValue] = useState('');
     const [tree, setTree] = useState<DeptTreeProp[]>([]);
     const [total, setTotal] = useState<number>(0);
     const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
@@ -161,19 +161,72 @@ const SystemUserPage = () => {
         });
     }
 
+    const getParentKey = (key: React.Key, tree: DeptTreeProp[]): React.Key => {
+        let parentKey: React.Key;
+        for (let i = 0; i < tree.length; i++) {
+            const node = tree[i];
+            if (node.children) {
+                if (node.children.some((item) => item.key === key)) {
+                    parentKey = node.key;
+                } else if (getParentKey(key, node.children)) {
+                    parentKey = getParentKey(key, node.children);
+                }
+            }
+        }
+        return parentKey!;
+    };
+
+    const treeData = useMemo(() => {
+        const loop = (data: DeptTreeProp[]): DeptTreeProp[] =>
+            data.map((item) => {
+                const strTitle = item.title as string;
+                const index = strTitle.indexOf(searchValue);
+                const beforeStr = strTitle.substring(0, index);
+                const afterStr = strTitle.slice(index + searchValue.length);
+                const title = index > -1 ? (
+                        <span>
+                            {beforeStr}
+                            <span style={{color: "#f50"}}>{searchValue}</span>
+                            {afterStr}
+                        </span>
+                    ) : (
+                        <span>{strTitle}</span>
+                    );
+                if (item.children) {
+                    return { title, key: item.key, children: loop(item.children) } as DeptTreeProp;
+                }
+                return {
+                    title,
+                    key: item.key,
+                } as DeptTreeProp;
+            });
+        return loop(tree);
+    }, [searchValue]);
+
+
     useEffect(() => {
-        loadTree.run();
         loadUser.run(pageQuery);
     }, [pageQuery])
 
+    useEffect(() => {
+        loadTree.run();
+        loadUser.run(pageQuery);
+    }, []);
+
     return <Row gutter={[16, 16]} style={{display: "flex", flexDirection: "row", flexFlow: "nowrap"}}>
         <Col flex="250px">
-            <Input placeholder="输入部门名称搜索" value={searchValue} style={{marginBottom: 10}} />
+            <Input
+                allowClear
+                placeholder="输入部门名称搜索"
+                value={searchValue}
+                style={{marginBottom: 10}}
+                onChange={e => setSearchValue(e.target.value)}
+            />
             {
                 tree.length > 0 && <Tree
                     defaultExpandAll={true}
-                    defaultExpandParent
-                    treeData={tree}
+                    defaultExpandParent={true}
+                    treeData={searchValue === "" ? tree : treeData}
                     onSelect={selectedRowKeys => setPageQuery({...pageQuery, deptId: selectedRowKeys[0] as number})}
                 />
             }
@@ -183,6 +236,20 @@ const SystemUserPage = () => {
                 <Button type="primary" onClick={() => openDrawer('create')}>增加</Button>
                 <Button type="primary" danger onClick={() => deleteRoleHandler()}>删除</Button>
                 <Button type="primary">导入</Button>
+                <Divider type="vertical" />
+                <Select
+                    onChange={e => setPageQuery({...pageQuery, status: e})}
+                    placeholder="选择用户状态"
+                    defaultValue={-1}
+                    style={{ width: 180 }}
+                    allowClear
+                    options={[
+                        { value: -1, label: '全部' },
+                        { value: 1, label: '正常' },
+                        { value: 0, label: '停用' }
+                    ]}
+                />
+                <Input placeholder="输入手机号/邮箱搜索" onChange={e => setPageQuery({...pageQuery, name: e.target.value})} />
             </Space>
             <Table
                 bordered

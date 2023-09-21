@@ -5,6 +5,7 @@
 package gin
 
 import (
+	"admin-api/internal/logger"
 	"crypto/tls"
 	"fmt"
 	"html/template"
@@ -33,7 +34,7 @@ func setupHTMLFiles(t *testing.T, mode string, tls bool, loadMethod func(*Engine
 
 	var router *Engine
 	captureOutput(t, func() {
-		router = New()
+		router = New(logger.Default())
 		router.Delims("{[{", "}]}")
 		router.SetFuncMap(template.FuncMap{
 			"formatAsDate": formatAsDate,
@@ -85,7 +86,7 @@ func TestH2c(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	r := Default()
+	r := Default(logger.Default())
 	r.UseH2C = true
 	r.GET("/", func(c *Context) {
 		c.String(200, "<h1>Hello world</h1>")
@@ -210,7 +211,7 @@ func init() {
 }
 
 func TestCreateEngine(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	assert.Equal(t, "/", router.basePath)
 	assert.Equal(t, router.engine, router)
 	assert.Empty(t, router.Handlers)
@@ -324,7 +325,7 @@ func TestLoadHTMLFilesFuncMap(t *testing.T) {
 }
 
 func TestAddRoute(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	router.addRoute("GET", "/", HandlersChain{func(_ *Context) {}})
 
 	assert.Len(t, router.trees, 1)
@@ -342,7 +343,7 @@ func TestAddRoute(t *testing.T) {
 }
 
 func TestAddRouteFails(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	assert.Panics(t, func() { router.addRoute("", "/", HandlersChain{func(_ *Context) {}}) })
 	assert.Panics(t, func() { router.addRoute("GET", "a", HandlersChain{func(_ *Context) {}}) })
 	assert.Panics(t, func() { router.addRoute("GET", "/", HandlersChain{}) })
@@ -354,7 +355,7 @@ func TestAddRouteFails(t *testing.T) {
 }
 
 func TestCreateDefaultRouter(t *testing.T) {
-	router := Default()
+	router := Default(logger.Default())
 	assert.Len(t, router.Handlers, 2)
 }
 
@@ -362,7 +363,7 @@ func TestNoRouteWithoutGlobalHandlers(t *testing.T) {
 	var middleware0 HandlerFunc = func(c *Context) {}
 	var middleware1 HandlerFunc = func(c *Context) {}
 
-	router := New()
+	router := New(logger.Default())
 
 	router.NoRoute(middleware0)
 	assert.Nil(t, router.Handlers)
@@ -385,7 +386,7 @@ func TestNoRouteWithGlobalHandlers(t *testing.T) {
 	var middleware1 HandlerFunc = func(c *Context) {}
 	var middleware2 HandlerFunc = func(c *Context) {}
 
-	router := New()
+	router := New(logger.Default())
 	router.Use(middleware2)
 
 	router.NoRoute(middleware0)
@@ -415,7 +416,7 @@ func TestNoMethodWithoutGlobalHandlers(t *testing.T) {
 	var middleware0 HandlerFunc = func(c *Context) {}
 	var middleware1 HandlerFunc = func(c *Context) {}
 
-	router := New()
+	router := New(logger.Default())
 
 	router.NoMethod(middleware0)
 	assert.Empty(t, router.Handlers)
@@ -441,7 +442,7 @@ func TestNoMethodWithGlobalHandlers(t *testing.T) {
 	var middleware1 HandlerFunc = func(c *Context) {}
 	var middleware2 HandlerFunc = func(c *Context) {}
 
-	router := New()
+	router := New(logger.Default())
 	router.Use(middleware2)
 
 	router.NoMethod(middleware0)
@@ -476,7 +477,7 @@ func compareFunc(t *testing.T, a, b any) {
 }
 
 func TestListOfRoutes(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	router.GET("/favicon.ico", handlerTest1)
 	router.GET("/", handlerTest1)
 	group := router.Group("/users")
@@ -518,7 +519,7 @@ func TestListOfRoutes(t *testing.T) {
 }
 
 func TestEngineHandleContext(t *testing.T) {
-	r := New()
+	r := New(logger.Default())
 	r.GET("/", func(c *Context) {
 		c.Request.URL.Path = "/v2"
 		r.HandleContext(c)
@@ -539,7 +540,7 @@ func TestEngineHandleContextManyReEntries(t *testing.T) {
 
 	var handlerCounter, middlewareCounter int64
 
-	r := New()
+	r := New(logger.Default())
 	r.Use(func(c *Context) {
 		atomic.AddInt64(&middlewareCounter, 1)
 	})
@@ -572,7 +573,7 @@ func TestEngineHandleContextManyReEntries(t *testing.T) {
 }
 
 func TestPrepareTrustedCIRDsWith(t *testing.T) {
-	r := New()
+	r := New(logger.Default())
 
 	// valid ipv4 cidr
 	{

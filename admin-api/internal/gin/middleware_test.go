@@ -5,6 +5,7 @@
 package gin
 
 import (
+	"admin-api/internal/logger"
 	"errors"
 	"net/http"
 	"strings"
@@ -16,7 +17,7 @@ import (
 
 func TestMiddlewareGeneralCase(t *testing.T) {
 	signature := ""
-	router := New()
+	router := New(logger.Default())
 	router.Use(func(c *Context) {
 		signature += "A"
 		c.Next()
@@ -44,7 +45,7 @@ func TestMiddlewareGeneralCase(t *testing.T) {
 
 func TestMiddlewareNoRoute(t *testing.T) {
 	signature := ""
-	router := New()
+	router := New(logger.Default())
 	router.Use(func(c *Context) {
 		signature += "A"
 		c.Next()
@@ -80,7 +81,7 @@ func TestMiddlewareNoRoute(t *testing.T) {
 
 func TestMiddlewareNoMethodEnabled(t *testing.T) {
 	signature := ""
-	router := New()
+	router := New(logger.Default())
 	router.HandleMethodNotAllowed = true
 	router.Use(func(c *Context) {
 		signature += "A"
@@ -117,7 +118,7 @@ func TestMiddlewareNoMethodEnabled(t *testing.T) {
 
 func TestMiddlewareNoMethodDisabled(t *testing.T) {
 	signature := ""
-	router := New()
+	router := New(logger.Default())
 
 	// NoMethod disabled
 	router.HandleMethodNotAllowed = false
@@ -158,7 +159,7 @@ func TestMiddlewareNoMethodDisabled(t *testing.T) {
 
 func TestMiddlewareAbort(t *testing.T) {
 	signature := ""
-	router := New()
+	router := New(logger.Default())
 	router.Use(func(c *Context) {
 		signature += "A"
 	})
@@ -184,7 +185,7 @@ func TestMiddlewareAbort(t *testing.T) {
 
 func TestMiddlewareAbortHandlersChainAndNext(t *testing.T) {
 	signature := ""
-	router := New()
+	router := New(logger.Default())
 	router.Use(func(c *Context) {
 		signature += "A"
 		c.Next()
@@ -208,7 +209,7 @@ func TestMiddlewareAbortHandlersChainAndNext(t *testing.T) {
 func TestMiddlewareFailHandlersChain(t *testing.T) {
 	// SETUP
 	signature := ""
-	router := New()
+	router := New(logger.Default())
 	router.Use(func(context *Context) {
 		signature += "A"
 		context.AbortWithError(http.StatusInternalServerError, errors.New("foo")) //nolint: errcheck
@@ -227,7 +228,7 @@ func TestMiddlewareFailHandlersChain(t *testing.T) {
 }
 
 func TestMiddlewareWrite(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	router.Use(func(c *Context) {
 		c.String(http.StatusBadRequest, "hola\n")
 	})

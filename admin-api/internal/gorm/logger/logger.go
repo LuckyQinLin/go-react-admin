@@ -1,6 +1,7 @@
 package logger
 
 import (
+	logger2 "admin-api/internal/logger"
 	"context"
 	"errors"
 	"fmt"
@@ -82,6 +83,37 @@ var (
 	Recorder = traceRecorder{Interface: Default, BeginAt: time.Now()}
 )
 
+func NewLogger(log logger2.ILogger, config Config) Interface {
+	var (
+		infoStr      = "%s [info] "
+		warnStr      = "%s [warn] "
+		errStr       = "%s [error] "
+		traceStr     = "%s [%.3fms] [rows:%v] %s"
+		traceWarnStr = "%s %s [%.3fms] [rows:%v] %s"
+		traceErrStr  = "%s %s [%.3fms] [rows:%v] %s"
+	)
+
+	if config.Colorful {
+		infoStr = Green + "%s " + Reset + Green + "[info] " + Reset
+		warnStr = BlueBold + "%s " + Reset + Magenta + "[warn] " + Reset
+		errStr = Magenta + "%s " + Reset + Red + "[error] " + Reset
+		traceStr = Green + "%s " + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
+		traceWarnStr = Green + "%s " + Yellow + "%s " + Reset + RedBold + "[%.3fms] " + Yellow + "[rows:%v]" + Magenta + " %s" + Reset
+		traceErrStr = RedBold + "%s " + MagentaBold + "%s " + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
+	}
+
+	return &newLogger{
+		inner:        log,
+		Config:       config,
+		infoStr:      infoStr,
+		warnStr:      warnStr,
+		errStr:       errStr,
+		traceStr:     traceStr,
+		traceWarnStr: traceWarnStr,
+		traceErrStr:  traceErrStr,
+	}
+}
+
 // New initialize logger
 func New(writer Writer, config Config) Interface {
 	var (
@@ -94,12 +126,12 @@ func New(writer Writer, config Config) Interface {
 	)
 
 	if config.Colorful {
-		infoStr = Green + "%s\n" + Reset + Green + "[info] " + Reset
-		warnStr = BlueBold + "%s\n" + Reset + Magenta + "[warn] " + Reset
-		errStr = Magenta + "%s\n" + Reset + Red + "[error] " + Reset
-		traceStr = Green + "%s\n" + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
-		traceWarnStr = Green + "%s " + Yellow + "%s\n" + Reset + RedBold + "[%.3fms] " + Yellow + "[rows:%v]" + Magenta + " %s" + Reset
-		traceErrStr = RedBold + "%s " + MagentaBold + "%s\n" + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
+		infoStr = Green + "%s " + Reset + Green + "[info] " + Reset
+		warnStr = BlueBold + "%s " + Reset + Magenta + "[warn] " + Reset
+		errStr = Magenta + "%s " + Reset + Red + "[error] " + Reset
+		traceStr = Green + "%s " + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
+		traceWarnStr = Green + "%s " + Yellow + "%s " + Reset + RedBold + "[%.3fms] " + Yellow + "[rows:%v]" + Magenta + " %s" + Reset
+		traceErrStr = RedBold + "%s " + MagentaBold + "%s " + Reset + Yellow + "[%.3fms] " + BlueBold + "[rows:%v]" + Reset + " %s"
 	}
 
 	return &logger{
@@ -112,6 +144,77 @@ func New(writer Writer, config Config) Interface {
 		traceWarnStr: traceWarnStr,
 		traceErrStr:  traceErrStr,
 	}
+}
+
+type newLogger struct {
+	inner logger2.ILogger
+	Config
+	infoStr, warnStr, errStr            string
+	traceStr, traceErrStr, traceWarnStr string
+}
+
+func (n *newLogger) LogMode(level LogLevel) Interface {
+	newlogger := *n
+	newlogger.LogLevel = level
+	return &newlogger
+}
+
+func (n newLogger) Info(ctx context.Context, msg string, data ...any) {
+	if n.LogLevel >= Info {
+		n.inner.Info(n.infoStr+msg, append([]interface{}{utils.FileWithLineNum()}, data...)...)
+	}
+}
+
+func (n newLogger) Warn(ctx context.Context, msg string, data ...any) {
+	if n.LogLevel >= Warn {
+		n.inner.Warn(n.warnStr+msg, append([]interface{}{utils.FileWithLineNum()}, data...)...)
+	}
+}
+
+func (n newLogger) Error(ctx context.Context, msg string, data ...any) {
+	if n.LogLevel >= Error {
+		n.inner.Error(n.errStr+msg, append([]interface{}{utils.FileWithLineNum()}, data...)...)
+	}
+}
+
+func (n newLogger) Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error) {
+	if n.LogLevel <= Silent {
+		return
+	}
+
+	elapsed := time.Since(begin)
+	switch {
+	case err != nil && n.LogLevel >= Error && (!errors.Is(err, ErrRecordNotFound) || !n.IgnoreRecordNotFoundError):
+		sql, rows := fc()
+		if rows == -1 {
+			n.inner.Error(n.traceErrStr, utils.FileWithLineNum(), err, float64(elapsed.Nanoseconds())/1e6, "-", sql)
+		} else {
+			n.inner.Error(n.traceErrStr, utils.FileWithLineNum(), err, float64(elapsed.Nanoseconds())/1e6, rows, sql)
+		}
+	case elapsed > n.SlowThreshold && n.SlowThreshold != 0 && n.LogLevel >= Warn:
+		sql, rows := fc()
+		slowLog := fmt.Sprintf("[Slow SQL >= %v]", n.SlowThreshold)
+		if rows == -1 {
+			n.inner.Warn(n.traceWarnStr, utils.FileWithLineNum(), slowLog, float64(elapsed.Nanoseconds())/1e6, "-", sql)
+		} else {
+			n.inner.Warn(n.traceWarnStr, utils.FileWithLineNum(), slowLog, float64(elapsed.Nanoseconds())/1e6, rows, sql)
+		}
+	case n.LogLevel == Info:
+		sql, rows := fc()
+		if rows == -1 {
+			n.inner.Info(n.traceStr, utils.FileWithLineNum(), float64(elapsed.Nanoseconds())/1e6, "-", sql)
+		} else {
+			n.inner.Info(n.traceStr, utils.FileWithLineNum(), float64(elapsed.Nanoseconds())/1e6, rows, sql)
+		}
+	}
+}
+
+// Trace print sql message
+func (n newLogger) ParamsFilter(ctx context.Context, sql string, params ...interface{}) (string, []interface{}) {
+	if n.Config.ParameterizedQueries {
+		return sql, nil
+	}
+	return sql, params
 }
 
 type logger struct {

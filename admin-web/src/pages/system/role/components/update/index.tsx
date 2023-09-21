@@ -24,7 +24,7 @@ const RoleUpdateDrawer: React.FC<RoleUpdateDrawerProp> = ({roleId, visible, clos
 
     const [selectKeys, setSelectKeys] = useState<number[]>([]);
     const [expendKeys, setExpendKeys] = useState<number[]>([]);
-    const [linkedFlag, setLinkedFlag] = useState<boolean>(false);
+    const [linkedFlag, setLinkedFlag] = useState<boolean>(true);
     const [form] = Form.useForm<RoleCreateFormProp>();
     const [tree, setTree] = useState<MenuTreeProp[]>([])
     const [treeSetting, setTreeSetting] = useState<number[]>([]);
@@ -59,6 +59,10 @@ const RoleUpdateDrawer: React.FC<RoleUpdateDrawerProp> = ({roleId, visible, clos
         setSelectKeys(data.includes(2) ? ids : [])
         setTreeSetting(values as number[]);
     }
+
+    const onCheck = (value: { checked: React.Key[]; halfChecked: React.Key[]; } | React.Key[]) => {
+        setSelectKeys('checked' in value ? (value.checked as number[]) : (value as React.Key[] as number[]));
+    };
 
     useEffect(() => {
         if (visible && roleId) {
@@ -124,7 +128,7 @@ const RoleUpdateDrawer: React.FC<RoleUpdateDrawerProp> = ({roleId, visible, clos
                             expandedKeys={expendKeys}
                             checkStrictly={linkedFlag}
                             style={{border: '1px solid #d5d5d5', borderRadius: 5, padding: '8px 5px'}}
-                            onCheck={(e) => setSelectKeys(e as React.Key[] as number[])}
+                            onCheck={onCheck}
                             onExpand={(e) => setExpendKeys(e as number[])}
                         />
                     </Spin>

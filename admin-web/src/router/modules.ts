@@ -3,8 +3,10 @@ import lazyLoad from "@/router/lazyLoad.tsx";
 
 const Layout = lazyLoad(() => import("@/pages/layout"));
 const HomePage = lazyLoad(() => import("@/pages/home"));
+
 const LoggerOperatePage = lazyLoad(() => import("@/pages/logger/operate"));
 const LoggerLoginPage = lazyLoad(() => import("@/pages/logger/login"));
+
 const SystemUserPage = lazyLoad(() => import("@/pages/system/user"));
 const SystemRolePage = lazyLoad(() => import("@/pages/system/role"));
 const SystemMenuPage = lazyLoad(() => import("@/pages/system/menu"));

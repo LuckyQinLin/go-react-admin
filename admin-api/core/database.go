@@ -9,6 +9,7 @@ import (
 	utils2 "admin-api/internal/gorm/utils"
 	"admin-api/utils"
 	"embed"
+	"time"
 )
 
 // GetTable 获取模式下的表名
@@ -52,8 +53,13 @@ func InitDb() {
 			SingularTable: true,
 		},
 		// 配置日志输出级别
-		Logger: logger.Default.LogMode(logger.Info),
-		Mapper: utils2.ReadTemplate(tpl, "role", "config", "menu"),
+		Logger: logger.NewLogger(Log, logger.Config{
+			SlowThreshold:             300 * time.Millisecond,
+			LogLevel:                  logger.Info,
+			IgnoreRecordNotFoundError: false,
+			Colorful:                  true,
+		}),
+		Mapper: utils2.ReadTemplate(tpl, "role", "config", "menu", "user"),
 	}); err != nil {
 		Log.Error("连接数据库失败: %s", err.Error())
 		panic(err.Error())

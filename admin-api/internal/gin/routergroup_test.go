@@ -5,6 +5,7 @@
 package gin
 
 import (
+	"admin-api/internal/logger"
 	"net/http"
 	"testing"
 
@@ -16,7 +17,7 @@ func init() {
 }
 
 func TestRouterGroupBasic(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	group := router.Group("/hola", func(c *Context) {})
 	group.Use(func(c *Context) {})
 
@@ -43,7 +44,7 @@ func TestRouterGroupBasicHandle(t *testing.T) {
 }
 
 func performRequestInGroup(t *testing.T, method string) {
-	router := New()
+	router := New(logger.Default())
 	v1 := router.Group("v1", func(c *Context) {})
 	assert.Equal(t, "/v1", v1.BasePath())
 
@@ -90,7 +91,7 @@ func performRequestInGroup(t *testing.T, method string) {
 }
 
 func TestRouterGroupInvalidStatic(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	assert.Panics(t, func() {
 		router.Static("/path/:param", "/")
 	})
@@ -101,7 +102,7 @@ func TestRouterGroupInvalidStatic(t *testing.T) {
 }
 
 func TestRouterGroupInvalidStaticFile(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	assert.Panics(t, func() {
 		router.StaticFile("/path/:param", "favicon.ico")
 	})
@@ -112,7 +113,7 @@ func TestRouterGroupInvalidStaticFile(t *testing.T) {
 }
 
 func TestRouterGroupInvalidStaticFileFS(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	assert.Panics(t, func() {
 		router.StaticFileFS("/path/:param", "favicon.ico", Dir(".", false))
 	})
@@ -127,7 +128,7 @@ func TestRouterGroupTooManyHandlers(t *testing.T) {
 		panicValue = "too many handlers"
 		maximumCnt = abortIndex
 	)
-	router := New()
+	router := New(logger.Default())
 	handlers1 := make([]HandlerFunc, maximumCnt-1)
 	router.Use(handlers1...)
 
@@ -141,7 +142,7 @@ func TestRouterGroupTooManyHandlers(t *testing.T) {
 }
 
 func TestRouterGroupBadMethod(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	assert.Panics(t, func() {
 		router.Handle(http.MethodGet, "/")
 	})
@@ -166,7 +167,7 @@ func TestRouterGroupBadMethod(t *testing.T) {
 }
 
 func TestRouterGroupPipeline(t *testing.T) {
-	router := New()
+	router := New(logger.Default())
 	testRoutesInterface(t, router)
 
 	v1 := router.Group("/v1")

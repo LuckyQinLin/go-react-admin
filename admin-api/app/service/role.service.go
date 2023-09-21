@@ -203,6 +203,7 @@ func (r *RoleService) Update(param *request.RoleUpdateRequest) *response.Busines
 		}
 		return
 	}); err != nil {
+		core.Log.Error("更新角色失败:%s", err.Error())
 		return response.CustomBusinessError(response.Failed, "更新角色失败")
 	}
 	return nil

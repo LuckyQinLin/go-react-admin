@@ -1,8 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useMemo, useState} from "react";
 import {Layout, Menu, MenuProps} from "antd";
 import {useSelector} from "@/redux/hooks";
 import {BreadcrumbProp} from "@/pages/layout/components/header";
-type MenuItem = Required<MenuProps>['items'][number];
+import {asyncRoutes} from "@/router";
+import {routerBuild, routerBuildMenu} from "@/router/routerFilter.tsx";
+import HomeRouter from "@/router/modules/home.tsx";
+import PersonRouter from "@/router/modules/person.tsx";
 import './index.less';
 
 interface LayoutHeaderProp {
@@ -12,26 +15,35 @@ interface LayoutHeaderProp {
 
 const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
 
-	const [defaultMenu, _] = useState<string>('');
-
-	const [menus, setMenus] = useState<MenuItem[]>([]);
+	const [defaultMenu, setDefaultMenu] = useState<string>('home');
+	const [openKeys, setOpenKeys] = useState<string[]>([]);
 
 	const userStore = useSelector((state) => state.user);
 
 
-	useEffect(() => {
-		if (userStore.menus) {
-			setMenus(userStore.menus)
-		}
-		return () => {}
-	}, [])
+	const menuItems = useMemo(() => {
+		let router = userStore.permissions?.length === 1 && userStore.permissions[0] === '*:*:*' ?
+			asyncRoutes : (userStore.userRouter ?
+					routerBuild(userStore.userRouter!) :
+					asyncRoutes
+			);
+		return routerBuildMenu([...HomeRouter, ...router, ...PersonRouter]);
+	}, [userStore.userRouter])
 
-	useEffect(() => {
-		console.log('发生变化', userStore.menus)
-		if (userStore.menus) {
-			setMenus(userStore.menus)
+	const clickMenu = (key: string) => {
+		setDefaultMenu(key)
+	}
+
+	const onOpenChange: MenuProps['onOpenChange'] = (keys) => {
+		console.log("menu", menuItems);
+		const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
+		const rootSubmenuKeys = asyncRoutes.map(item => item.meta?.key).filter(item => item != undefined);
+		if (latestOpenKey && rootSubmenuKeys.indexOf(latestOpenKey!) === -1) {
+			setOpenKeys(keys);
+		} else {
+			setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
 		}
-	}, [userStore.menus]);
+	};
 
 
 	return <Layout.Sider width={230} trigger={null} collapsible collapsed={collapsed}>
@@ -44,9 +56,11 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
 		<Menu
 			theme="dark"
 			mode="inline"
+			openKeys={openKeys}
+			onOpenChange={onOpenChange}
 			defaultSelectedKeys={[defaultMenu]}
-			items={menus}
-			// onClick={changePage}
+			items={menuItems}
+			onClick={({ key}) => clickMenu(key)}
 		/>
 	</Layout.Sider>
 }
