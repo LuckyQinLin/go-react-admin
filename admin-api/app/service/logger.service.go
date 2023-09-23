@@ -15,45 +15,52 @@ type LoggerService struct{}
 // VisitPage 访问日志分页查询
 func (s LoggerService) VisitPage(param *request.VisitLogRequest) (*response.PageData, *response.BusinessError) {
 	var (
-		buildCondition = func(param *request.VisitLogRequest) func(db *gorm.DB) *gorm.DB {
-			return func(db *gorm.DB) *gorm.DB {
-				db.Model(&entity.Visit{})
-				if param.Status != -1 {
-					db.Where("status = ?", param.Status)
-				}
-				if param.UserName != "" {
-					db.Where("user_name like concat('%', ?, '%')", param.UserName)
-				}
-				if param.Address != "" {
-					db.Where("ip_addr like concat('%', ?, '%')", param.Address)
-				}
-				if param.StartTime == nil && param.EndTime != nil {
-					db.Where("login_time <= ?", param.EndTime)
-				}
-				if param.StartTime != nil && param.EndTime == nil {
-					db.Where("login_time >= ?", param.StartTime)
-				}
-				if param.StartTime != nil && param.EndTime != nil {
-					db.Where("login_time between ? and ?", param.StartTime, param.EndTime)
-				}
-				return db
-			}
-		}
+		//buildCondition = func(param *request.VisitLogRequest) func(db *gorm.DB) *gorm.DB {
+		//	return func(db *gorm.DB) *gorm.DB {
+		//		db.Model(&entity.Visit{})
+		//		if param.Status != -1 {
+		//			db.Where("status = ?", param.Status)
+		//		}
+		//		if param.UserName != "" {
+		//			db.Where("user_name like concat('%', ?, '%')", param.UserName)
+		//		}
+		//		if param.Address != "" {
+		//			db.Where("ip_addr like concat('%', ?, '%')", param.Address)
+		//		}
+		//		if param.StartTime == nil && param.EndTime != nil {
+		//			db.Where("login_time <= ?", param.EndTime)
+		//		}
+		//		if param.StartTime != nil && param.EndTime == nil {
+		//			db.Where("login_time >= ?", param.StartTime)
+		//		}
+		//		if param.StartTime != nil && param.EndTime != nil {
+		//			db.Where("login_time between ? and ?", param.StartTime, param.EndTime)
+		//		}
+		//		return db
+		//	}
+		//}
 		list  []response.VisitLogResponse
 		total int64
 		err   error
 	)
-	if err = core.DB.Scopes(buildCondition(param)).Count(&total).Error; err != nil {
-		core.Log.Error("统计访问数据失败, 异常信息如下：%s", err.Error())
-		return nil, response.CustomBusinessError(response.Failed, "获取访问数据失败")
-	}
-	if err = core.DB.Scopes(buildCondition(param)).
-		Select("visit_id as id, user_name, ip_addr as ip, login_location as address, browser, os, status, msg, login_time").
-		Find(&list).
+	if err = core.DB.Model(&entity.Visit{}).
+		TemplatePageQuery("logger.userLoginLogPage", param.Size, param.Offset(), param).
+		Page(&list, &total).
 		Error; err != nil {
 		core.Log.Error("查询访问数据失败, 异常信息如下：%s", err.Error())
 		return nil, response.CustomBusinessError(response.Failed, "获取访问数据失败")
 	}
+	//if err = core.DB.Scopes(buildCondition(param)).Count(&total).Error; err != nil {
+	//	core.Log.Error("统计访问数据失败, 异常信息如下：%s", err.Error())
+	//	return nil, response.CustomBusinessError(response.Failed, "获取访问数据失败")
+	//}
+	//if err = core.DB.Scopes(buildCondition(param)).
+	//	Select("visit_id as id, user_name, ip_addr as ip, login_location as address, browser, os, status, msg, login_time").
+	//	Find(&list).
+	//	Error; err != nil {
+	//	core.Log.Error("查询访问数据失败, 异常信息如下：%s", err.Error())
+	//	return nil, response.CustomBusinessError(response.Failed, "获取访问数据失败")
+	//}
 	return &response.PageData{
 		Total: total,
 		Page:  param.Page,
