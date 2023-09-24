@@ -5,10 +5,10 @@ import (
 	"admin-api/utils"
 	"embed"
 	"gitee.com/molonglove/goboot/gorm"
+	"gitee.com/molonglove/goboot/gorm/driver/postgres"
 	"gitee.com/molonglove/goboot/gorm/logger"
 	"gitee.com/molonglove/goboot/gorm/schema"
 	utils2 "gitee.com/molonglove/goboot/gorm/utils"
-	"gorm.io/driver/postgres"
 	"time"
 )
 
