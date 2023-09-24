@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"admin-api/internal/cobra"
 	"fmt"
+	"gitee.com/molonglove/goboot/cobra"
 	"github.com/mitchellh/go-homedir"
 	"os"
 	"path/filepath"

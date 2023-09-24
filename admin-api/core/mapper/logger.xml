@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper namespace="LoggerMapper">
+    <select id="userLoginLogPage" param="param">
+        select
+            sv.visit_id       as id,
+            sv.user_name,
+            sv.ip_addr        as ip,
+            sv.login_location as address,
+            sv.browser,
+            sv.os,
+            sv.status,
+            sv.msg,
+            sv.login_time
+        from sys_visit sv where 1 = 1
+            {%- if param.Status != -1 %}
+                and sv.status = {{param.Status}}
+            {%- endif %}
+            {%- if param.UserName != "" %}
+                and sv.user_name like concat('%', '{{param.UserName}}', '%')
+            {%- endif %}
+            {%- if param.Address != "" %}
+                and sv.ip_addr like concat('%', '{{param.Address}}', '%')
+            {%- endif %}
+            {%- if param.StartTime == "" and param.EndTime != "" %}
+                and sv.login_time <![CDATA[<]]> '{{param.EndTime}}'
+            {%- endif %}
+            {%- if param.StartTime != "" and param.EndTime == "" %}
+                and sv.login_time <![CDATA[>]]> '{{param.StartTime}}'
+            {%- endif %}
+            {%- if param.StartTime != "" and param.EndTime != "" %}
+                and sv.login_time between '{{param.StartTime}}' and '{{param.EndTime}}'
+            {%- endif %}
+        order by sv.login_time desc
+    </select>
+</mapper>

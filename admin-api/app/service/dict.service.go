@@ -6,7 +6,7 @@ import (
 	"admin-api/app/models/request"
 	"admin-api/app/models/response"
 	"admin-api/core"
-	"admin-api/internal/gorm"
+	"gitee.com/molonglove/goboot/gorm"
 	"time"
 )
 

@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"admin-api/internal/cobra"
 	"admin-api/router"
+	"gitee.com/molonglove/goboot/cobra"
 )
 
 // serverCmd 启动子命令

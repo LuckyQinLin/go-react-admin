@@ -1,7 +1,7 @@
 package router
 
 import (
-	"admin-api/internal/gin"
+	"gitee.com/molonglove/goboot/gin"
 	"net/http"
 )
 

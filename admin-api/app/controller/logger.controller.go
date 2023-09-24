@@ -4,7 +4,7 @@ import (
 	"admin-api/app/models/request"
 	"admin-api/app/models/response"
 	"admin-api/app/service"
-	"admin-api/internal/gin"
+	"gitee.com/molonglove/goboot/gin"
 	"net/http"
 )
 

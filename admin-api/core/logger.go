@@ -1,7 +1,7 @@
 package core
 
 import (
-	"admin-api/internal/logger"
+	"gitee.com/molonglove/goboot/logger"
 	"github.com/mitchellh/go-homedir"
 )
 

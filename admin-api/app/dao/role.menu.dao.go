@@ -2,7 +2,7 @@ package dao
 
 import (
 	"admin-api/app/models/entity"
-	"admin-api/internal/gorm"
+	"gitee.com/molonglove/goboot/gorm"
 )
 
 var RoleMenu = new(RoleMenuDao)

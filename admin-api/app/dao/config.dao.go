@@ -3,7 +3,7 @@ package dao
 import (
 	"admin-api/app/models/entity"
 	"admin-api/core"
-	"admin-api/internal/gorm"
+	"gitee.com/molonglove/goboot/gorm"
 )
 
 var Config = new(ConfigDao)

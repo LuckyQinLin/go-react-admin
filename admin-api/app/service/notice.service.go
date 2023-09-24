@@ -6,7 +6,7 @@ import (
 	"admin-api/app/models/request"
 	"admin-api/app/models/response"
 	"admin-api/core"
-	"admin-api/internal/gorm"
+	"gitee.com/molonglove/goboot/gorm"
 	"time"
 )
 
@@ -143,6 +143,8 @@ func (d *NoticeService) Page(param *request.NoticePageRequest) (*response.PageDa
 }
 
 // Delete 通知删除
+// gitee.com/molonglove/goboot
+// gitee.com/molonglove/goboot
 func (d *NoticeService) Delete(param *request.NoticeDeleteRequest, username string) *response.BusinessError {
 	var (
 		err error

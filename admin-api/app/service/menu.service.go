@@ -7,7 +7,7 @@ import (
 	"admin-api/app/models/response"
 	"admin-api/app/models/vo"
 	"admin-api/core"
-	"admin-api/internal/gorm"
+	"gitee.com/molonglove/goboot/gorm"
 	"sort"
 	"time"
 )

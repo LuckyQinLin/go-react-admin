@@ -2,13 +2,13 @@ package core
 
 import (
 	"admin-api/app/models/entity"
-	"admin-api/internal/gorm"
-	"admin-api/internal/gorm/driver/postgres"
-	"admin-api/internal/gorm/logger"
-	"admin-api/internal/gorm/schema"
-	utils2 "admin-api/internal/gorm/utils"
 	"admin-api/utils"
 	"embed"
+	"gitee.com/molonglove/goboot/gorm"
+	"gitee.com/molonglove/goboot/gorm/driver/postgres"
+	"gitee.com/molonglove/goboot/gorm/logger"
+	"gitee.com/molonglove/goboot/gorm/schema"
+	utils2 "gitee.com/molonglove/goboot/gorm/utils"
 	"time"
 )
 
@@ -59,7 +59,7 @@ func InitDb() {
 			IgnoreRecordNotFoundError: false,
 			Colorful:                  true,
 		}),
-		Mapper: utils2.ReadTemplate(tpl, "role", "config", "menu", "user"),
+		Mapper: utils2.ReadTemplate(tpl, "role", "config", "menu", "user", "logger"),
 	}); err != nil {
 		Log.Error("连接数据库失败: %s", err.Error())
 		panic(err.Error())

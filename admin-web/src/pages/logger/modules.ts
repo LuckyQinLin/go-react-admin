@@ -1,4 +1,6 @@
 // LoginLoggerQueryProp 登录日志查询属性
+import {Dayjs} from "dayjs";
+
 interface LoginLoggerQueryProp {
     page:       number;  //
     size:       number;  //
@@ -7,6 +9,7 @@ interface LoginLoggerQueryProp {
     startTime?: string;  // 开始时间
     endTime?:   string;  // 结束时间
     address?:   string;  // IP地址
+    times?: (Dayjs | null)[];
 }
 
 // OperateLoggerQueryProp 操作日志查询属性

@@ -4,7 +4,7 @@ import (
 	"admin-api/app/models/entity"
 	"admin-api/app/models/response"
 	"admin-api/core"
-	"admin-api/internal/gorm"
+	"gitee.com/molonglove/goboot/gorm"
 )
 
 var User = NewUserDao()
