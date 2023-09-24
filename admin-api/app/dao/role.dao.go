@@ -4,8 +4,8 @@ import (
 	"admin-api/app/models/entity"
 	"admin-api/app/models/response"
 	"admin-api/core"
-	"admin-api/internal/gorm"
 	_ "embed"
+	"gitee.com/molonglove/goboot/gorm"
 )
 
 var Role = NewRoleDao()

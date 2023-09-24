@@ -2,13 +2,13 @@ package core
 
 import (
 	"admin-api/app/models/entity"
-	"admin-api/internal/gorm"
-	"admin-api/internal/gorm/driver/postgres"
-	"admin-api/internal/gorm/logger"
-	"admin-api/internal/gorm/schema"
-	utils2 "admin-api/internal/gorm/utils"
 	"admin-api/utils"
 	"embed"
+	"gitee.com/molonglove/goboot/gorm"
+	"gitee.com/molonglove/goboot/gorm/logger"
+	"gitee.com/molonglove/goboot/gorm/schema"
+	utils2 "gitee.com/molonglove/goboot/gorm/utils"
+	"gorm.io/driver/postgres"
 	"time"
 )
 

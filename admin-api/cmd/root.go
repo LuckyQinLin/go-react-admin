@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"admin-api/internal/cobra"
 	_ "embed"
+	"gitee.com/molonglove/goboot/cobra"
 )
 
 //go:embed banner.txt

@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"admin-api/internal/cobra"
 	"fmt"
+	"gitee.com/molonglove/goboot/cobra"
 )
 
 // backupsCmd 版本子命令

@@ -6,8 +6,8 @@ import (
 	"admin-api/app/models/response"
 	"admin-api/app/models/vo"
 	"admin-api/app/service"
-	"admin-api/internal/gin"
 	"admin-api/utils"
+	"gitee.com/molonglove/goboot/gin"
 	"net/http"
 )
 

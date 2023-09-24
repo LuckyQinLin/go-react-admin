@@ -3,10 +3,10 @@ package router
 import (
 	"admin-api/app/controller"
 	"admin-api/core"
-	"admin-api/internal/gin"
 	"context"
 	"errors"
 	"fmt"
+	"gitee.com/molonglove/goboot/gin"
 	"net/http"
 	"os"
 	"os/signal"

@@ -7,8 +7,8 @@ import (
 	"admin-api/app/models/vo"
 	"admin-api/app/service"
 	"admin-api/core"
-	"admin-api/internal/gin"
 	"admin-api/utils"
+	"gitee.com/molonglove/goboot/gin"
 	"github.com/xuri/excelize/v2"
 	"net/http"
 )
