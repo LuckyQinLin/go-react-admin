@@ -70,7 +70,7 @@ const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapse
 				return [{href: '', title: <HomeOutlined />}, ...temp];
     }
 
-    return <Layout.Header className="admin-layout-header" style={{ padding: 0, background: bgColor }}>
+    return <Layout.Header className="admin-layout-header" style={{ padding: 0, background: bgColor, height: 55 }}>
         {contextHolder}
         <Space className="admin-layout-header-left">
             <Button
@@ -81,7 +81,7 @@ const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapse
                     color: 'rgba(0, 0, 0, 0.88)',
                     fontSize: '16px',
                     width: 10,
-                    height: 64,
+                    height: 55,
                     marginLeft: 16
                 }}
             />
@@ -91,7 +91,7 @@ const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapse
                 style={{
                     color: 'rgba(0, 0, 0, 0.88)',
                     fontSize: '16px',
-                    width: 64,
+                    width: 55,
                     height: 64,
                 }}
             />
