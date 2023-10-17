@@ -39,9 +39,10 @@ const DeptCreateDrawer: React.FC<DeptCreateDrawerProp> = ({visible, parentId, cl
     return <Drawer
         width={500}
         title="添加部门"
-        placement="right"
-        onClose={() => close(false)}
         open={visible}
+        placement="right"
+        maskClosable={false}
+        onClose={() => close(false)}
         extra={
             <Space>
                 <Button type="primary" danger onClick={()=> close(false)}>取消</Button>
@@ -72,10 +73,38 @@ const DeptCreateDrawer: React.FC<DeptCreateDrawerProp> = ({visible, parentId, cl
                 <Form.Item name="leader" label="负责人">
                     <Input placeholder="请输入部门负责人" />
                 </Form.Item>
-                <Form.Item name="phone" label="联系电话">
+                <Form.Item name="phone" label="联系电话" rules={[
+                    {required: false},
+                    () => ({
+                    validator(_, value: string) {
+                        if (value.length > 0 && (!(/^(1[3456789]|9[28])\d{9}$/).test(value) || value.length !== 11)) {
+                            if (value.length !== 11) {
+                                return Promise.reject(new Error('请输入11位电话号码！'));
+                            }
+                            if (!(/^(1[3456789]|9[28])\d{9}$/).test(value)) {
+                                return Promise.reject(new Error('请输入11位有效电话号码！'));
+                            }
+                        }
+                        return Promise.resolve();
+                    },
+                })]}>
                     <Input placeholder="请输入联系电话" />
                 </Form.Item>
-                <Form.Item name="email" label="邮箱">
+                <Form.Item name="email" label="邮箱" rules={[
+                    {required: false},
+                    () => ({
+                        validator(_, value: string) {
+                            if (value.length > 0 && (!(/^(1[3456789]|9[28])\d{9}$/).test(value) || value.length !== 11)) {
+                                if (value.length > 50) {
+                                    return Promise.reject(new Error('邮箱长度不得超过50字符！'));
+                                }
+                                if (!(/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/).test(value)) {
+                                    return Promise.reject(new Error('邮箱格式不正确！'));
+                                }
+                            }
+                            return Promise.resolve();
+                        },
+                    })]}>
                     <Input placeholder="请输入邮箱" />
                 </Form.Item>
                 <Form.Item name="status" label="部门状态">

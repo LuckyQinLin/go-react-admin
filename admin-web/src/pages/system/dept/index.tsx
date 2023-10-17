@@ -14,36 +14,35 @@ const SystemDeptPage = () => {
             title: '部门名称',
             key: 'title',
             dataIndex: 'title',
-            align: 'center',
-            width: 150
-        },
-        {
-            title: '排序',
-            key: 'order',
-            dataIndex: 'order',
-            align: 'center',
-            width: 80
+            align: 'left',
         },
         {
             title: '状态',
             key: 'status',
             dataIndex: 'status',
             align: 'center',
-            width: 150,
-            render: (text) => text === 1 ? <Tag color="blue">正常</Tag>: <Tag color="red">禁用</Tag>
+            width: 180,
+            render: (text) => text === 1 ? <Tag color="blue">正常</Tag> : <Tag color="red">禁用</Tag>
+        },
+        {
+            title: '排序',
+            key: 'order',
+            dataIndex: 'order',
+            align: 'center',
+            width: 100
         },
         {
             title: '创建时间',
             key: 'createTime',
             dataIndex: 'createTime',
             align: 'center',
-            width: 150
+            width: 180
         },
         {
             title: '操作',
             key: 'active',
             align: 'center',
-            width: 200,
+            width: 250,
             render: (_, record) => (
                 <Space size={'small'}>
                     <Button size="small" type="primary" onClick={() => openDrawer('edit', record.key)}>编辑</Button>
@@ -55,6 +54,7 @@ const SystemDeptPage = () => {
     ];
 
     const [tableQuery] = useState<DeptTableQueryProp>({});
+    const [expendKey, setExpendKey] = useState<number[]>([]);
     const [drawerProp, setDrawerProp] = useState<DeptDrawerProp>({createVisible: false, updateVisible: false});
     const [datasource, setDatasource] = useState<DeptTableTreeProp[]>([]);
 
@@ -62,6 +62,8 @@ const SystemDeptPage = () => {
         manual: true,
         onSuccess: (data) => {
             setDatasource(data);
+            // 展开第一层数据
+            setExpendKey(data.map(item => item.key) || []);
         }
     })
 
@@ -76,7 +78,7 @@ const SystemDeptPage = () => {
     const deleteMenu = (deptId: number) => {
         Modal.confirm({
             title: '警告',
-            icon: <ExclamationCircleFilled />,
+            icon: <ExclamationCircleFilled/>,
             content: '确认删除当前部门？',
             okText: '删除',
             okType: 'danger',
@@ -85,13 +87,15 @@ const SystemDeptPage = () => {
                 const msg = await deptDelete(deptId);
                 message.success(msg)
             },
-            onCancel: () => {}
+            onCancel: () => {
+            }
         });
     }
 
 
     const closeDrawer = (isLoad: boolean) => {
-        setDrawerProp({...drawerProp,
+        setDrawerProp({
+            ...drawerProp,
             updateVisible: false,
             createVisible: false,
             currId: undefined,
@@ -100,6 +104,15 @@ const SystemDeptPage = () => {
         if (isLoad) {
             run(tableQuery);
         }
+    }
+
+    const expendHandler = (expanded: boolean, record: DeptTableTreeProp) => {
+        let data: number[] = expanded ? [...expendKey, record.key] : (expendKey.filter(item => item !== record.key) || []);
+        data = data.reduce((accumulator: number[], currentValue) => {
+            if (!accumulator.includes(currentValue)) { accumulator.push(currentValue); }
+            return accumulator;
+        }, [])
+        setExpendKey(data)
     }
 
     useEffect(() => {
@@ -119,6 +132,7 @@ const SystemDeptPage = () => {
             dataSource={datasource}
             style={{ marginTop: 10 }}
             rowKey={(record) => record.key}
+            expandable={{expandedRowKeys: expendKey, onExpand: expendHandler, indentSize: 30}}
             pagination={false}
         />
         <DeptCreateDrawer
