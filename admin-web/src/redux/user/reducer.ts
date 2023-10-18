@@ -1,6 +1,6 @@
 import {CHANGE_LONGIN_STATUS, CHANGE_MENU_STATUS, CLEAN_USER_STORE, UserTypes} from "./action";
 // import {MenuProps} from "antd";
-// import {IRouteObject} from "@/router/modules.ts";
+// import {IRouteObject} from "@/router/modules.tsx";
 import {UserRouterProp} from "@/pages/system/menu/modules.ts";
 
 // type MenuItem = Required<MenuProps>['items'][number];

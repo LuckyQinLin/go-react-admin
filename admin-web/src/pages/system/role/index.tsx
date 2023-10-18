@@ -122,10 +122,10 @@ const SystemRolePage = () => {
             run(pageQuery)
         }
     }
-
+    //
     useEffect(() => run(pageQuery), [])
-
-
+    //
+    //
     return <>
         <Space>
             <Button type="primary" icon={<PlusOutlined />} disabled={selectedRowKeys.length > 0} onClick={() => openDrawer('create')}>新增</Button>
@@ -173,6 +173,8 @@ const SystemRolePage = () => {
         <RoleUpdateDrawer visible={roleDrawer.updateVisible} close={isLoad => closeDrawer('update', isLoad)} roleId={roleDrawer.roleId} />
         <AllocateUserDrawer visible={roleDrawer.userVisible} roleId={roleDrawer.roleId} close={() => closeDrawer('user', false)} />
     </>
+
+    // return <div>哈哈哈</div>
 }
 
 export default SystemRolePage;

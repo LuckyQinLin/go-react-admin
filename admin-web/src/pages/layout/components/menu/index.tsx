@@ -27,7 +27,9 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
 					routerBuild(userStore.userRouter!) :
 					asyncRoutes
 			);
-		return routerBuildMenu([...HomeRouter, ...router, ...PersonRouter]);
+		const menu = routerBuildMenu([...HomeRouter, ...router, ...PersonRouter]);
+		console.log("old-tree Menu => ", menu);
+		return menu;
 	}, [userStore.userRouter])
 
 	const clickMenu = (key: string) => {
