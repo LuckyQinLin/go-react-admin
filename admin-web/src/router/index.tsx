@@ -54,6 +54,11 @@ const Router: React.FC = () => {
         loadRouter.run();
     }
 
+    // if (token) {
+    //     getUserInfo();
+    // }
+
+
     const routes = useMemo(() => {
         let router: IRouteObject[] = permissions?.length === 1 && permissions[0] === '*:*:*' ? asyncRoutes : (userRouter ? routerBuild(userRouter) : constantRouter);
         return [...constantRouter, ...router, {path: '*', element: <Navigate to="/exception/404" />}]
@@ -63,7 +68,9 @@ const Router: React.FC = () => {
         if (token) {
             getUserInfo();
         }
-    }, [token]);
+    }, []);
+
+
 
     return useRoutes(routes);
 }
