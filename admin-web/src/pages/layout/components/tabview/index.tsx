@@ -1,110 +1,214 @@
 import styled from "@emotion/styled";
-import {Tabs, TabsProps} from "antd";
+import React, {ReactElement, useEffect, useRef, useState} from "react";
+import {
+    CloseOutlined,
+    ColumnWidthOutlined,
+    LeftOutlined,
+    MinusOutlined,
+    RedoOutlined,
+    RightOutlined
+} from "@ant-design/icons";
+import {Dropdown} from "antd";
+import type { MenuProps } from 'antd';
+import {cleanUserStoreActionCreator} from "@/redux/user/action.ts";
+import { MenuInfo } from "rc-menu/lib/interface";
 
+
+interface TabViewProp {
+    key: string | number;
+    title: string | React.ReactNode;
+    closeIcon?: boolean | React.ReactNode
+}
+
+interface TabTotailProp {
+    tabsWith: number;
+    parentWith: number;
+}
 
 const LayoutTabview = () => {
 
-    const items: TabsProps['items'] = [
-        { key: '1', label: '首页', closable: false },
-        { key: '2', label: '用户管理' },
-        { key: '3', label: '角色管理' },
-        { key: '4', label: '角色管理' },
-        { key: '5', label: '角色管理' },
-        { key: '6', label: '角色管理' },
-        { key: '7', label: '角色管理' },
-        { key: '8', label: '角色管理' },
-        { key: '9', label: '角色管理' },
-        { key: '10', label: '角色管理' },
-        { key: '11', label: '角色管理' },
-        { key: '12', label: '角色管理' },
-        { key: '13', label: '角色管理' },
-        { key: '14', label: '角色管理' },
-        { key: '15', label: '角色管理' },
-        { key: '16', label: '角色管理' },
-        { key: '17', label: '角色管理' },
-        { key: '18', label: '角色管理' },
-        { key: '19', label: '角色管理' },
-        { key: '20', label: '角色管理' },
+    const [items, setItems] = useState<TabViewProp[]>([
+        {key: 'home', title: '首页', closeIcon: true},
+        {key: 'user', title: '用户管理'},
+        {key: 'account', title: '系统管理'},
+        {key: 'person', title: '人员管理'},
+        {key: 'role', title: '角色管理'},
+        {key: 'resource', title: '资源管理'},
+        {key: 'file', title: '文件管理'},
+        {key: 'logger', title: '日志管理'},
+        {key: 'message', title: '消息管理'},
+    ]);
+
+    const dropItems: MenuProps['items'] = [
+        { label: '刷新当前', key: '1', icon: <RedoOutlined />},
+        { label: '关闭当前', key: '2', icon: <CloseOutlined />},
+        { label: '关闭其他', key: '3', icon: <ColumnWidthOutlined />},
+        { label: '关闭全部', key: '4', icon: <MinusOutlined />},
     ];
 
-    const onChange = (key: string) => {
-        console.log(key);
+    const removeStart = () => {
+        if (scrollableRef.current) {
+            scrollableRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        }
+    }
+
+    const removeEnd = () => {
+        if (scrollableRef.current) {
+            const maxScroll = scrollableRef.current.clientWidth;
+            scrollableRef.current.scrollTo({ left: maxScroll, behavior: 'smooth' });
+        }
+    }
+
+    const scrollableRef = useRef<HTMLDivElement | null>(null);
+    const [tabSize, setTabSize] = useState<TabTotailProp>({tabsWith: 0, parentWith: 0});
+
+    const [selectedKey, setSelectedKey] = useState<string | number>('home');
+
+    const handleResize = () => {
+        console.log(tabSize, scrollableRef.current?.clientWidth)
+        setInterval(() => {
+            setTabSize({...tabSize, parentWith: scrollableRef.current?.clientWidth ?? tabSize.parentWith})
+        }, 100)
     };
 
+    /**
+     * 关闭tab页面
+     * @param key
+     */
+    const closeTabPage = (key: string | number) => {
+
+    }
+
+    const dropDownHandler = (e: MenuInfo, data: TabViewProp) => {
+        switch (e.key) {
+            case '1':
+            // 刷新当前
+            case '2':
+            // 关闭当前
+            case '3':
+            // 关闭其他
+            case '4':
+            // 关闭全部
+            default:
+                break
+        }
+    }
+
+
+
+    useEffect(() => {
+        if (scrollableRef.current) {
+            const width = Array.from(scrollableRef.current?.children)
+                .reduce((acc, childNode) => {return acc + childNode.clientWidth;}, 0);
+            setTabSize({tabsWith: width, parentWith: scrollableRef.current?.clientWidth})
+        }
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        }
+    }, []);
+
     return <Container>
-        <Tabs
-            type="editable-card"
-            hideAdd={true}
-            tabPosition={'top'}
-            defaultActiveKey="1"
-            items={items}
-            onChange={onChange} />
+        {tabSize.parentWith < tabSize.tabsWith && <div className="tab-view-left">
+            <LeftOutlined onClick={removeStart} />
+        </div>}
+        <div className="tab-view-items" ref={scrollableRef}>
+            {items.length > 0 &&
+                items.map(item =>
+                    <Dropdown menu={{ items: dropItems, onClick: (e) => dropDownHandler(e, item) }} trigger={['contextMenu']}>
+                        <div
+                            id={`tab-view-id-${item.key}`}
+                            onClick={() => setSelectedKey(item.key)}
+                            className={`tab-view-item-btn ${item.key === selectedKey ? 'tab-view-item-active' : null}`}
+                        >
+                            <span>{item.title}</span>
+                            {item.closeIcon ? null : <CloseOutlined className="span-icon" onClick={() => closeTabPage(item.key)} />}
+                        </div>
+                    </Dropdown>
+                )
+            }
+        </div>
+        {tabSize.parentWith < tabSize.tabsWith && <div className="tab-view-right">
+            <RightOutlined onClick={removeEnd}/>
+        </div>}
     </Container>
 }
 
 const Container = styled.div`
-  background-color: #ffffff;
+  background-color: #f5f5f5;
   border-bottom: 1px solid #f1f2f3;
-  
-  .ant-tabs-nav-wrap .ant-tabs-nav-wrap-ping-right {
-    position: relative;
-    display: flex;
-    flex: auto;
-    align-self: stretch;
-    overflow: hidden;
-    white-space: nowrap;
-    transform: translate(0);
-    height: 48px;
-    .ant-tabs-nav-list {
-      position: relative;
-      display: flex;
-      transition: opacity 0.3s;
-      background-color: #f5f5f5;
-      height: 48px;
-      flex-direction: row;
-      align-content: center;
-      align-items: center;
-      padding-left: 6px;
-    }
-    .ant-tabs-nav-operations {
-      display: flex;
-      height: 48px;
-      align-self: stretch;
-      background-color: #f5f5f5;
-      align-items: center;
-      button {
-        position: relative;
-        padding: 8px 10px;
-        background: #fff;
-        border: 0;
-        color: rgba(0, 0, 0, 0.88);
-        height: 35px;
+  height: 42px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;  
+  padding-left: 10px;
+  .tab-view-left {
+    color: rgb(31, 34, 37);
+    background: #fff;
+    flex-shrink: 0;
+    border-radius: 3px;
+    margin-right: 6px;
+    text-align: center;
+    span {
+      width: 32px;
+      height: 32px;
+      svg {
+        width: 32px;
       }
     }
   }
-  
-  .ant-tabs-nav {
-    margin: 0;
+  .tab-view-right {
+    color: rgb(31, 34, 37);
+    background: #fff;
+    flex-shrink: 0;
+    border-radius: 3px;
+    margin-left: 6px;
+    margin-right: 10px;
+    text-align: center;
+    span {
+      width: 32px;
+      height: 32px;
+      svg {
+        width: 32px;
+      }
+    }
   }
-  .ant-tabs-nav .ant-tabs-tab {
-    border: 0;
-    border-radius: 0;
+  .tab-view-items {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    white-space: nowrap;
+    overflow: hidden;
+    .tab-view-item-btn {
+      background: #fff;
+      color: rgb(31, 34, 37);
+      height: 32px;
+      padding: 6px 12px 4px;
+      border-radius: 3px;
+      margin-right: 6px;
+      cursor: pointer;
+      display: inline-block;
+      position: relative;
+      flex: 0 0 auto;
+      span {
+        float: left;
+        vertical-align: middle;
+        margin-right: 5px;
+      }
+      .span-icon {
+        height: 22px;
+        width: 21px;
+        margin-right: -6px;
+        position: relative;
+        vertical-align: middle;
+        text-align: center;
+        color: #808695;
+      }
+    }
+    .tab-view-item-active {
+      color: #2d8cf0;
+    }
   }
-  .ant-tabs-nav .ant-tabs-tab+.ant-tabs-tab { margin-left: 0}
-  
-  .ant-tabs-tab .ant-tabs-tab-with-remove {
-    margin-left: 0;
-    border-radius: 0 0 0 0;
-  }
-  .ant-tabs-nav .ant-tabs-tab-active {
-    background-color: #f0f8ff;
-  }
-  .ant-tabs-card.ant-tabs-top >.ant-tabs-nav .ant-tabs-tab {
-    margin-left: 0;
-    border-radius: 0 0 0 0;
-    border-bottom: 1px solid #f1f2f3;
-  }
-  
 `
 
 export default LayoutTabview;

@@ -6,6 +6,7 @@ import {asyncRoutes} from "@/router";
 import {routerBuild, routerBuildMenu} from "@/router/routerFilter.tsx";
 import HomeRouter from "@/router/modules/home.tsx";
 import PersonRouter from "@/router/modules/person.tsx";
+type MenuItem = Required<MenuProps>['items'][number];
 import './index.less';
 
 interface LayoutHeaderProp {
@@ -30,8 +31,12 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
 		return routerBuildMenu([...HomeRouter, ...router, ...PersonRouter]);
 	}, [userStore.userRouter])
 
-	const clickMenu = (key: string) => {
-		setDefaultMenu(key)
+	const clickMenu = (data?: MenuItem) => {
+		if (data !== null) {
+			console.log(data);
+			setDefaultMenu(data!.key as string)
+		}
+
 	}
 
 	const onOpenChange: MenuProps['onOpenChange'] = (keys) => {
@@ -60,7 +65,7 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
 			onOpenChange={onOpenChange}
 			defaultSelectedKeys={[defaultMenu]}
 			items={menuItems}
-			onClick={({ key}) => clickMenu(key)}
+			onClick={(e) => clickMenu(e as MenuItem)}
 		/>
 	</Layout.Sider>
 }

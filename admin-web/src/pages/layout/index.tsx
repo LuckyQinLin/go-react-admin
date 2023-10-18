@@ -36,7 +36,7 @@ const LayoutPage: React.FC = () => {
     const contentCss: React.CSSProperties = {
         margin: '0px 10px 10px 10px',
         padding: 16,
-        minHeight: 'calc(100vh - 55px - 40px - 32px)',
+        minHeight: 'calc(100vh - 55px - 48px - 11px)',
         background: colorBgContainer
     }
 
