@@ -1,9 +1,23 @@
 import React from "react";
 import lazyLoad from "@/router/lazyLoad.tsx";
-import {MenuProps} from "antd";
+import type {MenuProps} from "antd/es/menu";
 import IconFont from "@/components/IconFont";
 type MenuItem = Required<MenuProps>['items'][number];
 
+
+function getItem(
+    label: React.ReactNode,
+    key: React.Key,
+    icon?: React.ReactNode,
+    children?: MenuItem[]
+): MenuItem {
+    return {
+        key,
+        icon,
+        children,
+        label
+    } as MenuItem;
+}
 
 
 namespace Router {
@@ -39,7 +53,7 @@ namespace Router {
         PersonUserPage
     }
 
-    export const staticPath = ['/home/index', '/person/index', '/exception/404'];
+    export const staticPath = ['/home/index', '/person/index', '/exception/404', '/exception/403', '/exception/500'];
 
     export const NotFoundPath = '/exception/404';
     export const NotAuthPath = '/exception/403';
@@ -111,13 +125,7 @@ namespace Router {
         }
     }
 
-    const getItem = (label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[], type?: 'group'): MenuItem => {
-        return {key, icon, children, label, type,} as MenuItem;
-    }
-
-
-
-    export const menuItems: MenuProps['items'] = [
+    export const menuItems: MenuItem[] = [
 
         getItem('首页', '/home/index', <IconFont type="lucky-shouye1" />),
 
@@ -147,7 +155,5 @@ namespace Router {
     ];
 
 }
-
-
 
 export default Router;

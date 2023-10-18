@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Navigate, Outlet, useLocation, useRouteLoaderData} from "react-router-dom";
 import {Layout, theme} from "antd";
-import {LayoutHeader, LayoutNewSider, LayoutSider, LayoutTabview} from "@/pages/layout/components";
+import {LayoutHeader, LayoutNewSider, LayoutNewTwoSider, LayoutSider, LayoutTabview} from "@/pages/layout/components";
 import {BreadcrumbProp} from "@/pages/layout/components/header";
 import {PermInfo} from "@/redux/user/reducer";
 import "./index.less";
@@ -40,10 +40,12 @@ const LayoutPage: React.FC = () => {
 
     const dataLoader = useRouteLoaderData(Router.LayoutId) as User.UserPermissionProp;
     if (!searchRoute(pathname, routers)) {
+        console.log("11111111")
         return <Navigate to={NotFoundPath} />
     }
 
     if (!staticPath.includes(pathname) && !dataLoader.paths.includes(pathname)) {
+        console.log("22222222")
         return <Navigate to={NotAuthPath} />
     }
 
@@ -61,6 +63,7 @@ const LayoutPage: React.FC = () => {
     return <Layout className="admin-layout-area">
         {/*<LayoutSider collapsed={collapsed} breadcrumb={setBreadcrumb} />*/}
         <LayoutNewSider collapsed={collapsed} breadcrumb={setBreadcrumb} />
+        {/*<LayoutNewTwoSider collapsed={collapsed} breadcrumb={setBreadcrumb} />*/}
         <Layout>
             <LayoutHeader
                 breadcrumb={breadcrumb}
