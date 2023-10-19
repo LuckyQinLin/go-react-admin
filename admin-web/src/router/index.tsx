@@ -5,7 +5,7 @@ import RouterEnum = Router.RouterEnum;
 import {User, Menu} from "@/types";
 import {getPermissions} from "@/api/menu.ts";
 
-namespace NewRouter {
+namespace RouterSpace {
     const authLoader = async (): Promise<User.UserPermissionProp> => {
         const data = await getPermissions();
         const [paths, buttons] = parseMenus(data)
@@ -56,6 +56,7 @@ namespace NewRouter {
         {
             id: Router.LayoutId,
             element: getRouter(RouterEnum.Layout),
+            // element: LayoutPage,
             loader: authLoader, // 鉴权方法
             children: [
                 {
@@ -155,4 +156,4 @@ namespace NewRouter {
 
 
 
-export default NewRouter;
+export default RouterSpace;

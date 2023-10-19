@@ -4,13 +4,11 @@ import {BreadcrumbProp} from "@/pages/layout/components/header";
 import {useNavigate, useRouteLoaderData} from "react-router-dom";
 import {User, Menu as Menus} from "@/types";
 import IconFont from "@/components/IconFont";
-import Router from "@/router/modules.tsx";
+import RouterVariate from "@/router/modules.tsx";
 import useStore from "@/store/store.ts";
-import './index.less';
 import {HOME_PAGE} from "@/constant/setting.ts";
-import HomeItems = Router.HomeItems;
-import PersonItems = Router.PersonItems;
 type MenuItem = Required<MenuProps>['items'][number]
+import './index.less';
 
 interface LayoutHeaderProp {
     collapsed: boolean;
@@ -21,11 +19,11 @@ interface LayoutHeaderProp {
 const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
 
     let navigate = useNavigate();
-    const data = useRouteLoaderData(Router.LayoutId) as User.UserPermissionProp;
+    const data = useRouteLoaderData(RouterVariate.LayoutId) as User.UserPermissionProp;
     const userProp = useStore(state => state.userProp)
     const [menuList, setMenuList] = useState<MenuItem[]>([]);
     const [openKeys, setOpenKeys] = useState<string[]>([]);
-    const [selectedKeys, setSelectedKeys] = useState<string[]>(['home']);
+    const [selectedKeys] = useState<string[]>(['home']);
 
     const buildMenuItem = (label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[]): MenuItem => {
         return { key, icon, children, label } as MenuItem;
@@ -56,9 +54,10 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
 
 
 
-    const clickMenu = (key: string) => {
-        setSelectedKeys([key])
-        navigate(key)
+    const clickMenu = (item: MenuItem) => {
+        console.log(item)
+        // setSelectedKeys([item?.key as string])
+        // navigate(key)
     }
 
     const openSubKey = (keys: string[]) => {
@@ -74,11 +73,11 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
             return
         }
         setMenuList(userProp.isSuper ?
-            Router.menuItems :
+            RouterVariate.menuItems :
             [
-                ...HomeItems,
+                ...RouterVariate.HomeItems,
                 ...routerBuildMenu(data.menus),
-                ...PersonItems
+                ...RouterVariate.PersonItems
             ]
         );
     }, []);
@@ -99,7 +98,7 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
             openKeys={openKeys}
             selectedKeys={selectedKeys}
             onOpenChange={openSubKey}
-            onClick={({ key}) => clickMenu(key)}
+            onClick={(e) => clickMenu(e)}
         />
     </Layout.Sider>
 }

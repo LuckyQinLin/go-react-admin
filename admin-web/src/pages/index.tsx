@@ -1,8 +1,8 @@
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {ConfigProvider} from "antd";
+import RouterSpace from "@/router";
 import zhCN from "antd/lib/locale/zh_CN";
-import NewRouter from "src/router";
-import routers = NewRouter.routers;
+import routers = RouterSpace.routers;
 
 const Application = () => {
 

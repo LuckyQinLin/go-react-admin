@@ -20,7 +20,7 @@ function getItem(
 }
 
 
-namespace Router {
+namespace RouterVariate {
 
     export enum RouterEnum {
         Layout,
@@ -157,4 +157,4 @@ namespace Router {
 
 }
 
-export default Router;
+export default RouterVariate;

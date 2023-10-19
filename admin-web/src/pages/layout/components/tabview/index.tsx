@@ -19,23 +19,15 @@ interface TabViewProp {
     closeIcon?: boolean | React.ReactNode
 }
 
-interface TabTotailProp {
+interface TabTotalProp {
     tabsWith: number;
     parentWith: number;
 }
 
 const LayoutTabview = () => {
 
-    const [items, setItems] = useState<TabViewProp[]>([
-        {key: 'home', title: '首页', closeIcon: true},
-        {key: 'user', title: '用户管理'},
-        {key: 'account', title: '系统管理'},
-        {key: 'person', title: '人员管理'},
-        {key: 'role', title: '角色管理'},
-        {key: 'resource', title: '资源管理'},
-        {key: 'file', title: '文件管理'},
-        {key: 'logger', title: '日志管理'},
-        {key: 'message', title: '消息管理'},
+    const [items] = useState<TabViewProp[]>([
+        {key: 'home', title: '首页', closeIcon: true}
     ]);
 
     const dropItems: MenuProps['items'] = [
@@ -59,7 +51,7 @@ const LayoutTabview = () => {
     }
 
     const scrollableRef = useRef<HTMLDivElement | null>(null);
-    const [tabSize, setTabSize] = useState<TabTotailProp>({tabsWith: 0, parentWith: 0});
+    const [tabSize, setTabSize] = useState<TabTotalProp>({tabsWith: 0, parentWith: 0});
 
     const [selectedKey, setSelectedKey] = useState<string | number>('home');
 
@@ -75,7 +67,7 @@ const LayoutTabview = () => {
      * @param key
      */
     const closeTabPage = (key: string | number) => {
-
+        console.log(key)
     }
 
     const dropDownHandler = (e: MenuInfo, data: TabViewProp) => {
