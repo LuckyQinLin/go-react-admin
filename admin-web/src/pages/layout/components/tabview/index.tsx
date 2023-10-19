@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import React, {ReactElement, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
     CloseOutlined,
     ColumnWidthOutlined,
@@ -10,7 +10,6 @@ import {
 } from "@ant-design/icons";
 import {Dropdown} from "antd";
 import type { MenuProps } from 'antd';
-import {cleanUserStoreActionCreator} from "@/redux/user/action.ts";
 import { MenuInfo } from "rc-menu/lib/interface";
 
 

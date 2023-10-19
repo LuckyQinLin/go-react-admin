@@ -125,10 +125,11 @@ namespace Router {
         }
     }
 
+    export const HomeItems = [getItem('首页', '/home/index', <IconFont type="lucky-shouye1" />)];
+    export const PersonItems = [getItem('个人中心', '/person/index', <IconFont type="lucky-jiankong" />)];
+
     export const menuItems: MenuItem[] = [
-
-        getItem('首页', '/home/index', <IconFont type="lucky-shouye1" />),
-
+        ...HomeItems,
         getItem('系统管理', '/system', <IconFont type="lucky-shezhi1" />, [
             getItem('用户管理', '/system/user', <IconFont type="lucky-yonghu" />),
             getItem('角色管理', '/system/role', <IconFont type="lucky-jiaose" />),
@@ -151,7 +152,7 @@ namespace Router {
             getItem('操作日志', '/logger/operate', <IconFont type="lucky-caozuorizhi" />),
             getItem('登录日志', '/logger/login', <IconFont type="lucky-denglurizhi" />),
         ]),
-        getItem('个人中心', '/person/index', <IconFont type="lucky-jiankong" />),
+        ...PersonItems
     ];
 
 }
