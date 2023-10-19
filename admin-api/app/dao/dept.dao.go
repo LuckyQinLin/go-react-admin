@@ -2,6 +2,7 @@ package dao
 
 import (
 	"admin-api/app/models/entity"
+	"admin-api/app/models/response"
 	"admin-api/core"
 	"gitee.com/molonglove/goboot/gorm"
 )
@@ -53,4 +54,9 @@ func (d *DeptDao) UpdateById(tx *gorm.DB, dept *entity.Dept) error {
 // Delete 删除数据
 func (d *DeptDao) Delete(tx *gorm.DB, deptId ...int64) error {
 	return tx.Where("dept_id in ?", deptId).Delete(&entity.Dept{}).Error
+}
+
+func (d *DeptDao) GetDeptByUserId(userId int64) (result response.UserDeptProp, err error) {
+	err = core.DB.Model(entity.Dept{}).Template("dept.selectByUserId", map[string]any{"userId": userId}).First(&result).Error
+	return
 }

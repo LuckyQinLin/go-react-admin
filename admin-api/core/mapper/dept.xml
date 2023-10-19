@@ -47,4 +47,16 @@
         select * from sys_dept where dept_id = {{param.id}}
     </select>
 
+    <!-- 根据ID获取部门信息 -->
+    <select id="selectByUserId" param="param">
+        select *
+        from sys_dept sd
+        where sd.del_flag = 1
+          and exists(select 1
+                     from sys_user su
+                     where su.del_flag = 1
+                       and su.dept_id = sd.dept_id
+                       and su.user_id = {{param.userId}})
+    </select>
+
 </mapper>

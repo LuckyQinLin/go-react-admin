@@ -3,7 +3,7 @@ module admin-api
 go 1.20
 
 require (
-	gitee.com/molonglove/goboot v0.0.3
+	gitee.com/molonglove/goboot v0.0.4
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/goccy/go-json v0.10.2
 	github.com/mitchellh/go-homedir v1.1.0

@@ -17,7 +17,6 @@ type CaptchaImageResponse struct {
 type UserLoginResponse struct {
 	Token      string `json:"token"`      // token信息
 	ExpireTime int64  `json:"expireTime"` // 到期时间
-
 }
 
 // UserInfoResponse 用户信息
@@ -37,9 +36,18 @@ type UserInfoResponse struct {
 
 // UserLoginInfoResponse 用户登录信息
 type UserLoginInfoResponse struct {
-	User        UserInfoProp `json:"user"`        // 菜单
-	Roles       []string     `json:"roles"`       // 角色字符
-	Permissions []string     `json:"permissions"` // 权限字符
+	IsSuper  bool           `json:"isSuper"`  // 是否超级管理员
+	Avatar   string         `json:"avatar"`   // 头像
+	UserId   int64          `json:"userId"`   // 用户ID
+	UserName string         `json:"userName"` // 用户名称
+	Sex      int            `json:"sex"`      // 性别
+	Phone    string         `json:"phone"`    // 手机号
+	NickName string         `json:"nickName"` // 昵称
+	Email    string         `json:"email"`    // 邮箱
+	Dept     UserDeptProp   `json:"dept"`     // 部门
+	Posts    []UserPostProp `json:"posts"`    // 岗位
+	Roles    []UserRoleProp `json:"roles"`    // 角色信息
+	Operates []string       `json:"operates"` // 按钮等页面操作权限字符
 }
 
 // UserInfoProp 用户信息

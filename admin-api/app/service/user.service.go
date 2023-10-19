@@ -220,108 +220,126 @@ func (u *UserService) GetUserInfo(userId int64) (*response.UserInfoResponse, *re
 // UserLoginInfo 获取用户登录信息
 func (u *UserService) UserLoginInfo(userId int64) (*response.UserLoginInfoResponse, *response.BusinessError) {
 	var (
-		posts  []entity.Post
-		menus  []entity.Menu
-		user   entity.User
-		dept   entity.Dept
-		roles  []entity.Role
-		result *response.UserLoginInfoResponse
-		err    error
-	)
-	result = &response.UserLoginInfoResponse{}
-	// 获取用户信息
-	if user, err = dao.User.GetUserById(userId); err == nil {
-		result.User = response.UserInfoProp{
-			Admin:    user.UserId == vo.SUPER_USER_ID,
-			Avatar:   user.Avatar,
-			UserId:   user.UserId,
-			UserName: user.UserName,
-			NickName: user.NickName,
-			Sex:      user.Sex,
-			Phone:    user.Phone,
-			Email:    user.Email,
-			DeptId:   user.DeptId,
-		}
-	}
-	// 获取部门信息
-	if dept, err = dao.Dept.GetDeptById(user.DeptId); err == nil {
-		result.User.Dept = response.UserDeptProp{
-			DeptId:    dept.DeptId,
-			ParentId:  dept.ParentId,
-			DeptName:  dept.DeptName,
-			Leader:    dept.Leader,
-			Ancestors: dept.Ancestors,
-			OrderNum:  dept.OrderNum,
-			Status:    dept.Status,
-		}
-	}
-	// 获取角色信息
-	if roles, err = dao.Role.GetRoleByUserId(userId); err == nil && len(roles) > 0 {
-		result.Roles = make([]string, 0)
-		result.User.Roles = make([]response.UserRoleProp, 0)
-		for _, item := range roles {
-			result.Roles = append(result.Roles, item.RoleKey)
-			result.User.Roles = append(result.User.Roles, response.UserRoleProp{
-				RoleId:   item.RoleId,
-				RoleName: item.RoleName,
-				RoleCode: item.RoleKey,
-			})
-		}
-	}
-	if userId == vo.SUPER_USER_ID {
-		result.Roles = []string{"admin"}
-	}
-	// 获取资源信息
-	if userId == vo.SUPER_USER_ID {
-		result.Permissions = []string{"*:*:*"}
-	} else {
-		if menus, err = dao.Menu.GetMenuByUserId(userId); err == nil && len(menus) > 0 {
-			result.Permissions = make([]string, 0)
-			for _, item := range menus {
-				result.Permissions = append(result.Permissions, item.Perms)
+		result      *response.UserLoginInfoResponse
+		getUserInfo = func(result *response.UserLoginInfoResponse, userId int64, wait *sync.WaitGroup) {
+			var (
+				user entity.User
+				err  error
+			)
+			defer wait.Done()
+			if user, err = dao.User.GetUserById(userId); err == nil {
+				result.IsSuper = user.UserId == vo.SUPER_USER_ID
+				result.Avatar = user.Avatar
+				result.UserId = user.UserId
+				result.UserName = user.UserName
+				result.NickName = user.NickName
+				result.Sex = user.Sex
+				result.Phone = user.Phone
+				result.Email = user.Email
 			}
 		}
-	}
-	// 获取岗位信息
-	if posts, err = dao.Post.GetPostByUserId(userId); err == nil && len(posts) > 0 {
-		result.User.Posts = make([]response.UserPostProp, 0)
-		for _, item := range posts {
-			result.User.Posts = append(result.User.Posts, response.UserPostProp{
-				PostId:   item.PostId,
-				PostName: item.PostName,
-				PostCode: item.PostCode,
-			})
+		getDeptInfo = func(result *response.UserLoginInfoResponse, userId int64, wait *sync.WaitGroup) {
+			// 获取部门信息
+			defer wait.Done()
+			var data entity.Dept
+			if err := core.DB.
+				Mappers("dept").
+				Query("selectByUserId", func() any {
+					return map[string]any{"userId": userId}
+				}).
+				First(&data).
+				Error; err != nil {
+				core.Log.Error("获取用户的部门信息出错: %s", err.Error())
+				return
+			}
+			result.Dept = response.UserDeptProp{
+				DeptId:    data.DeptId,
+				ParentId:  data.ParentId,
+				DeptName:  data.DeptName,
+				Leader:    data.Leader,
+				Ancestors: data.Ancestors,
+				OrderNum:  data.OrderNum,
+				Status:    data.Status,
+			}
 		}
-	}
-	if err != nil {
-		return nil, response.CustomBusinessError(response.Failed, "获取用户信息失败")
-	}
+		getRoleInfo = func(result *response.UserLoginInfoResponse, userId int64, wait *sync.WaitGroup) {
+			var (
+				roleIds []int64
+				data    []response.UserRoleProp
+				roles   []entity.Role
+				err     error
+			)
+			defer wait.Done()
+			if roles, err = dao.Role.GetRoleByUserId(userId); err == nil && len(roles) > 0 {
+				roleIds = make([]int64, 0)
+				data = make([]response.UserRoleProp, 0)
+				for _, item := range roles {
+					roleIds = append(roleIds, item.RoleId)
+					data = append(data, response.UserRoleProp{
+						RoleId:   item.RoleId,
+						RoleName: item.RoleName,
+						RoleCode: item.RoleKey,
+					})
+				}
+			}
+			result.Roles = data
+			if userId == vo.SUPER_USER_ID {
+				result.Operates = []string{"all"}
+			} else {
+				if len(roleIds) > 0 {
+					core.Log.Info("获取对应的资源信息")
+					if err = core.DB.Mappers("menu").Query("selectOperateByRoles", func() any {
+						condition := make(map[string]any)
+						if userId == vo.SUPER_USER_ID {
+							condition["IsAll"] = 0
+						} else {
+							condition["RoleIds"] = roleIds
+						}
+						return condition
+					}).Find(&result.Operates).Error; err != nil {
+						core.Log.Error("获取用户用户拥有的操作权限失败: %s", err.Error())
+					}
+				}
+			}
+		}
+		getPostInfo = func(result *response.UserLoginInfoResponse, userId int64, wait *sync.WaitGroup) {
+			var (
+				data  []response.UserPostProp
+				posts []entity.Post
+				err   error
+			)
+			defer wait.Done()
+			data = make([]response.UserPostProp, 0)
+			if posts, err = dao.Post.GetPostByUserId(userId); err == nil && len(posts) > 0 {
+				for _, item := range posts {
+					data = append(data, response.UserPostProp{
+						PostId:   item.PostId,
+						PostName: item.PostName,
+						PostCode: item.PostCode,
+					})
+				}
+			}
+			result.Posts = data
+		}
+	)
+	result = new(response.UserLoginInfoResponse)
+	group := &sync.WaitGroup{}
+	group.Add(4)
+	// 获取用户信息
+	go getUserInfo(result, userId, group)
+	// 获取用户部门信息
+	go getDeptInfo(result, userId, group)
+	// 获取角色信息
+	go getRoleInfo(result, userId, group)
+	// 获取岗位信息
+	go getPostInfo(result, userId, group)
+	group.Wait()
 	return result, nil
 }
 
 // Page 用户分页
 func (u *UserService) Page(param *request.UserPageRequest) (*response.PageData, *response.BusinessError) {
 	var (
-		//buildCondition = func(param *request.UserPageRequest) func(db *gorm.DB) *gorm.DB {
-		//	return func(db *gorm.DB) *gorm.DB {
-		//		db.Model(&entity.User{}).
-		//			Alias("u").
-		//			Where("u.del_flag = 1")
-		//		if param.Status != nil {
-		//			db.Where("u.status = @status", sql.Named("status", param.Status))
-		//		}
-		//		if param.UserName != "" {
-		//			db.Where("u.user_name like concat('%', @userName, '%')", sql.Named("userName", param.UserName))
-		//		}
-		//		if param.Phone != "" {
-		//			db.Where("u.phone like concat('%', @phone, '%')", sql.Named("phone", param.Phone))
-		//		}
-		//		if param.DeptId != nil && *param.DeptId != 0 {
-		//			db.Where("(u.dept_id = @deptId or u.dept_id in (select t.dept_id from sys_dept t where @deptId = any (string_to_array(t.ancestors, ',')::integer[])))", sql.Named("deptId", param.DeptId))
-		//		}
-		//		return db
-		//	}
-		//}
 		list  []response.UserPageResponse
 		total int64
 		err   error
@@ -337,19 +355,6 @@ func (u *UserService) Page(param *request.UserPageRequest) (*response.PageData, 
 		core.Log.Error("查询用户信息失败, 异常信息如下：%s", err.Error())
 		return nil, response.CustomBusinessError(response.Failed, "获取用户数据失败")
 	}
-
-	//if err = core.DB.Scopes(buildCondition(param)).Count(&total).Debug().Error; err != nil {
-	//	core.Log.Error("统计用户数据失败, 异常信息如下：%s", err.Error())
-	//	return nil, response.CustomBusinessError(response.Failed, "获取用户数据失败")
-	//}
-	//if err = core.DB.Scopes(buildCondition(param)).
-	//	Select("u.user_id,u.dept_id,u.nick_name,u.user_name,u.email,u.avatar,u.phone,u.status,u.create_time,d.dept_name").
-	//	Joins("left join sys_dept d on u.dept_id = d.dept_id").
-	//	Find(&list).
-	//	Error; err != nil {
-	//	core.Log.Error("查询用户数据失败, 异常信息如下：%s", err.Error())
-	//	return nil, response.CustomBusinessError(response.Failed, "获取用户数据失败")
-	//}
 	return &response.PageData{
 		Total: total,
 		Page:  param.Page,

@@ -29,6 +29,7 @@ const (
 	DateUpdateError     HttpCode = 100521
 	CaptchaImageError   HttpCode = 100522
 	UserNotAllowDelete  HttpCode = 100523
+	LoginSuccess        HttpCode = 100524
 )
 
 var Menus = map[HttpCode]string{
@@ -58,6 +59,7 @@ var Menus = map[HttpCode]string{
 	DateUpdateError:     "数据更新失败",
 	CaptchaImageError:   "验证码生成失败",
 	UserNotAllowDelete:  "当前用户不允许删除",
+	LoginSuccess:        "登录成功",
 }
 
 // Message 消息
@@ -71,6 +73,14 @@ func Ok(data any) Message {
 	return Message{
 		Code: Success,
 		Msg:  Menus[Success],
+		Data: data,
+	}
+}
+
+func OkMsg(code HttpCode, data any) Message {
+	return Message{
+		Code: Success,
+		Msg:  Menus[code],
 		Data: data,
 	}
 }

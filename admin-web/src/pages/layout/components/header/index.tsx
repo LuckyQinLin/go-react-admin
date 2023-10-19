@@ -11,10 +11,8 @@ import {
 import {ItemType as BreadcrumbType} from "antd/es/breadcrumb/Breadcrumb";
 import './index.less';
 import {AdminIcon} from "@/components";
-import {useDispatch} from "react-redux";
-import {cleanUserStoreActionCreator} from "@/redux/user/action";
 import {useNavigate} from "react-router-dom";
-import {useSelector} from "@/redux/hooks";
+import useStore from "@/store/store.ts";
 
 interface LayoutHeaderProp {
     breadcrumb?: BreadcrumbProp[];
@@ -31,10 +29,9 @@ export interface BreadcrumbProp {
 
 const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapsed, changeCollapsed}) => {
 
-    const dispatch = useDispatch();
+    const userProp = useStore(state => state.userProp);
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
-    const {user} = useSelector((state) => state.user);
 
     const dropdownItems: MenuProps['items'] = [
         { key: '1', icon: <SettingOutlined />, label: '个人设置'},
@@ -54,7 +51,7 @@ const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapse
     const onClick: MenuProps['onClick'] = (e) => {
         if (e.key === '2') {
             messageApi.success('退出成功');
-            dispatch(cleanUserStoreActionCreator());
+            // TODO 清空
             navigate('/login');
         }
     };
@@ -70,7 +67,7 @@ const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapse
 				return [{href: '', title: <HomeOutlined />}, ...temp];
     }
 
-    return <Layout.Header className="admin-layout-header" style={{ padding: 0, background: bgColor }}>
+    return <Layout.Header className="admin-layout-header" style={{ padding: 0, background: bgColor, height: 55 }}>
         {contextHolder}
         <Space className="admin-layout-header-left">
             <Button
@@ -81,7 +78,7 @@ const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapse
                     color: 'rgba(0, 0, 0, 0.88)',
                     fontSize: '16px',
                     width: 10,
-                    height: 64,
+                    height: 55,
                     marginLeft: 16
                 }}
             />
@@ -91,7 +88,7 @@ const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapse
                 style={{
                     color: 'rgba(0, 0, 0, 0.88)',
                     fontSize: '16px',
-                    width: 64,
+                    width: 55,
                     height: 64,
                 }}
             />
@@ -101,7 +98,7 @@ const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapse
             <Dropdown menu={{items: dropdownItems, onClick}} placement="top" arrow className="header-right">
                 <span className="alhr-dropdown">
                     <Avatar src={<img src={'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png'} alt="avatar" />} />
-                    <span className="alhrd-title">{user?.userName}</span>
+                    <span className="alhrd-title">{userProp?.userName}</span>
                 </span>
             </Dropdown>
             <Dropdown menu={languageItems} placement="bottomRight" arrow className="header-right">
