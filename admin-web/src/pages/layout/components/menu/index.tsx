@@ -4,7 +4,7 @@ import {BreadcrumbProp} from "@/pages/layout/components/header";
 import {useNavigate, useRouteLoaderData} from "react-router-dom";
 import {User, Menu as Menus} from "@/types";
 import IconFont from "@/components/IconFont";
-import Router from "@/new-router/modules.tsx";
+import Router from "@/router/modules.tsx";
 import useStore from "@/store/store.ts";
 import './index.less';
 import {HOME_PAGE} from "@/constant/setting.ts";
@@ -18,7 +18,7 @@ interface LayoutHeaderProp {
 }
 
 
-const LayoutNewSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
+const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
 
     let navigate = useNavigate();
     const data = useRouteLoaderData(Router.LayoutId) as User.UserPermissionProp;
@@ -26,7 +26,7 @@ const LayoutNewSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
     const [menuList, setMenuList] = useState<MenuItem[]>([]);
     const [openKeys, setOpenKeys] = useState<string[]>([]);
     const [selectedKeys, setSelectedKeys] = useState<string[]>(['home']);
-    
+
     const buildMenuItem = (label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[]): MenuItem => {
         return { key, icon, children, label } as MenuItem;
     }
@@ -104,4 +104,4 @@ const LayoutNewSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
     </Layout.Sider>
 }
 
-export default LayoutNewSider;
+export default LayoutSider;

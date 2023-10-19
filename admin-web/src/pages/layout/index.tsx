@@ -3,34 +3,17 @@ import {Navigate, Outlet, useLocation, useRouteLoaderData} from "react-router-do
 import {Layout, theme} from "antd";
 import {LayoutHeader, LayoutSider, LayoutTabview} from "@/pages/layout/components";
 import {BreadcrumbProp} from "@/pages/layout/components/header";
-import {PermInfo} from "@/redux/user/reducer";
 import "./index.less";
 import {User} from "@/types";
-import NewRouter from "@/new-router";
+import NewRouter from "src/router";
 import searchRoute = NewRouter.searchRoute;
 import routers = NewRouter.routers;
-import Router from "@/new-router/modules.tsx";
+import Router from "@/router/modules.tsx";
 import staticPath = Router.staticPath;
 import NotFoundPath = Router.NotFoundPath;
 import NotAuthPath = Router.NotAuthPath;
 import useStore from "@/store/store.ts";
 
-
-export const permsKeys = (perms: PermInfo[]): string[] => {
-    let result: string[] = [];
-    perms.forEach(item => {
-        result.push(item.code)
-        if (item.children) {
-            item.children.forEach(inner => {
-                result.push(inner.code)
-                if (inner.children) {
-                    result.push(...inner.children.map(end => end.code))
-                }
-            })
-        }
-    })
-    return result;
-}
 
 const LayoutPage: React.FC = () => {
 

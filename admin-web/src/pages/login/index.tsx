@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import Logo from '@/assets/images/account-logo.png';
 import './index.less';
-import {Button, Checkbox, Form, Input, message, Spin, Tabs, TabsProps} from "antd";
+import {Button, Checkbox, Form, Input, message, Tabs, TabsProps} from "antd";
 import {
     GithubOutlined,
     LockOutlined,
@@ -13,12 +13,9 @@ import {
     WechatOutlined
 } from "@ant-design/icons";
 import LoginBg from '@/assets/images/login-bg-1.svg';
-import {changeLoginStatusActionCreator} from "@/redux/user/action";
-import {useDispatch} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import {captchaImage, sendCaptcha, userLogin, userRegister} from "@/api/user";
+import {captchaImage, sendCaptcha, userRegister} from "@/api/user";
 import {LoginCaptchaProp, RegisterFormProp} from "@/pages/login/modules";
-import {useRequest} from "ahooks";
 import {HOME_PAGE} from "@/constant/setting.ts";
 import {User} from "@/types";
 import useStore from "@/store/store.ts";
@@ -168,28 +165,18 @@ const LoginPage: React.FC = () => {
 
     const userLoginFetch = useStore((state) => state.userLoginFetch)
 
-    const dispatch = useDispatch();
-
-    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
-    const {run} = useRequest(userLogin, {
-        manual: true,
-        onSuccess: (data)=> {
-            dispatch(changeLoginStatusActionCreator({...data}));
-            navigate(HOME_PAGE);
-        }
-    })
 
     const loginHandle = async (value: LoginFormProp) => {
         try {
-            setLoading(true);
+            // setLoading(true);
             userLoginFetch(value)
                 .then(() => {navigate(HOME_PAGE)})
                 .catch(err => {console.log(err.message)});
         } finally {
-            setLoading(false)
+            // setLoading(false)
         }
 
     }

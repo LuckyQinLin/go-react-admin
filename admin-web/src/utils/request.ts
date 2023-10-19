@@ -1,7 +1,5 @@
 import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse, Canceler, InternalAxiosRequestConfig} from "axios";
 import {message as Message, Modal} from 'antd';
-import {store} from "@/redux";
-import {cleanUserStoreActionCreator} from "@/redux/user/action.ts";
 import useStore from "@/store/store.ts";
 
 export enum ResultEnum {
@@ -145,7 +143,7 @@ function checkStatus(status: number, msg: string): void {
 		// 在登录成功后返回当前页面，这一步需要在登录页操作。
 		case 401:
 			Message.error('认证失败，' + msg);
-			store.dispatch(cleanUserStoreActionCreator())
+			// TODO 清空
 			window.location.href = '/login';
 			break;
 		case 403:
