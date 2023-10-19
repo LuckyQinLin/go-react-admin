@@ -1,5 +1,3 @@
-import {LoginFormProp} from "@/pages/login";
-import {UserState} from "@/redux/user/reducer.ts";
 import {https, PageData} from "@/utils/request.ts";
 import {LoginCaptchaProp, RegisterFormProp} from "@/pages/login/modules.ts";
 import {
@@ -8,14 +6,15 @@ import {
     UserTableProp,
     UserUpdateFormProp
 } from "@/pages/system/user/modules.ts";
+import {User} from "@/types";
 
 // userLogin 用户登录
-export const userLogin = (data: LoginFormProp): Promise<UserState> => {
+export const userLogin = (data: User.LoginFormProp): Promise<User.UserLoginResponse> => {
     return https.request({
         url: '/user/login',
         method: 'post',
         data: data
-    })
+    }, {isShowSuccessMessage: true})
 }
 
 // captchaImage 验证码
@@ -108,7 +107,7 @@ export const userRole = (userId: number, ids: number[]): Promise<string> => {
 }
 
 // userLoginInfo 获取用户登录信息
-export const userLoginInfo = (): Promise<UserLoginInfoProp> => {
+export const userLoginInfo = (): Promise<User.UserInfoProp> => {
     return https.request({
         url: '/user/loginInfo',
         method: 'get',

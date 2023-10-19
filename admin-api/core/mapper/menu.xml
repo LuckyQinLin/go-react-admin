@@ -31,4 +31,27 @@
             {% endif %}
     </select>
 
+    <select id="selectOperateByRoles" param="param">
+        select
+         distinct sm.perms
+        from sys_menu sm
+        where 1 = 1
+            and sm.menu_type = 'F'
+            {%- if param.IsAll != 0 %}
+                {# 单独角色 #}
+                {%- if param.RoleId != 0 %}
+                    and exists(select 1 from sys_role_menu srm
+                        where srm.role_id = {{param.RoleId}}
+                            and srm.menu_id = sm.menu_id
+                        )
+            {%- else %}
+                {# 全部角色 #}
+                and exists(select 1 from sys_role_menu srm
+                    where srm.menu_id = sm.menu_id
+                        and srm.role_id in ({{param.RoleIds|join:(",")}})
+                )
+            {%- endif %}
+        {% endif %}
+    </select>
+
 </mapper>

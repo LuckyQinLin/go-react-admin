@@ -46,7 +46,7 @@ func (u *UserController) Login(c *gin.Context) {
 		c.JSON(http.StatusOK, response.ResultCustom(customErr))
 		return
 	}
-	c.JSON(http.StatusOK, response.Ok(result))
+	c.JSON(http.StatusOK, response.OkMsg(response.LoginSuccess, result))
 }
 
 // GetUserInfo 获取用户信息

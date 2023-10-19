@@ -4,9 +4,27 @@ import Dept from "@/types/dept.ts";
 import Menu from "@/types/menu.ts";
 
 namespace User {
+
+    export interface UserStoreProp {
+        loginProp?: UserLoginResponse;
+        userProp?: UserInfoProp;
+        setLoginProp: (data: UserLoginResponse) => void;
+        setUserProp: (data: UserInfoProp) => void;
+        userLoginFetch: (data: LoginFormProp) => Promise<void>
+        useInfoFetch: () => Promise<void>
+    }
+
+    // LoginFormProp 用户登录表单
+    export interface LoginFormProp {
+        username: string;
+        password: string;
+        captcha: string;
+        uuid: string;
+    }
+
     // 用户详情
     export interface UserInfoProp {
-        admin: boolean;   // 是否admin
+        isSuper: boolean;   // 是否admin
         avatar: string;   // 头像
         userId: number;   // 用户ID
         userName: string; // 用户名称
@@ -18,6 +36,7 @@ namespace User {
         dept: Dept.UserDeptProp;   // 部门信息
         roles: Role.UserRoleProp[];// 角色
         posts: Post.UserPostProp[];// 岗位
+        operates: string[]; // 操作
     }
 
     // 用户权限信息
@@ -27,6 +46,13 @@ namespace User {
         paths: string[];            // 路径
 
     }
+
+    // UserLoginResponse 用户登录返回
+    export interface UserLoginResponse {
+        token: string;      // token信息
+        expireTime: number; // 到期时间
+    }
+
 }
 
 export default User

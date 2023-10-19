@@ -1,15 +1,13 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Layout, Menu, MenuProps} from "antd";
 import {BreadcrumbProp} from "@/pages/layout/components/header";
-import './index.less';
-import {Link, useNavigate, useRouteLoaderData} from "react-router-dom";
+import {useNavigate, useRouteLoaderData} from "react-router-dom";
 import {User, Menu as Menus} from "@/types";
 import IconFont from "@/components/IconFont";
 import Router from "@/new-router/modules.tsx";
-import {asyncRoutes} from "@/router";
-import {routerBuild, routerBuildMenu} from "@/router/routerFilter.tsx";
-import HomeRouter from "@/router/modules/home.tsx";
-import PersonRouter from "@/router/modules/person.tsx";
+import useStore from "@/store/store.ts";
+import './index.less';
+import {HOME_PAGE} from "@/constant/setting.ts";
 type MenuItem = Required<MenuProps>['items'][number]
 
 interface LayoutHeaderProp {
@@ -17,38 +15,17 @@ interface LayoutHeaderProp {
     breadcrumb: (data: BreadcrumbProp[]) => void;
 }
 
-const home: Menus.MenuItemProp = {
-    pId: 1,
-    id: 1,
-    sort: 0,
-    title: '首页',
-    perms: 'home',
-    path: '/home/index',
-    icon: 'lucky-shouye1',
-    types: 'M',
-    component: '',
-}
-
-const person: Menus.MenuItemProp = {
-    pId: 0,
-    id: 1,
-    sort: 0,
-    title: '个人中心',
-    perms: 'person',
-    path: '/person/index',
-    icon: 'lucky-jiankong',
-    types: 'M',
-    component: '',
-}
-
 
 const LayoutNewSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
 
     let navigate = useNavigate();
     const data = useRouteLoaderData(Router.LayoutId) as User.UserPermissionProp;
+    const userProp = useStore(state => state.userProp)
     const [menuList, setMenuList] = useState<MenuItem[]>([]);
     const [openKeys, setOpenKeys] = useState<string[]>([]);
     const [selectedKeys, setSelectedKeys] = useState<string[]>(['home']);
+
+
 
     const buildMenuItem = (label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[]): MenuItem => {
         return { key, icon, children, label } as MenuItem;
@@ -77,6 +54,8 @@ const LayoutNewSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
         });
     }
 
+
+
     const clickMenu = (key: string) => {
         setSelectedKeys([key])
         navigate(key)
@@ -90,10 +69,11 @@ const LayoutNewSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
 
 
     useEffect(() => {
-        // const treeMenu = routerBuildMenu([home, ...data.menus, person]);
-        const treeMenu = routerBuildMenu(data.menus);
-        const items = Router.menuItems;
-        console.log("new-tree Menu => ", treeMenu);
+        if (userProp === undefined) {
+            navigate(HOME_PAGE)
+            return
+        }
+        const items = userProp.isSuper ? Router.menuItems : routerBuildMenu(data.menus)
         console.log("new-tree all Menu => ", items);
         setMenuList(items!);
     }, []);
@@ -110,8 +90,7 @@ const LayoutNewSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
             mode="inline"
             theme="dark"
             inlineCollapsed={collapsed}
-            items={Router.menuItems}
-            // openKeys={openKeys}
+            items={menuList}
             openKeys={openKeys}
             selectedKeys={selectedKeys}
             onOpenChange={openSubKey}

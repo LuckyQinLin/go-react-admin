@@ -2,6 +2,7 @@ import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse, Canceler, Inter
 import {message as Message, Modal} from 'antd';
 import {store} from "@/redux";
 import {cleanUserStoreActionCreator} from "@/redux/user/action.ts";
+import useStore from "@/store/store.ts";
 
 export enum ResultEnum {
 	SUCCESS = 100200,
@@ -361,10 +362,7 @@ const transform: AxiosTransform = {
 		if (isShowMessage) {
 			if (hasSuccess && (successMessageText || isShowSuccessMessage)) {
 				// 是否显示自定义信息提示
-				Modal.success({
-					title: '成功',
-					content: successMessageText || message || '操作成功！',
-				})
+				Message.success(message || errorMessageText || '操作失败！');
 			} else if (!hasSuccess && (errorMessageText || isShowErrorMessage)) {
 				// 是否显示自定义信息提示
 				Message.error(message || errorMessageText || '操作失败！');
@@ -471,13 +469,13 @@ const transform: AxiosTransform = {
 	 * @description: 请求拦截器处理
 	 */
 	requestInterceptors: (config, options) => {
-		// 请求之前处理config
-		const token = store.getState().user.token;
-		if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
-			// jwt token
-			(config as Recordable).headers.Authorization = options.authenticationScheme
-				? `${options.authenticationScheme} ${token}`
-				: token;
+		const loginProp = useStore.getState().loginProp
+		// 判断loginProp 存在，配置是否需要携带token
+		if (loginProp && loginProp.token && (config as Recordable)?.requestOptions?.withToken !== false) {
+			// authenticationScheme token串前缀
+			(config as Recordable).headers.Authorization = options.authenticationScheme ?
+				`${options.authenticationScheme} ${loginProp.token}`
+				: loginProp.token
 		}
 		return config;
 	},

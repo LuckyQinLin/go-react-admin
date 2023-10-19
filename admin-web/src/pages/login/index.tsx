@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import Logo from '@/assets/images/account-logo.png';
 import './index.less';
-import {Button, Checkbox, Form, Input, message, Tabs, TabsProps} from "antd";
+import {Button, Checkbox, Form, Input, message, Spin, Tabs, TabsProps} from "antd";
 import {
     GithubOutlined,
     LockOutlined,
@@ -20,6 +20,8 @@ import {captchaImage, sendCaptcha, userLogin, userRegister} from "@/api/user";
 import {LoginCaptchaProp, RegisterFormProp} from "@/pages/login/modules";
 import {useRequest} from "ahooks";
 import {HOME_PAGE} from "@/constant/setting.ts";
+import {User} from "@/types";
+import useStore from "@/store/store.ts";
 
 
 export interface LoginFormProp {
@@ -30,13 +32,13 @@ export interface LoginFormProp {
 }
 
 interface LoginProp {
-    submit: (data: LoginFormProp) => void;
+    submit: (data: User.LoginFormProp) => void;
     changeRegister: () => void;
 }
 
 const LoginForm: React.FC<LoginProp> = ({submit, changeRegister}) => {
 
-    const [form] = Form.useForm<LoginFormProp>();
+    const [form] = Form.useForm<User.LoginFormProp>();
 
     const onSubmit = () => {
         form.validateFields().then(value => submit({...value, uuid: captchaProp.uuid}))
@@ -164,9 +166,11 @@ const RegisterForm: React.FC<RegisterProp> = ({submit, changeRegister}) => {
 
 const LoginPage: React.FC = () => {
 
+    const userLoginFetch = useStore((state) => state.userLoginFetch)
+
     const dispatch = useDispatch();
 
-
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
@@ -178,7 +182,17 @@ const LoginPage: React.FC = () => {
         }
     })
 
-    const loginHandle = async (value: LoginFormProp) => run(value)
+    const loginHandle = async (value: LoginFormProp) => {
+        try {
+            setLoading(true);
+            userLoginFetch(value)
+                .then(() => {navigate(HOME_PAGE)})
+                .catch(err => {console.log(err.message)});
+        } finally {
+            setLoading(false)
+        }
+
+    }
 
     const registerHandle = async (value: RegisterFormProp) => {
         await userRegister(value)
@@ -202,23 +216,25 @@ const LoginPage: React.FC = () => {
     const [activeKey, setActiveKey] = useState<string>('1');
 
     return <div className="account-root">
-        <div className="account-root-item">
-            <div className="account-root-item-img">
-                <img src={LoginBg} alt="" />
-                {/*<img src="https://pro.naiveadmin.com/assets/login-bg.be83cd61.svg" alt="" />*/}
-            </div>
-        </div>
-        <div className="account-root-item root-right-item">
-            <div className="account-form">
-                <div className="account-top">
-                    <div className="account-top-logo">
-                        <img src={Logo} alt="" />
-                    </div>
-                    <div className="account-top-desc">一款通用的后台管理系统</div>
+        {/*<Spin spinning={loading} >*/}
+            <div className="account-root-item">
+                <div className="account-root-item-img">
+                    <img src={LoginBg} alt="" />
+                    {/*<img src="https://pro.naiveadmin.com/assets/login-bg.be83cd61.svg" alt="" />*/}
                 </div>
-                <Tabs className="account-tabs" activeKey={activeKey} onChange={setActiveKey} centered items={items} />
             </div>
-        </div>
+            <div className="account-root-item root-right-item">
+                <div className="account-form">
+                    <div className="account-top">
+                        <div className="account-top-logo">
+                            <img src={Logo} alt="" />
+                        </div>
+                        <div className="account-top-desc">一款通用的后台管理系统</div>
+                    </div>
+                    <Tabs className="account-tabs" activeKey={activeKey} onChange={setActiveKey} centered items={items} />
+                </div>
+            </div>
+        {/*</Spin>*/}
     </div>
 }
 

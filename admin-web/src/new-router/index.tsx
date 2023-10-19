@@ -38,6 +38,7 @@ namespace NewRouter {
     }
 
     export const searchRoute: any = (path: string, routes: any = []) => {
+        console.log("searchRoute")
         for (const item of routes) {
             if (item.path === path) return true
             if (item.children) {

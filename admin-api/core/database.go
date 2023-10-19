@@ -59,7 +59,7 @@ func InitDb() {
 			IgnoreRecordNotFoundError: false,
 			Colorful:                  true,
 		}),
-		Mapper: utils2.ReadTemplate(tpl, "role", "config", "menu", "user", "logger"),
+		Mapper: utils2.ReadTemplate(tpl, "role", "config", "menu", "user", "logger", "dept"),
 	}); err != nil {
 		Log.Error("连接数据库失败: %s", err.Error())
 		panic(err.Error())

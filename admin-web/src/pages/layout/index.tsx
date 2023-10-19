@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Navigate, Outlet, useLocation, useRouteLoaderData} from "react-router-dom";
 import {Layout, theme} from "antd";
-import {LayoutHeader, LayoutNewSider, LayoutNewTwoSider, LayoutSider, LayoutTabview} from "@/pages/layout/components";
+import {LayoutHeader, LayoutNewSider, LayoutTabview} from "@/pages/layout/components";
 import {BreadcrumbProp} from "@/pages/layout/components/header";
 import {PermInfo} from "@/redux/user/reducer";
 import "./index.less";
@@ -13,6 +13,7 @@ import Router from "@/new-router/modules.tsx";
 import staticPath = Router.staticPath;
 import NotFoundPath = Router.NotFoundPath;
 import NotAuthPath = Router.NotAuthPath;
+import useStore from "@/store/store.ts";
 
 
 export const permsKeys = (perms: PermInfo[]): string[] => {
@@ -37,21 +38,17 @@ const LayoutPage: React.FC = () => {
     const {token: { colorBgContainer }} = theme.useToken();
     const [collapsed, setCollapsed] = useState(false);
     const [breadcrumb, setBreadcrumb] = useState<BreadcrumbProp[]>([]);
+    const useInfoFetch = useStore((state) => state.useInfoFetch)
+
+    useEffect(() => { useInfoFetch()}, []);
 
     const dataLoader = useRouteLoaderData(Router.LayoutId) as User.UserPermissionProp;
     if (!searchRoute(pathname, routers)) {
-        console.log("11111111")
         return <Navigate to={NotFoundPath} />
     }
-
     if (!staticPath.includes(pathname) && !dataLoader.paths.includes(pathname)) {
-        console.log("22222222")
         return <Navigate to={NotAuthPath} />
     }
-
-    useEffect(() => {
-        // getUserInfo()
-    }, []);
 
     const contentCss: React.CSSProperties = {
         margin: '0px 10px 10px 10px',
