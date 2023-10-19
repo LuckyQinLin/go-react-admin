@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Layout, Menu, MenuProps} from "antd";
 import {BreadcrumbProp} from "@/pages/layout/components/header";
 import {useNavigate, useRouteLoaderData} from "react-router-dom";
-import {User, Menu as Menus} from "@/types";
+import {User, Menus} from "@/types";
 import IconFont from "@/components/IconFont";
 import RouterVariate from "@/router/modules.tsx";
 import useStore from "@/store/store.ts";
@@ -23,7 +23,7 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
     const userProp = useStore(state => state.userProp)
     const [menuList, setMenuList] = useState<MenuItem[]>([]);
     const [openKeys, setOpenKeys] = useState<string[]>([]);
-    const [selectedKeys] = useState<string[]>(['home']);
+    const [selectedKeys, setSelectedKeys] = useState<string[]>(['home']);
 
     const buildMenuItem = (label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[]): MenuItem => {
         return { key, icon, children, label } as MenuItem;
@@ -53,11 +53,11 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
     }
 
 
-
-    const clickMenu = (item: MenuItem) => {
-        console.log(item)
-        // setSelectedKeys([item?.key as string])
-        // navigate(key)
+    const clickMenu = (data: string) => {
+        const target = RouterVariate.menuTitleItems.find(item => data === item.path);
+        console.log("clickMenu", target)
+        setSelectedKeys([data])
+        navigate(data)
     }
 
     const openSubKey = (keys: string[]) => {
@@ -72,14 +72,15 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
             navigate(HOME_PAGE)
             return
         }
-        setMenuList(userProp.isSuper ?
+        const items = userProp.isSuper ?
             RouterVariate.menuItems :
             [
                 ...RouterVariate.HomeItems,
                 ...routerBuildMenu(data.menus),
                 ...RouterVariate.PersonItems
             ]
-        );
+
+        setMenuList(items);
     }, []);
 
 
@@ -98,7 +99,7 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
             openKeys={openKeys}
             selectedKeys={selectedKeys}
             onOpenChange={openSubKey}
-            onClick={(e) => clickMenu(e)}
+            onClick={({key}) => clickMenu(key)}
         />
     </Layout.Sider>
 }

@@ -5,7 +5,7 @@ import {
     MenuTableTreeQueryProp,
     MenuTreeProp, MenuUpdateFormProp, UserRouterProp
 } from "@/pages/system/menu/modules.ts";
-import {Menu} from "@/types";
+import {Menus} from "@/types";
 
 // menuTree 菜单树
 export const menuTable = (data: MenuTableTreeQueryProp): Promise<MenuTableTreeProp[]> => {
@@ -70,7 +70,7 @@ export const userPageRouter = (roleId?: number): Promise<UserRouterProp[]> => {
 }
 
 // menuDelete 菜单删除
-export const getPermissions = (roleId?: number): Promise<Menu.MenuItemProp[]> => {
+export const getPermissions = (roleId?: number): Promise<Menus.MenuItemProp[]> => {
     return https.request({
         url: '/menu/router',
         method: 'get',

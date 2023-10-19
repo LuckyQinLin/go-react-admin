@@ -1,4 +1,4 @@
-namespace Menu {
+namespace Menus {
     // 资源数据
     export interface MenuItemProp {
         id:        number;        // 菜单主键
@@ -12,6 +12,12 @@ namespace Menu {
         component: string;        // 组件路由
         children?: MenuItemProp[] // 下级菜单
     }
+
+    // MenuTitleProp 菜单对应的标题和路由
+    export interface MenuTitleProp {
+        title: string;
+        path: string;
+    }
 }
 
-export default Menu
+export default Menus
