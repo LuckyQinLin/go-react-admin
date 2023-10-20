@@ -20,7 +20,8 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
 
     let navigate = useNavigate();
     const data = useRouteLoaderData(RouterVariate.LayoutId) as User.UserPermissionProp;
-    const userProp = useStore(state => state.userProp)
+    const userProp = useStore(state => state.userProp);
+    const addTabView = useStore(state => state.addTabView);
     const [menuList, setMenuList] = useState<MenuItem[]>([]);
     const [openKeys, setOpenKeys] = useState<string[]>([]);
     const [selectedKeys, setSelectedKeys] = useState<string[]>(['home']);
@@ -56,8 +57,11 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
     const clickMenu = (data: string) => {
         const target = RouterVariate.menuTitleItems.find(item => data === item.path);
         console.log("clickMenu", target)
-        setSelectedKeys([data])
-        navigate(data)
+        if (target) {
+            addTabView({title: target.title, key: target.path as string})
+            setSelectedKeys([data])
+            navigate(data)
+        }
     }
 
     const openSubKey = (keys: string[]) => {

@@ -2,16 +2,23 @@ import Post from "@/types/post.ts";
 import Role from "@/types/role.ts";
 import Dept from "@/types/dept.ts";
 import Menu from "@/types/menu.ts";
+import Menus from "@/types/menu.ts";
 
 namespace User {
 
     export interface UserStoreProp {
+        tabViewKey: string;
+        tabViews: Menus.TabViewProp[];
         loginProp?: UserLoginResponse;
         userProp?: UserInfoProp;
         setLoginProp: (data: UserLoginResponse) => void;
         setUserProp: (data: UserInfoProp) => void;
-        userLoginFetch: (data: LoginFormProp) => Promise<void>
-        useInfoFetch: () => Promise<void>
+        userLoginFetch: (data: LoginFormProp) => Promise<void>;
+        useInfoFetch: () => Promise<void>;
+        addTabView: (data: Menus.TabViewProp) => void;
+        removeTabView: (key: string, isNegation?: boolean) => void;
+        setTabViewKey: (key: string) => void;
+        closeTabViewAll: () => void;
     }
 
     // LoginFormProp 用户登录表单

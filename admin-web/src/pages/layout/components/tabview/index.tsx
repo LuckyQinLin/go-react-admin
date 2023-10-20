@@ -11,24 +11,23 @@ import {
 import {Dropdown} from "antd";
 import type { MenuProps } from 'antd';
 import { MenuInfo } from "rc-menu/lib/interface";
-
-
-interface TabViewProp {
-    key: string | number;
-    title: string | React.ReactNode;
-    closeIcon?: boolean | React.ReactNode
-}
+import {Menus} from "@/types";
+import useStore from "@/store/store.ts";
+import {useNavigate} from "react-router-dom";
 
 interface TabTotalProp {
     tabsWith: number;
     parentWith: number;
 }
 
-const LayoutTabview = () => {
+const LayoutTabview: React.FC = () => {
 
-    const [items] = useState<TabViewProp[]>([
-        {key: 'home', title: '首页', closeIcon: true}
-    ]);
+    let navigate = useNavigate();
+    const items = useStore(state => state.tabViews)
+    const selectedKey = useStore(state => state.tabViewKey)
+    const removeTabView = useStore(state => state.removeTabView)
+    const setTabViewKey = useStore(state => state.setTabViewKey)
+    const closeTabViewAll = useStore(state => state.closeTabViewAll)
 
     const dropItems: MenuProps['items'] = [
         { label: '刷新当前', key: '1', icon: <RedoOutlined />},
@@ -53,49 +52,69 @@ const LayoutTabview = () => {
     const scrollableRef = useRef<HTMLDivElement | null>(null);
     const [tabSize, setTabSize] = useState<TabTotalProp>({tabsWith: 0, parentWith: 0});
 
-    const [selectedKey, setSelectedKey] = useState<string | number>('home');
-
-    const handleResize = () => {
-        console.log(tabSize, scrollableRef.current?.clientWidth)
-        setInterval(() => {
-            setTabSize({...tabSize, parentWith: scrollableRef.current?.clientWidth ?? tabSize.parentWith})
-        }, 100)
-    };
-
     /**
      * 关闭tab页面
+     * @param event
      * @param key
      */
-    const closeTabPage = (key: string | number) => {
-        console.log(key)
+    const closeTabPage = (event: React.MouseEvent, key: string | number) => {
+        event.stopPropagation();
+        removeTabView(key as string)
     }
 
-    const dropDownHandler = (e: MenuInfo, data: TabViewProp) => {
+    const dropDownHandler = (e: MenuInfo, data: Menus.TabViewProp) => {
         switch (e.key) {
             case '1':
-            // 刷新当前
+                // 刷新当前
+                break;
             case '2':
-            // 关闭当前
+                // 关闭当前
+                removeTabView(data.key as string);
+                break;
             case '3':
-            // 关闭其他
+                // 关闭其他
+                removeTabView(data.key as string, true);
+                break;
             case '4':
-            // 关闭全部
+                // 关闭全部
+                closeTabViewAll()
+                break;
             default:
                 break
         }
     }
 
-
+    const clickTabView = (key: string) => {
+        setTabViewKey(key)
+        navigate(key)
+    }
 
     useEffect(() => {
+        navigate(selectedKey)
+    }, [selectedKey]);
+
+    useEffect(() => {
+        getTabViewWith()
+    }, [items]);
+
+
+    const getTabViewWith = () => {
         if (scrollableRef.current) {
             const width = Array.from(scrollableRef.current?.children)
                 .reduce((acc, childNode) => {return acc + childNode.clientWidth;}, 0);
-            setTabSize({tabsWith: width, parentWith: scrollableRef.current?.clientWidth})
+            setTimeout(() => setTabSize({
+                tabsWith: width,
+                parentWith: scrollableRef.current?.clientWidth ?? tabSize.parentWith
+            }), 100)
         }
-        window.addEventListener('resize', handleResize);
+    }
+
+
+    useEffect(() => {
+        getTabViewWith()
+        window.addEventListener('resize', getTabViewWith);
         return () => {
-            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('resize', getTabViewWith);
         }
     }, []);
 
@@ -109,11 +128,14 @@ const LayoutTabview = () => {
                     <Dropdown menu={{ items: dropItems, onClick: (e) => dropDownHandler(e, item) }} trigger={['contextMenu']}>
                         <div
                             id={`tab-view-id-${item.key}`}
-                            onClick={() => setSelectedKey(item.key)}
+                            onClick={() => clickTabView(item.key as string)}
                             className={`tab-view-item-btn ${item.key === selectedKey ? 'tab-view-item-active' : null}`}
                         >
                             <span>{item.title}</span>
-                            {item.closeIcon ? null : <CloseOutlined className="span-icon" onClick={() => closeTabPage(item.key)} />}
+                            {item.closeIcon ? null : <CloseOutlined
+                                className="span-icon"
+                                onClick={(event) => closeTabPage(event, item.key)}
+                            />}
                         </div>
                     </Dropdown>
                 )

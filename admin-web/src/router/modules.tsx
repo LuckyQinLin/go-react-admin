@@ -23,7 +23,6 @@ function getItem(
 
 namespace RouterVariate {
 
-    import MenuTitleProp = Menus.MenuTitleProp;
 
     export enum RouterEnum {
         Layout,
@@ -158,7 +157,7 @@ namespace RouterVariate {
         ...PersonItems
     ];
 
-    export const menuTitleItems: MenuTitleProp[] = [
+    export const menuTitleItems: Menus.MenuTitleProp[] = [
         {title: '首页', path: '/home/index'},
 
         {title: '用户管理', path: '/system/user'},

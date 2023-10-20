@@ -1,3 +1,5 @@
+import React from "react";
+
 namespace Menus {
     // 资源数据
     export interface MenuItemProp {
@@ -17,6 +19,13 @@ namespace Menus {
     export interface MenuTitleProp {
         title: string;
         path: string;
+    }
+
+    // TabViewProp 路由菜单栏属性
+    export interface TabViewProp {
+        key: string | number;
+        title: string | React.ReactNode;
+        closeIcon?: boolean | React.ReactNode
     }
 }
 
