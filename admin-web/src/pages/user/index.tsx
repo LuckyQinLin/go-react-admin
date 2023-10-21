@@ -25,7 +25,7 @@ const UserCenterPage = () => {
     ];
 
     return <>
-        <Container gutter={16}>
+        <Container gutter={8}>
             <Col span={6} style={{marginRight: 0}}>
                 <Card title="个人信息" bordered={false}>
                     <Avatar

@@ -110,6 +110,10 @@ func initRouter() {
 			logger.POST("visit", controller.Logger.VisitPage)     // 访问日志
 			logger.POST("operate", controller.Logger.OperatePage) // 操作日志
 		}
+		monitor := root.Group("monitor") // 监控模块
+		{
+			monitor.GET("serverInfo", controller.Monitor.GetServerInfo) // 获取服务器详情
+		}
 	}
 }
 
