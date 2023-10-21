@@ -53,6 +53,8 @@ const LayoutHeader: React.FC<LayoutHeaderProp> = ({breadcrumb, bgColor, collapse
             messageApi.success('退出成功');
             // TODO 清空
             navigate('/login');
+        } else if (e.key === '1') {
+            navigate('/person/index')
         }
     };
 

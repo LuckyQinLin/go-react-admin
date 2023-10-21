@@ -7,6 +7,7 @@ import {noticeDelete} from "@/api/notice.ts";
 import {ParamCreateDrawer, ParamUpdateDrawer} from "@/pages/system/param/components";
 import {ConfigDrawerProp, ConfigPageProp, ConfigPageQueryProp} from "@/pages/system/param/modules.ts";
 import {configPage} from "@/api/config.ts";
+import styled from "@emotion/styled";
 
 const SystemParamPage = () => {
 
@@ -132,7 +133,7 @@ const SystemParamPage = () => {
 
     useEffect(() => run(pageQuery), [])
 
-    return <>
+    return <Container>
         <Space>
             <Button type="primary" icon={<PlusOutlined />} disabled={selectedRowKeys.length > 0} onClick={() => openDrawer('create')}>新增</Button>
             <Button type="primary" icon={<DownloadOutlined />} disabled={selectedRowKeys.length <= 0}>导出</Button>
@@ -167,7 +168,13 @@ const SystemParamPage = () => {
         />
         <ParamCreateDrawer visible={configDrawer.createVisible} close={(isLoad) => closeDrawer('create', isLoad)} />
         <ParamUpdateDrawer visible={configDrawer.updateVisible} close={(isLoad) => closeDrawer('update', isLoad)} configId={configDrawer.configId} />
-    </>
+    </Container>
 }
+
+const Container = styled.div`
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 5px;
+`
 
 export default SystemParamPage;

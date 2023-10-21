@@ -31,9 +31,9 @@ const LayoutPage: React.FC = () => {
 
     const contentCss: React.CSSProperties = {
         margin: '0px 10px 10px 10px',
-        padding: 16,
-        minHeight: 'calc(100vh - 55px - 48px - 11px)',
-        background: colorBgContainer
+        // padding: 16,
+        minHeight: 'calc(100vh - 55px - 41px - 11px)',
+        // background: colorBgContainer
     }
 
     return <Layout className="admin-layout-area">

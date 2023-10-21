@@ -11,6 +11,7 @@ import {useRequest} from "ahooks";
 import {MenuCreateDrawer, MenuUpdateDrawer} from "@/pages/system/menu/components";
 import IconFont from "@/components/IconFont";
 import {ExclamationCircleFilled} from "@ant-design/icons";
+import styled from "@emotion/styled";
 
 
 const AuthorityPermissionPage = () => {
@@ -137,7 +138,7 @@ const AuthorityPermissionPage = () => {
     }, [])
 
 
-    return <>
+    return <Container>
         <Space>
             <Button type='primary' onClick={() => setDrawerProp({...drawerProp, createVisible: true, parentId: 0})}>创建</Button>
             <Button type='primary' onClick={() => run(tableQuery)}>刷新</Button>
@@ -168,7 +169,13 @@ const AuthorityPermissionPage = () => {
             menuId={drawerProp.currId!}
             visible={drawerProp.updateVisible}
             close={closeDrawer} />
-    </>
+    </Container>
 }
+
+const Container = styled.div`
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 5px;
+`
 
 export default AuthorityPermissionPage;

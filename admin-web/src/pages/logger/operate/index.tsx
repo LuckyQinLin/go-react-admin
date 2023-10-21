@@ -7,6 +7,7 @@ import {Space, Switch, Table} from "antd";
 import {useState} from "react";
 import {useRequest} from "ahooks";
 import {operateLoggerPage} from "@/api/logger.ts";
+import styled from "@emotion/styled";
 
 const LoggerOperatePage = () => {
     const columns: ColumnsType<OperateLoggerTableProp> = [
@@ -59,7 +60,7 @@ const LoggerOperatePage = () => {
         }
     })
 
-    return <>
+    return <Container>
         <Space></Space>
         <Table
             bordered
@@ -88,7 +89,13 @@ const LoggerOperatePage = () => {
                 }
             }}
         />
-    </>
+    </Container>
 }
+
+const Container = styled.div`
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 5px;
+`
 
 export default LoggerOperatePage;

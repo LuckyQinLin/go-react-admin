@@ -6,6 +6,7 @@ import {useRequest} from "ahooks";
 import {roleDelete, rolePage} from "@/api/role.ts";
 import {useEffect, useState} from "react";
 import {AllocateUserDrawer, RoleCreateDrawer, RoleUpdateDrawer} from "@/pages/system/role/components";
+import styled from "@emotion/styled";
 
 const SystemRolePage = () => {
 
@@ -126,7 +127,7 @@ const SystemRolePage = () => {
     useEffect(() => run(pageQuery), [])
     //
     //
-    return <>
+    return <Container>
         <Space>
             <Button type="primary" icon={<PlusOutlined />} disabled={selectedRowKeys.length > 0} onClick={() => openDrawer('create')}>新增</Button>
             <Button type="primary" icon={<DownloadOutlined />} disabled={selectedRowKeys.length <= 0}>导出</Button>
@@ -172,9 +173,15 @@ const SystemRolePage = () => {
         <RoleCreateDrawer visible={roleDrawer.createVisible} close={(isLoad) => closeDrawer('create', isLoad)} />
         <RoleUpdateDrawer visible={roleDrawer.updateVisible} close={isLoad => closeDrawer('update', isLoad)} roleId={roleDrawer.roleId} />
         <AllocateUserDrawer visible={roleDrawer.userVisible} roleId={roleDrawer.roleId} close={() => closeDrawer('user', false)} />
-    </>
+    </Container>
 
     // return <div>哈哈哈</div>
 }
+
+const Container = styled.div`
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 5px;
+`
 
 export default SystemRolePage;
