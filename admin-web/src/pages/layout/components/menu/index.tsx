@@ -6,7 +6,6 @@ import {User, Menus} from "@/types";
 import IconFont from "@/components/IconFont";
 import RouterVariate from "@/router/modules.tsx";
 import useStore from "@/store/store.ts";
-import {HOME_PAGE} from "@/constant/setting.ts";
 type MenuItem = Required<MenuProps>['items'][number]
 import './index.less';
 
@@ -72,18 +71,19 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
 
 
     useEffect(() => {
-        if (userProp === undefined) {
-            navigate(HOME_PAGE)
-            return
-        }
-        const items = userProp.isSuper ?
+        // if (userProp === undefined) {
+        //     navigate(HOME_PAGE)
+        //     return
+        // }
+        // debugger;
+        const items = userProp?.isSuper ?
             RouterVariate.menuItems :
             [
                 ...RouterVariate.HomeItems,
                 ...routerBuildMenu(data.menus),
                 ...RouterVariate.PersonItems
             ]
-
+        console.log("menu", userProp, data, items)
         setMenuList(items);
     }, []);
 
@@ -98,7 +98,6 @@ const LayoutSider: React.FC<LayoutHeaderProp> = ({collapsed}) => {
         <Menu
             mode="inline"
             theme="dark"
-            inlineCollapsed={collapsed}
             items={menuList}
             openKeys={openKeys}
             selectedKeys={selectedKeys}

@@ -56,7 +56,6 @@ namespace RouterSpace {
         {
             id: Router.LayoutId,
             element: getRouter(RouterEnum.Layout),
-            // element: LayoutPage,
             loader: authLoader, // 鉴权方法
             children: [
                 {

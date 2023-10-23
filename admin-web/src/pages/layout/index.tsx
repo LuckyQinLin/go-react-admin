@@ -20,7 +20,7 @@ const LayoutPage: React.FC = () => {
     const useInfoFetch = useStore((state) => state.useInfoFetch)
 
     useEffect(() => { useInfoFetch()}, []);
-
+    // debugger;
     const dataLoader = useRouteLoaderData(RouterVariate.LayoutId) as User.UserPermissionProp;
     if (!searchRoute(pathname, RouterSpace.routers)) {
         return <Navigate to={RouterVariate.NotFoundPath} />
