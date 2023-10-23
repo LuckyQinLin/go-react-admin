@@ -11,6 +11,12 @@ namespace Monitor {
 		virtualizationSystem: string; // 虚拟化系统
 		virtualizationRole: string; // 指示主机是虚拟机中的“guest”（客户机）还是虚拟机宿主机（"host"）
 	}
+
+	// CpuInfoResponse cpu占用率
+	export interface CpuInfoResponse {
+		time: string; // 时间
+		num: number; // 数值
+	}
 }
 
 export default Monitor;

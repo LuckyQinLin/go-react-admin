@@ -3,7 +3,9 @@ package service
 import (
 	"admin-api/app/models/response"
 	"admin-api/core"
+	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/host"
+	"time"
 )
 
 var Monitor = new(MonitorService)
@@ -23,6 +25,23 @@ type MonitorService struct{}
 //	}, nil
 //}
 
+// GetCpuInfo 获取CPU占用率
+func (m *MonitorService) GetCpuInfo(interval int64) (*response.CpuUsageResponse, *response.BusinessError) {
+	var (
+		timeValue time.Time
+		percent   []float64
+		err       error
+	)
+	if percent, err = cpu.Percent(time.Duration(interval)*time.Second, false); err != nil {
+		return nil, response.CustomBusinessError(response.Failed, "获取服务器CPU占用率出错")
+	}
+	timeValue = time.Now()
+	return &response.CpuUsageResponse{
+		Time: &timeValue,
+		Num:  percent[0],
+	}, nil
+}
+
 // GetServerInfo 获取系统信息
 func (m *MonitorService) GetServerInfo() (*response.ServerInfoResponse, *response.BusinessError) {
 	var (
@@ -35,7 +54,7 @@ func (m *MonitorService) GetServerInfo() (*response.ServerInfoResponse, *respons
 	}
 	return &response.ServerInfoResponse{
 		Hostname:        info.Hostname,
-		Uptime:          info.Uptime,
+		Uptime:          time.Now().Add(time.Duration(info.Uptime)).Unix(),
 		Procs:           info.Procs,
 		OS:              info.OS,
 		Platform:        info.Platform,

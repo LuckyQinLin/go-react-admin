@@ -1,5 +1,11 @@
 package response
 
+import (
+	"admin-api/utils"
+	"encoding/json"
+	"time"
+)
+
 type (
 	// ServerUsageResponse 服务器占用率
 	ServerUsageResponse struct {
@@ -11,7 +17,7 @@ type (
 	// ServerInfoResponse 服务器信息
 	ServerInfoResponse struct {
 		Hostname        string `json:"hostname"`
-		Uptime          uint64 `json:"runTime"`         // 运行时间
+		Uptime          int64  `json:"runTime"`         // 运行时间
 		Procs           uint64 `json:"procs"`           // 进程数
 		OS              string `json:"os"`              // 操作系统名称
 		Platform        string `json:"platform"`        // 操作系统平台
@@ -19,4 +25,21 @@ type (
 		KernelVersion   string `json:"kernelVersion"`   // 内核版本
 		KernelArch      string `json:"kernelArch"`      // 内核架构
 	}
+
+	// CpuUsageResponse CPU占用
+	CpuUsageResponse struct {
+		Time *time.Time `json:"time"`
+		Num  float64    `json:"num"`
+	}
 )
+
+func (s CpuUsageResponse) MarshalJSON() ([]byte, error) {
+	type temp CpuUsageResponse
+	return json.Marshal(&struct {
+		temp
+		Time utils.DateTime1 `json:"time"`
+	}{
+		temp: (temp)(s),
+		Time: utils.DateTime1(*s.Time),
+	})
+}

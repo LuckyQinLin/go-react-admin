@@ -50,3 +50,15 @@ export const throttle = (fn: Function, time: number) => {
 		}
 	}
 }
+
+/**
+ * 将时间戳转为 => 几天几小时几分钟几秒
+ * @param mss
+ */
+export const formatDuring = (mss: number): string => {
+	let days = Math.trunc(mss / (1000 * 60 * 60 * 24));
+	let hours = Math.trunc((mss % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+	let minutes = Math.trunc((mss % (1000 * 60 * 60)) / (1000 * 60));
+	let seconds = ((mss % (1000 * 60)) / 1000).toFixed(0);
+	return days + " 天 " + hours + " 小时 " + minutes + " 分钟 " + seconds + " 秒 ";
+}

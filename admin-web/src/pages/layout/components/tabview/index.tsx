@@ -125,7 +125,7 @@ const LayoutTabview: React.FC = () => {
         <div className="tab-view-items" ref={scrollableRef}>
             {items.length > 0 &&
                 items.map(item =>
-                    <Dropdown menu={{ items: dropItems, onClick: (e) => dropDownHandler(e, item) }} trigger={['contextMenu']}>
+                    <Dropdown key={item.key} menu={{ items: dropItems, onClick: (e) => dropDownHandler(e, item) }} trigger={['contextMenu']}>
                         <div
                             id={`tab-view-id-${item.key}`}
                             onClick={() => clickTabView(item.key as string)}

@@ -28,6 +28,19 @@ type MonitorController struct {
 //	ctx.JSON(http.StatusOK, response.Ok(result))
 //}
 
+// GetCPUInfo 获取服务器CPU信息
+func (m *MonitorController) GetCPUInfo(ctx *gin.Context) {
+	var (
+		result    *response.CpuUsageResponse
+		customErr *response.BusinessError
+	)
+	if result, customErr = service.Monitor.GetCpuInfo(1); customErr != nil {
+		ctx.JSON(http.StatusOK, response.ResultCustom(customErr))
+		return
+	}
+	ctx.JSON(http.StatusOK, response.Ok(result))
+}
+
 // GetServerInfo 获取服务器信息
 func (m *MonitorController) GetServerInfo(ctx *gin.Context) {
 	var (
