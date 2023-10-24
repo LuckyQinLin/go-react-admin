@@ -41,6 +41,9 @@ const CpuUsageChart = () => {
         getCpuData()
         return () => {
             datas.splice(0, datas.length)
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current)
+            }
         }
     }, []);
 

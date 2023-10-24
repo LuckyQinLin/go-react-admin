@@ -65,7 +65,10 @@ const MemUsageChart = () => {
     useEffect(() => {
         getMemData();
         return () => {
-            datas.splice(0, datas.length)
+            datas.splice(0, datas.length);
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current)
+            }
         }
     }, []);
 
