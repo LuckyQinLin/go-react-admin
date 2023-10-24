@@ -5,6 +5,7 @@ import (
 	"admin-api/core"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/mem"
 	"time"
 )
 
@@ -39,6 +40,27 @@ func (m *MonitorService) GetCpuInfo(interval int64) (*response.CpuUsageResponse,
 	return &response.CpuUsageResponse{
 		Time: &timeValue,
 		Num:  percent[0],
+	}, nil
+}
+
+// GetMemoryInfo 获取内存占用率
+func (m *MonitorService) GetMemoryInfo() (*response.MemUsageResponse, *response.BusinessError) {
+	var (
+		timeValue time.Time
+		err       error
+	)
+	memInfo, err := mem.VirtualMemory()
+	if err != nil {
+		core.Log.Error("获取服务器内存占用情况出错: %s", err.Error())
+		return nil, response.CustomBusinessError(response.Failed, "获取服务器内存占用情况出错")
+	}
+	timeValue = time.Now()
+	return &response.MemUsageResponse{
+		Time:    &timeValue,
+		Total:   memInfo.Total,
+		Used:    memInfo.Used,
+		Free:    memInfo.Free,
+		Percent: float64(memInfo.Used) / float64(memInfo.Total) * 100,
 	}, nil
 }
 

@@ -1,16 +1,14 @@
 import styled from "@emotion/styled";
 import {Card, Col, Descriptions, DescriptionsProps, Row} from "antd";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {useRequest} from "ahooks";
-import {cpuInfo, serverInfo} from "@/api/monitor.ts";
+import {serverInfo} from "@/api/monitor.ts";
 import {formatDuring} from "@/utils/time.ts";
-import {Area, AreaConfig} from "@ant-design/charts";
-import Monitor from "@/types/monitor.ts";
+import CpuUsageChart from "@/pages/monitor/server/CpuUsageChart.tsx";
+import MemUsageChart from "@/pages/monitor/server/MemUsageChart.tsx";
 
 const MonitorServerPage = () => {
 
-
-    const [data, setData] = useState<Monitor.CpuInfoResponse[]>([]);
     const [items, setItems] = useState<DescriptionsProps['items']>([])
 
     const serverRequest = useRequest(serverInfo, {
@@ -51,47 +49,10 @@ const MonitorServerPage = () => {
         }
     })
 
-    const cpuRequest = useRequest(cpuInfo, {
-        manual: true,
-        onSuccess: (result)=> {
-            setData([...data, {time: result.time, num: Number(result.num.toFixed(2))}]);
-        }
-    })
-
-    let intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-
-    const config: AreaConfig = {
-        data,
-        xField: 'time',
-        yField: 'num',
-        yAxis: {
-            range: [0, 100]
-        },
-        onReady: chart => {
-            intervalRef.current = setInterval(async () => {
-                let response = await cpuInfo();
-                const newItem: Monitor.CpuInfoResponse = {time: response.time, num: Number(response.num.toFixed(2))};
-                setData((origin) => {
-                    return [...(origin.length > 10 ? origin.slice(1) : origin), newItem];
-                })
-                console.log("newData", response, data);
-                chart.changeData(data)
-                chart.render();
-            }, 3000)
-        }
-    };
-
 
 
     useEffect(() => {
         serverRequest.run();
-        cpuRequest.run();
-        return () => {
-            if (intervalRef.current !== null) {
-                clearInterval(intervalRef.current);
-            }
-        }
     }, [])
 
     return <Container>
@@ -100,14 +61,10 @@ const MonitorServerPage = () => {
         </Card>
         <Row gutter={5}>
             <Col span={12}>
-                <Card className="server-card server-status" title="CPU">
-                    <Area {...config} />
-                </Card>
+                <CpuUsageChart />
             </Col>
             <Col span={12}>
-                <Card className="server-card server-status" title="内存">
-
-                </Card>
+                <MemUsageChart />
             </Col>
             <Col span={12}>
                 <Card className="server-card server-status" title="磁盘">

@@ -41,6 +41,19 @@ func (m *MonitorController) GetCPUInfo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response.Ok(result))
 }
 
+// GetMemInfo 获取服务器内存信息
+func (m *MonitorController) GetMemInfo(ctx *gin.Context) {
+	var (
+		result    *response.MemUsageResponse
+		customErr *response.BusinessError
+	)
+	if result, customErr = service.Monitor.GetMemoryInfo(); customErr != nil {
+		ctx.JSON(http.StatusOK, response.ResultCustom(customErr))
+		return
+	}
+	ctx.JSON(http.StatusOK, response.Ok(result))
+}
+
 // GetServerInfo 获取服务器信息
 func (m *MonitorController) GetServerInfo(ctx *gin.Context) {
 	var (

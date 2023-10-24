@@ -17,6 +17,22 @@ namespace Monitor {
 		time: string; // 时间
 		num: number; // 数值
 	}
+
+	// MemUsageResponse 内存占用
+	export interface MemUsageResponse {
+		time: string;
+		total: number;
+		used: number;
+		free: number;
+		percent: number;
+	}
+
+	// MemAreaField 内存面积图属性
+	export interface MemAreaField {
+		data: number;
+		time: string;
+		types: string;
+	}
 }
 
 export default Monitor;

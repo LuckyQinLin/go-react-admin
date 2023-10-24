@@ -31,10 +31,30 @@ type (
 		Time *time.Time `json:"time"`
 		Num  float64    `json:"num"`
 	}
+
+	// MemUsageResponse 内存占用
+	MemUsageResponse struct {
+		Time    *time.Time `json:"time"`    // 时间
+		Total   uint64     `json:"total"`   // 总内存
+		Used    uint64     `json:"used"`    // 使用
+		Free    uint64     `json:"free"`    // 空闲
+		Percent float64    `json:"percent"` // 占比
+	}
 )
 
 func (s CpuUsageResponse) MarshalJSON() ([]byte, error) {
 	type temp CpuUsageResponse
+	return json.Marshal(&struct {
+		temp
+		Time utils.DateTime1 `json:"time"`
+	}{
+		temp: (temp)(s),
+		Time: utils.DateTime1(*s.Time),
+	})
+}
+
+func (s MemUsageResponse) MarshalJSON() ([]byte, error) {
+	type temp MemUsageResponse
 	return json.Marshal(&struct {
 		temp
 		Time utils.DateTime1 `json:"time"`

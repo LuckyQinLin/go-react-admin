@@ -113,6 +113,7 @@ func initRouter() {
 		monitor := root.Group("monitor") // 监控模块
 		{
 			monitor.GET("cpuInfo", controller.Monitor.GetCPUInfo)       // 获取服务器CPU占用详情
+			monitor.GET("memInfo", controller.Monitor.GetMemInfo)       // 获取服务器内存占用详情
 			monitor.GET("serverInfo", controller.Monitor.GetServerInfo) // 获取服务器详情
 		}
 	}
