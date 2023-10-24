@@ -64,7 +64,7 @@ const SystemUserPage = () => {
             align: 'center',
             width: 160,
             render: (_, record) => (
-                <Space size={'small'}>
+                record.isSuper ? null : <Space size={'small'}>
                     <Button type="link" size='small' style={{padding: 4}} onClick={() => openDrawer('update', record.userId)}>修改</Button>
                     <Button type="link" size='small' style={{padding: 4}}>重置密码</Button>
                     <Button type="link" size='small' style={{padding: 4}} onClick={() => openDrawer('role', record.userId)}>分配角色</Button>

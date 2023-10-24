@@ -13,6 +13,7 @@ type RolePageResponse struct {
 	RoleName   string    `json:"roleName"`   // 角色名称
 	RoleSort   int       `json:"roleSort"`   // 角色排序
 	Status     int       `json:"status"`     // 角色状态
+	IsSuper    bool      `json:"isSuper"`    // 是否超级角色
 	CreateTime time.Time `json:"createTime"` // 创建时间
 }
 

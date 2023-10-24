@@ -1,31 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mapper namespace="RoleMapper">
-    <select id="selectRoleList">
+    <select id="selectRoleList" param="param">
         select
-            *
-        from sys_role
+            sr.role_id,
+            sr.role_name,
+            sr.role_key,
+            sr.role_sort,
+            sr.status,
+            case
+                when sr.role_id = {{param.SuperId}} then 1
+                else 0
+            end as is_super,
+            sr.create_time
+        from sys_role sr
         where del_flag = 1
-            {% if param.Status != 0 %}
-                and status = {{param.Status}}
-            {% endif %}
-            {% if param.Name != "" %}
+            {%- if param.Status != 0 %}
+                and sr.status = {{param.Status}}
+            {%- endif %}
+            {%- if param.Name != "" %}
                 and (
-                    role_name like concat('%', {{param.Name}}, '%')
+                    sr.role_name like concat('%', {{param.Name}}, '%')
                     or
-                    role_key like concat('%', {{param.Name}}, '%')
+                    sr.role_key like concat('%', {{param.Name}}, '%')
                 )
-            {% endif %}
-            {% if param.StartTime == nil and param.EndTime != nil %}
-                and create_time <![CDATA[<]]> {{param.EndTime}}
-            {% endif %}
-            {% if param.StartTime != nil and param.EndTime == nil %}
-                and create_time <![CDATA[>]]> {{param.StartTime}}
-            {% endif %}
-            {% if param.StartTime != nil and param.EndTime != nil %}
-                and create_time between {{param.StartTime}} and {{param.EndTime}}
-            {% endif %}
+            {%- endif %}
+            {%- if param.StartTime == "" and param.EndTime != "" %}
+                and sr.create_time <![CDATA[<]]> {{param.EndTime}}
+            {%- endif %}
+            {%- if param.StartTime != "" and param.EndTime == "" %}
+                and sr.create_time <![CDATA[>]]> {{param.StartTime}}
+            {%- endif %}
+            {%- if param.StartTime != "" and param.EndTime != "" %}
+                and sr.create_time between {{param.StartTime}} and {{param.EndTime}}
+            {%- endif %}
+        order by sr.create_time desc
     </select>
-    <select id="selectRoleAll">
+    <select id="selectRoleAll" param="param">
         select
             *
         from sys_role

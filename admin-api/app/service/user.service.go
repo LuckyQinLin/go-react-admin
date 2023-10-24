@@ -344,7 +344,7 @@ func (u *UserService) Page(param *request.UserPageRequest) (*response.PageData, 
 		total int64
 		err   error
 	)
-
+	param.SuperId = vo.SUPER_USER_ID
 	if err = core.DB.Model(&entity.User{}).
 		TemplatePageQuery(
 			"user.selectUserPage",

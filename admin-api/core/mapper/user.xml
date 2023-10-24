@@ -11,7 +11,11 @@
             su.phone,
             su.status,
             su.create_time,
-            sd.dept_name
+            sd.dept_name,
+            case
+                when su.user_id = {{param.SuperId}} then 1
+                else 0
+            end as is_super
         from sys_user su
             left join sys_dept sd on sd.dept_id = su.dept_id
         where su.del_flag = 1
