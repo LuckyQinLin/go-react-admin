@@ -22,6 +22,10 @@ func IpAddress(ip string) (res string) {
 		err  error
 	)
 	// 判断是否为内网地址
+	if ip == "::1" {
+		res = "::1"
+		return
+	}
 
 	if ip[:3] == "10." || ip[:4] == "172." || ip[:4] == "192." {
 		res = "内网IP"

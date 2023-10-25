@@ -1,4 +1,6 @@
-namespace Menu {
+import React from "react";
+
+namespace Menus {
     // 资源数据
     export interface MenuItemProp {
         id:        number;        // 菜单主键
@@ -12,6 +14,19 @@ namespace Menu {
         component: string;        // 组件路由
         children?: MenuItemProp[] // 下级菜单
     }
+
+    // MenuTitleProp 菜单对应的标题和路由
+    export interface MenuTitleProp {
+        title: string;
+        path: string;
+    }
+
+    // TabViewProp 路由菜单栏属性
+    export interface TabViewProp {
+        key: string | number;
+        title: string | React.ReactNode;
+        closeIcon?: boolean | React.ReactNode
+    }
 }
 
-export default Menu
+export default Menus

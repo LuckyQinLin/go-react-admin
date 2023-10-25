@@ -6,6 +6,7 @@ import {Button, message, Modal, Space, Switch, Table} from "antd";
 import {ColumnsType} from "antd/es/table";
 import {DeleteOutlined, DownloadOutlined, ExclamationCircleFilled, PlusOutlined} from "@ant-design/icons";
 import {PostCreateDrawer, PostUpdateDrawer} from "@/pages/system/post/components";
+import styled from "@emotion/styled";
 
 const SystemPostPage = () => {
 
@@ -119,7 +120,7 @@ const SystemPostPage = () => {
 
     useEffect(() => run(pageQuery), [])
 
-    return <>
+    return <Container>
         <Space>
             <Button type="primary" icon={<PlusOutlined />} disabled={selectedRowKeys.length > 0} onClick={() => openDrawer('create')}>新增</Button>
             <Button type="primary" icon={<DownloadOutlined />} disabled={selectedRowKeys.length <= 0}>导出</Button>
@@ -154,7 +155,13 @@ const SystemPostPage = () => {
         />
         <PostCreateDrawer visible={postDrawer.createVisible} close={(isLoad) => closeDrawer('create', isLoad)} />
         <PostUpdateDrawer visible={postDrawer.updateVisible} close={(isLoad) => closeDrawer('update', isLoad)} postId={postDrawer.postId} />
-    </>
+    </Container>
 }
+
+const Container = styled.div`
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 5px;
+`
 
 export default SystemPostPage;

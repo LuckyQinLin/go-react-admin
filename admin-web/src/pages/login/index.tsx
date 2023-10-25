@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import Logo from '@/assets/images/account-logo.png';
 import './index.less';
 import {Button, Checkbox, Form, Input, message, Tabs, TabsProps} from "antd";
 import {
@@ -214,7 +213,7 @@ const LoginPage: React.FC = () => {
                 <div className="account-form">
                     <div className="account-top">
                         <div className="account-top-logo">
-                            <img src={Logo} alt="" />
+                            后台管理系统
                         </div>
                         <div className="account-top-desc">一款通用的后台管理系统</div>
                     </div>

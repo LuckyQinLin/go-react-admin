@@ -2,6 +2,7 @@ import React from "react";
 import lazyLoad from "@/router/lazyLoad.tsx";
 import type {MenuProps} from "antd/es/menu";
 import IconFont from "@/components/IconFont";
+import {Menus} from "@/types";
 type MenuItem = Required<MenuProps>['items'][number];
 
 
@@ -20,7 +21,8 @@ function getItem(
 }
 
 
-namespace Router {
+namespace RouterVariate {
+
 
     export enum RouterEnum {
         Layout,
@@ -155,6 +157,34 @@ namespace Router {
         ...PersonItems
     ];
 
+    export const menuTitleItems: Menus.MenuTitleProp[] = [
+        {title: '首页', path: '/home/index'},
+
+        {title: '用户管理', path: '/system/user'},
+        {title: '角色管理', path: '/system/role'},
+        {title: '菜单管理', path: '/system/menu'},
+        {title: '部门管理', path: '/system/dept'},
+        {title: '岗位管理', path: '/system/post'},
+        {title: '字典管理', path: '/system/dict'},
+        {title: '参数管理', path: '/system/param'},
+        {title: '通知公告', path: '/system/inform'},
+
+        {title: '在线用户', path: '/monitor/onlineUser'},
+        {title: '定时任务', path: '/monitor/timeTask'},
+        {title: '服务器监控', path: '/monitor/server'},
+        {title: '缓冲监控', path: '/monitor/cache'},
+        {title: '缓冲列表', path: '/monitor/cacheList'},
+
+        {title: '操作日志', path: '/logger/operate'},
+        {title: '登录日志', path: '/logger/login'},
+
+        {title: '404', path: '/exception/404'},
+        {title: '403', path: '/exception/403'},
+        {title: '500', path: '/exception/500'},
+
+        {title: '个人中心', path: '/person/index'},
+    ]
+
 }
 
-export default Router;
+export default RouterVariate;

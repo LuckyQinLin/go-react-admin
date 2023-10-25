@@ -18,6 +18,7 @@ interface UserTableProp {
     phone:      string; // 手机号
     status:     number; // 状态
     createTime: string; // 创建时间
+    isSuper?: boolean;
 }
 
 // UserCreateDrawerProp 用户创建抽屉属性

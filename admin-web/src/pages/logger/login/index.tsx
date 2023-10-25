@@ -7,6 +7,7 @@ import {Button, DatePicker, Form, Input, Select, Space, Table, Tag} from "antd";
 import {LoginLoggerQueryProp, LoginLoggerTableProp} from "@/pages/logger/modules.ts";
 import locale from 'antd/es/date-picker/locale/zh_CN';
 import 'dayjs/locale/zh-cn';
+import styled from "@emotion/styled";
 
 const LoggerLoginPage = () => {
 
@@ -98,7 +99,7 @@ const LoggerLoginPage = () => {
         run(query)
     }, []);
 
-    return <>
+    return <Container>
         <Space>
             <Form layout={'inline'} style={{ maxWidth: 'none' }}>
                 <Form.Item name="address" label="登录地址">
@@ -149,7 +150,13 @@ const LoggerLoginPage = () => {
                 }
             }}
         />
-    </>
+    </Container>
 }
+
+const Container = styled.div`
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 5px;
+`
 
 export default LoggerLoginPage;

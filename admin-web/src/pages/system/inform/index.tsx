@@ -6,6 +6,7 @@ import {DeleteOutlined, DownloadOutlined, ExclamationCircleFilled, PlusOutlined}
 import {noticeDelete, noticePage} from "@/api/notice.ts";
 import {useRequest} from "ahooks";
 import {NoticeCreateDrawer, NoticeUpdateDrawer} from "@/pages/system/inform/components";
+import styled from "@emotion/styled";
 
 const SystemInformPage = () => {
     const columns: ColumnsType<NoticePageProp> = [
@@ -118,7 +119,7 @@ const SystemInformPage = () => {
 
     useEffect(() => run(pageQuery), [])
 
-    return <>
+    return <Container>
         <Space>
             <Button type="primary" icon={<PlusOutlined />} disabled={selectedRowKeys.length > 0} onClick={() => openDrawer('create')}>新增</Button>
             <Button type="primary" icon={<DownloadOutlined />} disabled={selectedRowKeys.length <= 0}>导出</Button>
@@ -153,7 +154,13 @@ const SystemInformPage = () => {
         />
         <NoticeCreateDrawer visible={noticeDrawer.createVisible} close={(isLoad) => closeDrawer('create', isLoad)} />
         <NoticeUpdateDrawer visible={noticeDrawer.updateVisible} close={(isLoad) => closeDrawer('update', isLoad)} noticeId={noticeDrawer.noticeId} />
-    </>
+    </Container>
 }
+
+const Container = styled.div`
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 5px;
+`
 
 export default SystemInformPage;

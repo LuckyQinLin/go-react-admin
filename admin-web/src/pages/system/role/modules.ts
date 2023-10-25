@@ -20,6 +20,7 @@ interface RolePageProp {
     roleSort: number;
     status: number;
     createTime: string;
+    isSuper?: boolean;
 }
 
 // RoleCreateDrawerProp 角色创建属性
@@ -55,7 +56,9 @@ interface RoleDrawerProp {
     createVisible: boolean;
     userVisible: boolean;
     updateVisible: boolean;
+    dataVisible: boolean;
     roleId?: number;
+    roleItem?: RolePageProp;
 }
 
 // AllocateUserDrawerProp 分配用户

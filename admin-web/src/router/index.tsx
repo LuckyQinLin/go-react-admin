@@ -2,10 +2,10 @@ import {Navigate} from "react-router-dom";
 import Router from "@/router/modules.tsx";
 import getRouter = Router.getRouter;
 import RouterEnum = Router.RouterEnum;
-import {User, Menu} from "@/types";
+import {User, Menus} from "@/types";
 import {getPermissions} from "@/api/menu.ts";
 
-namespace NewRouter {
+namespace RouterSpace {
     const authLoader = async (): Promise<User.UserPermissionProp> => {
         const data = await getPermissions();
         const [paths, buttons] = parseMenus(data)
@@ -20,16 +20,16 @@ namespace NewRouter {
      * 解析资源信息返回路由和按钮
      * @param data
      */
-    const parseMenus = (data: Menu.MenuItemProp[]): [string[], string[]] => {
+    const parseMenus = (data: Menus.MenuItemProp[]): [string[], string[]] => {
         // 获取菜单路由
-        const getMenuPath = (list: Menu.MenuItemProp[]): string[] => {
-            return list.reduce((result: string[], item: Menu.MenuItemProp) => {
+        const getMenuPath = (list: Menus.MenuItemProp[]): string[] => {
+            return list.reduce((result: string[], item: Menus.MenuItemProp) => {
                 return result.concat(Array.isArray(item.children) && item.types !== 'F' ? getMenuPath(item.children) : item.path + '')
             }, [])
         }
         // 获取菜单按钮
-        const getMenuButton = (list: Menu.MenuItemProp[]): string[] => {
-            return list.reduce((result: string[], item: Menu.MenuItemProp) => {
+        const getMenuButton = (list: Menus.MenuItemProp[]): string[] => {
+            return list.reduce((result: string[], item: Menus.MenuItemProp) => {
                 return result.concat(Array.isArray(item.children) && item.types === 'F' ? getMenuPath(item.children) : item.perms)
             }, [])
         }
@@ -155,4 +155,4 @@ namespace NewRouter {
 
 
 
-export default NewRouter;
+export default RouterSpace;

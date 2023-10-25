@@ -8,6 +8,7 @@ import {userDelete, userPage, userStatus} from "@/api/user.ts";
 import {ColumnsType} from "antd/es/table";
 import {UserCreateDrawer, UserRoleDrawer, UserUpdateDrawer} from "@/pages/system/user/components";
 import {ExclamationCircleFilled} from "@ant-design/icons";
+import styled from "@emotion/styled";
 
 const SystemUserPage = () => {
 
@@ -63,7 +64,7 @@ const SystemUserPage = () => {
             align: 'center',
             width: 160,
             render: (_, record) => (
-                <Space size={'small'}>
+                record.isSuper ? null : <Space size={'small'}>
                     <Button type="link" size='small' style={{padding: 4}} onClick={() => openDrawer('update', record.userId)}>修改</Button>
                     <Button type="link" size='small' style={{padding: 4}}>重置密码</Button>
                     <Button type="link" size='small' style={{padding: 4}} onClick={() => openDrawer('role', record.userId)}>分配角色</Button>
@@ -213,76 +214,84 @@ const SystemUserPage = () => {
         loadUser.run(pageQuery);
     }, []);
 
-    return <Row gutter={[16, 16]} style={{display: "flex", flexDirection: "row", flexFlow: "nowrap"}}>
-        <Col flex="250px">
-            <Input
-                allowClear
-                placeholder="输入部门名称搜索"
-                value={searchValue}
-                style={{marginBottom: 10}}
-                onChange={e => setSearchValue(e.target.value)}
-            />
-            {
-                tree.length > 0 && <Tree
-                    defaultExpandAll={true}
-                    defaultExpandParent={true}
-                    treeData={searchValue === "" ? tree : treeData}
-                    onSelect={selectedRowKeys => setPageQuery({...pageQuery, deptId: selectedRowKeys[0] as number})}
-                />
-            }
-        </Col>
-        <Col flex="auto">
-            <Space>
-                <Button type="primary" onClick={() => openDrawer('create')}>增加</Button>
-                <Button type="primary" danger onClick={() => deleteRoleHandler()}>删除</Button>
-                <Button type="primary">导入</Button>
-                <Divider type="vertical" />
-                <Select
-                    onChange={e => setPageQuery({...pageQuery, status: e})}
-                    placeholder="选择用户状态"
-                    defaultValue={-1}
-                    style={{ width: 180 }}
+    return <Container>
+            <Row gutter={[16, 16]} style={{display: "flex", flexDirection: "row", flexFlow: "nowrap"}}>
+                <Col flex="250px">
+                <Input
                     allowClear
-                    options={[
-                        { value: -1, label: '全部' },
-                        { value: 1, label: '正常' },
-                        { value: 0, label: '停用' }
-                    ]}
+                    placeholder="输入部门名称搜索"
+                    value={searchValue}
+                    style={{marginBottom: 10}}
+                    onChange={e => setSearchValue(e.target.value)}
                 />
-                <Input placeholder="输入手机号/邮箱搜索" onChange={e => setPageQuery({...pageQuery, name: e.target.value})} />
-            </Space>
-            <Table
-                bordered
-                size={'small'}
-                columns={columns}
-                loading={loadUser.loading}
-                dataSource={datasource}
-                style={{ marginTop: 10 }}
-                rowKey={(record) => record.userId}
-                pagination={{
-                    onShowSizeChange: (current, size) => loadUser.run({...pageQuery, page: current, size: size}),
-                    onChange: (page, pageSize) => loadUser.run({...pageQuery, page: page, size: pageSize}),
-                    showTotal: () => `共 ${total} 个`,
-                    showQuickJumper: true,
-                    showSizeChanger: true,
-                    pageSize: pageQuery.size,
-                    current: pageQuery.page,
-                    size: 'default',
-                    total: total,
-                }}
-                rowSelection={{
-                    type: 'checkbox',
-                    selectedRowKeys: selectedRowKeys,
-                    onChange: (selectedRowKeys: React.Key[]) => {
-                        setSelectedRowKeys([...selectedRowKeys.map(item => item as number)])
-                    }
-                }}
-            />
-        </Col>
+                {
+                    tree.length > 0 && <Tree
+                        defaultExpandAll={true}
+                        defaultExpandParent={true}
+                        treeData={searchValue === "" ? tree : treeData}
+                        onSelect={selectedRowKeys => setPageQuery({...pageQuery, deptId: selectedRowKeys[0] as number})}
+                    />
+                }
+            </Col>
+                <Col flex="auto">
+                <Space>
+                    <Button type="primary" onClick={() => openDrawer('create')}>增加</Button>
+                    <Button type="primary" danger onClick={() => deleteRoleHandler()}>删除</Button>
+                    <Button type="primary">导入</Button>
+                    <Divider type="vertical" />
+                    <Select
+                        onChange={e => setPageQuery({...pageQuery, status: e})}
+                        placeholder="选择用户状态"
+                        defaultValue={-1}
+                        style={{ width: 180 }}
+                        allowClear
+                        options={[
+                            { value: -1, label: '全部' },
+                            { value: 1, label: '正常' },
+                            { value: 0, label: '停用' }
+                        ]}
+                    />
+                    <Input placeholder="输入手机号/邮箱搜索" onChange={e => setPageQuery({...pageQuery, name: e.target.value})} />
+                </Space>
+                <Table
+                    bordered
+                    size={'small'}
+                    columns={columns}
+                    loading={loadUser.loading}
+                    dataSource={datasource}
+                    style={{ marginTop: 10 }}
+                    rowKey={(record) => record.userId}
+                    pagination={{
+                        onShowSizeChange: (current, size) => loadUser.run({...pageQuery, page: current, size: size}),
+                        onChange: (page, pageSize) => loadUser.run({...pageQuery, page: page, size: pageSize}),
+                        showTotal: () => `共 ${total} 个`,
+                        showQuickJumper: true,
+                        showSizeChanger: true,
+                        pageSize: pageQuery.size,
+                        current: pageQuery.page,
+                        size: 'default',
+                        total: total,
+                    }}
+                    rowSelection={{
+                        type: 'checkbox',
+                        selectedRowKeys: selectedRowKeys,
+                        onChange: (selectedRowKeys: React.Key[]) => {
+                            setSelectedRowKeys([...selectedRowKeys.map(item => item as number)])
+                        }
+                    }}
+                />
+            </Col>
+        </Row>
         <UserCreateDrawer visible={userDrawer.createVisible} close={(isLoad) => closeDrawer('create', isLoad)} />
         <UserUpdateDrawer visible={userDrawer.updateVisible} close={(isLoad) => closeDrawer('update', isLoad)} userId={userDrawer.userId} />
         <UserRoleDrawer visible={userDrawer.roleVisible} close={() => closeDrawer('role', false)} userId={userDrawer.userId} />
-    </Row>
+    </Container>
 }
+
+const Container = styled.div`
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 5px;
+`
 
 export default SystemUserPage;

@@ -6,6 +6,7 @@ import {DeleteOutlined, DownloadOutlined, ExclamationCircleFilled, PlusOutlined}
 import {DictDrawerProp, DictPageProp, DictPageQueryProp} from "@/pages/system/dict/modules.ts";
 import {dictDelete, dictPage} from "@/api/dict.ts";
 import {DictCreateDrawer, DictUpdateDrawer} from "@/pages/system/dict/components";
+import styled from "@emotion/styled";
 
 const SystemDictPage = () => {
 
@@ -118,7 +119,7 @@ const SystemDictPage = () => {
 
     useEffect(() => run(pageQuery), [])
 
-    return <>
+    return <Container>
         <Space>
             <Button type="primary" icon={<PlusOutlined />} disabled={selectedRowKeys.length > 0} onClick={() => openDrawer('create')}>新增</Button>
             <Button type="primary" icon={<DownloadOutlined />} disabled={selectedRowKeys.length <= 0}>导出</Button>
@@ -153,7 +154,13 @@ const SystemDictPage = () => {
         />
         <DictCreateDrawer visible={postDrawer.createVisible} close={(isLoad) => closeDrawer('create', isLoad)} />
         <DictUpdateDrawer visible={postDrawer.updateVisible} close={(isLoad) => closeDrawer('update', isLoad)} dictId={postDrawer.dictId} />
-    </>
+    </Container>
 }
+
+const Container = styled.div`
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 5px;
+`
 
 export default SystemDictPage;

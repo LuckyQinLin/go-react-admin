@@ -6,6 +6,7 @@ import {useRequest} from "ahooks";
 import {deptDelete, deptTable} from "@/api/dept.ts";
 import {ExclamationCircleFilled} from "@ant-design/icons";
 import {DeptCreateDrawer, DeptUpdateDrawer} from "@/pages/system/dept/components";
+import styled from "@emotion/styled";
 
 const SystemDeptPage = () => {
 
@@ -119,7 +120,7 @@ const SystemDeptPage = () => {
         run(tableQuery)
     }, [])
 
-    return <>
+    return <Container>
         <Space>
             <Button type='primary' onClick={() => setDrawerProp({...drawerProp, createVisible: true, parentId: 0})}>创建</Button>
             <Button type='primary' onClick={() => run(tableQuery)}>刷新</Button>
@@ -144,7 +145,13 @@ const SystemDeptPage = () => {
             deptId={drawerProp.currId!}
             visible={drawerProp.updateVisible}
             close={closeDrawer} />
-    </>
+    </Container>
 }
+
+const Container = styled.div`
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 5px;
+`
 
 export default SystemDeptPage;

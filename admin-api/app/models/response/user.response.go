@@ -100,6 +100,7 @@ type UserPageResponse struct {
 	Phone      string     `json:"phone"`      // 手机号
 	Status     int        `json:"status"`     // 状态
 	CreateTime *time.Time `json:"createTime"` // 创建时间
+	IsSuper    bool       `json:"isSuper"`    // 是否为超级用户
 }
 
 func (s UserPageResponse) MarshalJSON() ([]byte, error) {
